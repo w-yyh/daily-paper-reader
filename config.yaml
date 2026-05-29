@@ -25,3 +25,54 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: CGCD
+      description: 开放世界新类发现与CGCD方向论文检索
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: novel class discovery
+          keyword_cn: 新类发现
+          query: methods for discovering novel classes in open world settings
+        - keyword: open world learning
+          keyword_cn: 开放世界学习
+          query: learning algorithms that handle open world scenarios with unknown classes
+        - keyword: category grouped class discovery
+          keyword_cn: 类别分组的新类发现
+          query: category-grouped class discovery approach for clustering novel categories
+        - keyword: generalized category discovery
+          keyword_cn: 广义类别发现
+          query: generalized category discovery for unlabeled data with unknown classes
+      intent_queries:
+        - query: Category Grouped Class Discovery for open world novel class discovery
+          query_cn: 面向开放世界新类发现的类别分组类发现方法
+          enabled: true
+          source: manual
+          note: ''
+        - query: novel category discovery in open world setting using contrastive clustering
+          query_cn: 在开放世界设置中使用对比聚类的新类别发现
+          enabled: true
+          source: manual
+          note: ''
+        - query: open world learning with group based class discovery and self supervision
+          query_cn: 基于分组类发现和自监督的开放世界学习
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-05-29T07:22:27.457Z'
+source_backends:
+  arxiv:
+    papers_table: arxiv_papers
+    use_vector_rpc: true
+    vector_rpc: match_arxiv_papers
+    vector_rpc_exact: match_arxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_arxiv_papers_bm25
+    sync_table: arxiv_sync_status
+    sync_success_value: success
+    schema: public
+    kind: supabase
+    enabled: true
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
