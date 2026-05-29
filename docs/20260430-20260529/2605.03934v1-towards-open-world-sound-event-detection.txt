@@ -1,0 +1,525 @@
+Title: Towards Open World Sound Event Detection
+
+URL Source: https://arxiv.org/pdf/2605.03934v1
+
+Published Time: Wed, 06 May 2026 01:13:57 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+# Towards Open World Sound Event Detection 
+
+Pham Hoang Hai a,1 , Le Trong Minh b,1, ∗, Le Hoang Son b, ∗
+
+> aVNU University of Engineering and Technology, Hanoi, 100000, Vietnam
+> bArtificial Intelligence Research Center, VNU Information Technology Institute, Hanoi, 100000, Vietnam
+
+Abstract 
+
+Sound Event Detection (SED) plays a vital role in audio understanding, with applications in surveillance, smart cities, healthcare, and multimedia index-ing. However, conventional SED systems operate under a closed-world as-sumption, limiting their effectiveness in real-world environments where novel acoustic events frequently emerge. Inspired by the success of open-world learning in computer vision, we introduce the Open-World Sound Event De-tection (OW-SED) paradigm, where models must detect known events, iden-tify unseen ones, and incrementally learn from them. To tackle the unique challenges of OW-SED, such as overlapping and ambiguous events, we pro-pose a 1D Deformable architecture that leverages deformable attention to adaptively focus on salient temporal regions. Furthermore, we design a novel Open-World DefOrmable SOund Event Detection Transformer (WOOT) framework incorporating feature disentanglement, separating class-specific and class-agnostic representations, and a one-to-many matching strategy with a diversity loss to enhance representation diversity. Experimental re-sults demonstrate that our method achieves marginally superior performance compared to existing leading techniques in closed-world settings and signifi-cantly improves over existing baselines in open-world scenarios. 
+
+Keywords: 
+
+Audio Processing, Sound event detection, Open-world learning, Incremental learning, Deep learning      
+
+> ∗Corresponding author
+> Email addresses: 21020015@vnu.edu.vn (Pham Hoang Hai), 21020355@vnu.edu.vn
+> (Le Trong Minh), sonlh@vnu.edu.vn (Le Hoang Son)
+> 1These authors contributed equally to this work.
+> arXiv:2605.03934v1 [cs.SD] 5 May 2026
+
+1. Introduction 
+
+Sound Event Detection (SED) is a core task in audio understanding, with applications spanning surveillance [1], smart cities [2], medical monitor-ing [3], and multimedia indexing [4]. Traditional SED systems are typically developed under a closed-world assumption: all sound event classes that may appear during inference are known in advance and included in the training set. While this setup has driven progress in benchmark-driven [5, 6, 7, 8, 9], it falls short in real-world scenarios, where systems are often deployed in dy-namic and unpredictable environments and must handle previously unseen events. To address similar challenges in the visual domain, the Open-World Ob-ject Detection (OWOD) paradigm was introduced [10, 11, 12, 13]. OWOD systems aim to detect known categories while identifying previously unseen objects, flagging them for annotation, and incrementally learning new cat-egories without catastrophic forgetting. This open-world formulation has significantly advanced the robustness and adaptability of object detectors in real-world environments. Inspired by this paradigm, we propose the first formulation of open-world learning for Sound Event Detection, termed Open-World Sound Event Detec-tion (OW-SED). As illustrated in Figure 1, OW-SED extends conventional Sound Event Detection by requiring a model not only to identify sound events from a set of known training classes (e.g., street music, dog bark, children playing) but also to recognize the presence of unknown acoustic events during inference. These unknown events can then be labeled by a human oracle and incrementally integrated into the model, thereby enabling continual learning of new sound classes (e.g., siren, drilling, car horn). Compared to vision, sound events are typically temporally overlapping, ambiguous, and context-dependent, posing unique challenges for open-world modeling. Our work introduces OW-SED as a new and necessary direction for robust, adaptive, and realistic audio understanding systems. In this paper, we first propose 1D Deformable architecture for sound event detection. In SED, consecutive time segments often exhibit high similarity due to slow-varying background sounds and redundant acoustic patterns. Moreover, sound events frequently lack clearly defined temporal boundaries and may overlap with one another, making precise temporal localization espe-cially challenging. These characteristics demand that SED models be highly sensitive to subtle, local variations in the temporal domain. However, stan-2Input 
+
+Sound Event Detection System 
+
+Output   
+
+> dog bark
+> street music
+> children playing
+> unknown
+> Time
+> Each event is assigned to a known class or labeled as unknown
+> + onset and offset timestamp
+> Closed World
+> Open World
+> drilling car horn siren
+> Incremental Learning
+> Training labels: street music, dog bark, children playing
+> Unknwon
+
+Figure 1: Introduction to the Open-World Sound Event Detection (OW-SED) task 
+
+dard Transformer architectures, used in previous work [6], treat all positions in the sequence equally, making them less sensitive to subtle local changes. To address this challenge, we adopt deformable attention [14], which focuses on a limited number of relevant positions surrounding a reference point within the input sequence. Both the sampling offsets and corresponding attention weights are learned and dynamically tuned based on the input, allowing the model to adaptively focus on informative regions while preserving locality awareness. In addition, we introduce a novel framework named Open-World De-fOrmable SOund Event Detection Transformer (WOOT) , which builds upon our proposed 1D Deformable architecture and prior work on open-world object detection [11]. Our framework incorporates two additional key im-3provements to better address the challenges of the Open-World Sound Event Detection domain. First, we propose to disentangle the feature representation of each detected event into a class-specific component and a class-agnostic component. This separation encourages the model to better generalize to unseen classes by isolating information that is invariant across sound event categories. Second, we introduce a two-stage training process. In a stan-dard detection training pipeline, each ground-truth event is matched to only one query via Hungarian matching. This one-to-one constraint ignores other queries that are not matched, even if they make reasonable predictions (e.g., queries that predict the correct class and whose predicted segments are fully contained within the corresponding ground-truth interval). To overcome this limitation, we adopt a one-to-many matching strategy in the first stage, al-lowing multiple queries to be matched to the same ground-truth event. How-ever, this approach can lead to redundant optimization, where many queries are trained to represent the same ground-truth event. As a result, the model’s capacity to capture diverse patterns, particularly those useful for unknown class detection, becomes limited. To mitigate this, we introduce a diversity loss in the second stage of training, which explicitly encourages the features of different queries to be dissimilar. This promotes a more diverse set of learned representations, boosting the model’s effectiveness in detecting and representing novel sound events. Experiments on the URBAN-SED [15] and DESED [16] dataset show that our 1D Deformable model performs competitively with strong existing meth-ods in the closed-world setting, while our open-world framework achieves superior performance in the open-world setting compared to prior baselines. 
+
+In summary, the core contributions of our paper are listed be-low :
+
+• We introduce the first formulation of Open-World Sound Event De-tection (OW-SED), extending the open-world learning paradigm from computer vision to audio understanding, where models must detect known sound events while identifying and learning from previously un-seen acoustic events. 
+
+• We present a novel 1D Deformable architecture designed for sound event detection that uses deformable attention to adaptively focus on informative temporal regions, addressing the challenges of temporally overlapping, ambiguous, and context-dependent sound events. 4• We develop a novel Open-World Deformable Sound Event Detection Transformer ( WOOT ) framework that incorporates two key improve-ments: feature disentanglement that separates event representations into class-specific and class-agnostic components for better generaliza-tion to unseen classes, and a training process combining one-to-many matching with diversity loss to promote diverse learned representations while avoiding redundant optimization. 
+
+• We demonstrate through experiments on the URBAN-SED [15] and DESED [16] datasets that our approach outperforms existing tech-niques, achieving state-of-the-art results. 
+
+2. Related Works 
+
+2.1. Sound Event Detections 
+
+In recent years, there has been growing attention on Sound Event Detec-tion, which focuses on identifying sound event categories and localizing their temporal onsets and offsets within an audio signal. This surge in interest is largely driven by its wide range of applications and the advancements in deep learning technologies. Early research in SED primarily focused on leveraging traditional machine learning models with hand-crafted features. Approaches utilizing Gaussian Mixture Models and Hidden Markov Models, often ap-plied to Mel-frequency cepstral coefficients or other low-level descriptors, were the standard practice for modeling acoustic events [17, 18]. However, these approaches relied on simplistic statistical models with limited capacity to model hierarchical or non-linear patterns in acoustic signals, making them inadequate for capturing the spectral and temporal complexities of real-world soundscapes involving overlapping or context-dependent events. The advent of deep learning introduced a fundamental shift in method-ology. Convolutional Neural Networks (CNNs) were first employed to learn structured patterns in the time–frequency domain from log-mel spectrograms and other time–frequency representations [19]. This was soon followed by the incorporating of Recurrent Neural Networks (RNNs), particularly Long Short-Term Memory (LSTM) units, leading to the widely adopted Convolu-tional Recurrent Neural Network (CRNN) architecture [9]. CRNNs became the dominant model for SED tasks in the DCASE challenge series, con-sistently outperforming previous approaches. Building upon this, Nam et al. [20] introduce the Frequency Dynamic Convolutional Recurrent Neural 5Network (FDY-CRNN), a novel convolution module to improve the model’s capability in capturing diverse frequency patterns, resulting in improved per-formance on domestic environment sound event detection (DESED) dataset. More recent work has explored attention-based and transformer-based architectures, which enable models to focus on relevant parts of the input sequence and handle long-range dependencies without recurrence. For in-stance, the Audio Spectrogram Transformer for SED (AST-SED) [21] com-bines a frequency-wise transformer encoder with a temporal Bi-GRU decoder to restore temporal resolution. In parallel, Conformer-based architectures [22], which combine convolutional modules with self-attention, have shown great promise for polyphonic SED. In particular, Barahona et al. [23] pro-posed a Conformer-based system enhanced with Frequency Dynamic Con-volutions and BEATs audio embeddings, which significantly improved Poly-phonic Sound Detection Score (PSDS). Besides, the Sound Event Detection Transformer (SEDT) [6] has emerged as a novel paradigm that reconceptual-izes SED as a set prediction problem, drawing inspiration from the Detection Transformer (DETR) [24] framework originally developed for computer vi-sion. This end-to-end architecture introduces a one-dimensional variant of DETR specifically adapted for temporal sequences, featuring a one-to-many bipartite matching strategy and an audio query branch to better capture category-specific information and improve classification performance. More recently, Yin et al. [25] introduced a multi-granularity acoustic information fusion approach that leverages an interactive dual-conformer module to cap-ture complementary fine- and coarse-scale temporal features, further advanc-ing detection performance in complex acoustic scenes. Despite these advancements, existing SED systems predominantly oper-ate under the closed world assumption, where the set of target sound classes is fixed and known during training. This constraint limits the generalization capability of current models when deployed in dynamic and evolving acoustic scenes. 
+
+2.2. Open-set and Open-Vocabulary Sound Event Detection 
+
+Some recent works have explored open-set classification and open-vocabulary settings that relax the closed-world label assumption in SED, but they do so in different ways. You et al.[26] study about open-set sound event clas-sification primarily focuses on unknown rejection, where the model decides whether an input belongs to one of the known classes or should be rejected 6as unknown, without considering temporal boundary localization. In con-trast, open-vocabulary SED methods aim to detect and label events beyond the training ontology through audio–text models, in which the detector is conditioned on free-form textual or audio queries and localizes events that match the query semantics, as in Detect Any Sound [27] and FlexSED [28]. 
+
+OW-SED differs from both settings in what is assumed at deployment and what is required over time. It operates in a prompt-free manner and must detect and localize previously unseen sound events as unknown during infer-ence, while also enabling these unknowns to be incorporated as new known classes in later learning phases. Additionally, several recent works have investigated class-incremental learn-ing for SED. Representative examples include UCIL [29] and the framework of Pandey et al. [30]. These methods assume that, at each learning phase, audio segments from newly introduced sound classes are already labeled and assigned to known class identities, and the main objective is to update the de-tector while mitigating catastrophic forgetting. However, Open-World SED is broader than this setting. It addresses not only how to learn from newly provided classes, but also how such classes emerge in the first place. At de-ployment, novel sound events are neither labeled nor specified in advance and must first be detected and localized as unknown before they can be incor-porated into later learning stages. This formulation follows the Open World Learning (OWL) perspective, a well-established task setting (discussed in more detail in 2.3), which couples known-class recognition, unknown identifi-cation, and progressive learning of novel classes over time. In this way, Open-World SED naturally combines Open-set detection with class-incremental SED, resulting in a more general and realistic learning paradigm for sound event detection. 
+
+2.3. Open World Learning 
+
+Open World Learning is a learning paradigm designed to address the limitations of conventional closed-world systems by enabling models to rec-ognize known classes while simultaneously identifying, rejecting, and eventu-ally learning novel, previously unseen categories during deployment. One of the most actively studied domains in OWL is Open World Object Detection (OWOD). Joseph et al. [10] formalized the OWOD problem and introduced the Open World Object Detector (ORE), which combines an energy-based unknown object classifier with contrastive clustering to discover and integrate 7novel categories over time. Subsequent studies have focused on transformer-based architectures. OW-DETR (Open-world Detection Transformer) [13], introduced by Gupta et al., is a transformer-based framework that addresses OWOD challenges through attention-driven pseudo-label generation, a clas-sifier for distinguishing novel categories, and an objectness evaluation mod-ule. This method utilizes a pseudo-labeling scheme where object queries with strong attention scores that do not align with any known class annotations are selected as pseudo-unknowns. Similarly, Open World DETR [31] builds on Deformable DETR with a two-stage training method, incorporating a class-agnostic binary classification head and a multi-view self-labeling mechanism that generates pseudo ground truths for unknown classes by combining a pre-trained binary classifier with selective search. In contrast, PROB [11] in-troduces a novel probabilistic framework for objectness estimation that does not use pseudo-labeling. It separates objectness prediction from classification using a density-based objectness head, enabling the detection of unknown ob-jects without relying on negative examples or explicit background-unknown separation. Another distinct approach, OW-RCNN [32] adapts the Faster R-CNN architecture to the open-world setting, introducing a class-agnostic Region Proposal Network (RPN) and a discriminative unknown-aware clas-sifier, and supports continual learning through a decoupled representation and classification head. In addition to OWOD, the principles of Open World Learning have been explored across various domains. In image classification, Bendale [33] in-troduced the OpenMax framework, which estimates whether a test sample belongs to an unknown category by modeling activations in the penultimate layer using class-wise Weibull distributions, enabling open set recognition without retraining. Shu et al. [34] proposed DOC (Deep Open Classifi-cation), which utilizes one-vs-rest sigmoid output layers with a confidence threshold to separate known and unknown classes, allowing neural networks to reject unseen inputs during inference. In medical imaging, Zamzmi et al. [35] proposed an open-world active learning framework for echocardiography view classification that labels known views, clusters unknown ones for expert review, and incrementally updates the model to handle new imaging views. While open-world learning has been mostly studied in vision, related work in audio has also started to surface in the form of anomalous sound detection. For example, Zheng et al. [36] propose STWWgram-ODCBAM, which fuses multimodal features and attention mechanisms to detect abnormal acoustic events in industrial settings. 8Collectively, these works demonstrate the broad applicability and im-portance of OWL across domains where static closed-world assumptions are insufficient for real-world deployment. In this research, we take the first step toward exploring Open World Learning for the task of Sound Event Detection. We formally define the OW-SED problem, propose a baseline framework inspired by open-world object detection principles, and establish a benchmark for evaluation. This work marks the first attempt to extend OWL into the audio domain, paving the way for developing adaptive and ro-bust SED systems capable of handling novel sound events in dynamic acoustic environments. 
+
+3. Problem Formulation 
+
+At time t, the known set of sound event classes is defined as Kt =
+
+{1, 2, . . . , C } where C denotes the current total of identified and learned cate-gories. Let Dt = {At, Y t} be the dataset at time t, where At = {a1, . . . , a N } is a collection of N audio clips and Yt = {y1, . . . , y N } denotes the corresponding event annotations. Each label yi = {v1, . . . , v K } is a set of K sound events in clip ai, where each event vk = [ lk, s k, e k] consists of the class label lk ∈ K t
+
+and its onset sk and offset ek timestamps. Let U = {C + 1 , C + 2 , . . . } represent the set of unknown classes that might occur during inference but are not included in the current training data. In the OW-SED setting, the model ft is trained at each time step 
+
+t to identify sound events belonging to the known classes Kt, while also identifying novel acoustic events by assigning them a special unknown class label (denoted as class 0). These unknown predictions are then reviewed by a human oracle, who labels a subset Ut ⊂ U with n new class identities and supplies a corresponding set of labeled training instances. After this update, the set of known classes becomes Kt+1 = Kt ∪ { C +1, . . . , C + n}. To simulate realistic constraints such as limited memory, privacy, and computational cost, only a small portion of past data can be retained. As a result, the model must be incrementally updated from ft
+
+to ft+1 without retraining from scratch. The updated model ft+1 should be able to detect all classes in Kt+1 while maintaining performance on previously learned classes, thus avoiding catastrophic forgetting. This process continues over time as new unknown events are discovered, labeled, and incrementally learned. The goal of OW-SED is to support this 9continual cycle of open-world learning while maintaining robust detection and generalization across both seen and unseen acoustic events. 
+
+4. Methods 
+
+4.1. 1D Deformable DETR 
+
+We propose 1D Deformable DETR, a novel end-to-end architecture that extends Deformable DETR to the audio domain for temporal event detec-tion. While the original Deformable DETR is designed for 2D spatial ob-ject detection using multi-scale deformable attention, our model adapts the transformer to a temporal 1D setting, using a simplified one-level Tempo-ral Deformable Attention module. This transformation is essential for audio sequences, which inherently lie on a 1D temporal axis, unlike 2D spatial in-puts in vision. An overview of the proposed WOOT model architecture is illustrated in Figure 2. 
+
+4.1.1. Backbone 
+
+In our framework, ResNet-50 [37] is employed as the feature extraction backbone, motivated by its proven effectiveness in audio classification tasks and its strong capability to capture discriminative time-frequency represen-tations [4, 38]. Given an input audio segment, its Mel-spectrogram repre-sentation is first computed as X ∈ R1×T0×F0 , where T0 and F0 denote the initial temporal and frequency resolutions, respectively. Passing X through the backbone produces a high-level feature tensor f ∈ RC× T ×F , with C rep-resenting the number of output channels and (T, F ) corresponding to the transformed temporal and frequency dimensions. To match the channel di-mension with the transformer attention embedding size d, a 1 × 1 convolu-tion is applied, resulting in z0 ∈ Rd×T ×F . In the conventional Deformable DETR, designed for image inputs, the CNN feature map has the shape 
+
+(B, d, H, W ), where B is the batch size, d is the embedding dimension, and 
+
+(H, W ) represents the spatial dimensions. For audio-based adaptation, this representation is transformed into a one-dimensional temporal sequence by reshaping the CNN features into (B, T, d × F ). This yields the sequence 
+
+XS ∈ RT ×D, where D = d × F , which serves as the input to the subse-quent transformer encoder. 10 CNN    
+
+> 1D-DSA
+> Add & Norm
+> FFN
+> Add & Norm
+> Self-Attention
+> Add & Norm
+> 1D-DCA
+> Add & Norm
+> FFN
+> Add & Norm
+> 1D Positional Encoding
+> Encoder
+> Decoder
+> Feature Disentangle
+> Backbone
+> DSA: Deformable Self-Attention
+> DCA: Deformable Cross-Attention
+> FFN: Feed-Forward Network
+> event query class-agnosis feature class-specific feature
+
+Figure 2: Illustration of the WOOT model architecture . The proposed WOOT is built upon a 1D Deformable Transformer backbone specifically tailored for sound event de-tection. It introduces a transformer encoder with 1D Deformable Self-Attention (1D-DSA) to enable efficient temporal modeling, a decoder with 1D Deformable Cross-Attention 
+
+(1D-DCA) to progressively refine event representations, and a specialized prediction head comprising a regression branch ( fbbox ) for estimating event timestamps, a classification branch ( fcls ) for computing class probabilities, and an eventness branch ( fevent ) for eval-uating eventness scores. On top of this backbone, WOOT further introduces two key components to address the challenges of open-world sound event detection: (i) Disentan-gled feature representation : each detected event is decomposed into a class-specific and a class-agnostic component, enhancing generalization to unseen sound classes. (ii) Two-stage training strategy : the first stage adopts a one-to-many matching scheme that allows multiple queries to learn from the same ground-truth event, improving coverage of am-biguous temporal regions. The second stage introduces a diversity loss ( Ldis ) that enforces dissimilarity among query features, thereby reducing redundancy and promoting diverse representations critical for unknown event detection. 
+
+4.1.2. Positional encoding 
+
+Since localization in the proposed setting is defined along a single axis, a one-dimensional sinusoidal positional encoding is employed and replicated across the frequency dimension. For a given time index t and frequency bin 
+
+f , the positional encoding is defined as 11 Pt,f, 2i = sin  t/ 10000 2i/d  , (1) 
+
+Pt,f, 2i+1 = cos  t/ 10000 2i/d  , (2) where i ∈ { 0, 1, ..., [d/ 2] − 1} indexes the sinusoidal pairs along the channel dimension and d represents the transformer embedding size. Notably, the encoding depends solely on the temporal index t, and the same temporal code is broadcast uniformly across all frequency bins f . The resulting positional encoding tensor has the shape P ∈ Rd×T ×F , which is subsequently reshaped to P ∈ RT ×D, where D = d × F , so as to match the dimensionality of XS
+
+before being added to the input feature sequence. 
+
+4.1.3. Encoder 
+
+Let X0 
+
+> E
+
+= XS + P ∈ RT ×D denote the feature sequence enhanced with position information. The encoder comprises LE identical layers indexed by 
+
+ℓ ∈ { 1, ..., L E }. Each layer contains: (i) a 1D Deformable Self-Attention (1D-DSA) sub-layer and (ii) a position-wise feed-forward network (FFN). We use residual connections and LayerNorm (LN) after each sub-layer. 
+
+˜X = LN  X(ℓ−1)  
+
+> E
+
++ 1D-DSA (X(ℓ−1)  
+
+> E
+
+) (3) 
+
+X(ℓ) 
+
+> E
+
+= LN   ˜X + FFN( ˜X) (4) 1D Deformable Self Attention replaces dense attention with sparse sam-pling around a reference time, improving locality sensitivity and reducing computation compared to full attention. 1D-DSA attends only to a small set of key temporal positions around a reference point for each query, enabling the model to concentrate on the most relevant context. This is particularly suitable for audio, where important cues (e.g., transient onsets or short acous-tic events) are localized and may be masked by long stretches of irrelevant background if treated with uniform attention. This 1D formulation reduces complexity, improves convergence, and makes the attention mechanism more interpretable in the audio domain. For the reference coordinate rq, a center-based normalization is used: 
+
+rq = ( tq + 0 .5) /T (5) where tq is the discrete temporal index of the query position q in the input sequence and T is the sequence length. The +0 .5 term shifts from the left 12 edge of the time bin to its center, ensuring symmetric sampling in both directions and avoiding boundary bias. The normalized sampling location for head m, query q, point j is: 
+
+pmqj = rq + ∆tmqj 
+
+T (6) with ∆tmqj are learnable offsets relative to tq.Let zq ∈ RD be the query feature and rq be its normalized temporal reference coordinate. For a feature sequence X ∈ RT ×D, the output of the 
+
+m-th attention head is computed as: 
+
+hm =
+
+> J
+
+X
+
+> j=1
+
+amqj W Vm X (pmqj · T ) (7) with W Vm ∈ RD×(D/M ) is learnable weights, J is the number of sampled points, 
+
+amqj are normalized attention weights. The feature X(·) is interpolated when the sampling location is fractional. The attention weights and offsets are predicted from zq via linear layers, with the weights normalized by softmax 
+
+so that PKj=1 amqj = 1 . The final head output is obtained by concatenating 
+
+hm from all M heads and projecting with a learnable matrix W O ∈ RD×D.1D-DSA (zq, r q, X ) = W OConcat (h1, h 2, ..., h m), (8) By learning to focus on a sparse set of informative temporal positions, 1D-DSA achieves both computational efficiency and better event localization, resulting in strong performance for detecting audio events. 
+
+4.1.4. Decoder 
+
+The decoder receives the encoder features XE together with Nq learned query embeddings as input. These Nq query embeddings are learnable event slots, each representing a potential sound event instance. In the first de-coding layer, they are not tied to any specific time or class, but serve as trainable probes that attend to the encoder features and progressively spe-cialize through deformable cross-attention. The decoder is composed of LD
+
+identical blocks, each comprising a Multi-Head Self-Attention (MHSA) layer, a 1D Deformable Cross-Attention (1D-DCA) layer, and a feed-forward net-work. Its primary role is to generate refined event representations. As in the encoder, residual connections are applied after each sub-layer, followed by 13 layer normalization. The principal distinction from the encoder lies in the incorporation of the 1D-DCA module. Unlike the 1D-DSA, which captures dependencies within the same input sequence, the 1D-DCA mechanism at-tends to the encoder features XE using the query embeddings. This layer operates on three inputs: the query embeddings from the preceding decoder layer, the coordinates of reference points within the encoder feature sequence, and the encoder features XE themselves. Through this design, each query is guided by its learnable reference points to focus selectively on a sparse set of temporal positions in the encoder output. As decoding progresses, these queries iteratively refine their attention, enabling the formation of precise and discriminative event representations for the final prediction stage. 
+
+4.1.5. Prediction Heads 
+
+The prediction stage converts the event representations produced by the decoder into temporal boundaries and class labels using feed-forward net-works specialized for each output type. For temporal localization, each pre-dicted event is represented by two normalized values: the temporal center and the duration. A multi-layer perceptron (MLP) is employed to obtain the timestamp. For event classification, two outputs are produced. First, a linear projection followed by a softmax activation estimates the categorical distribution over all classes. Second, the eventness head, which is modeled using a multivariate Gaussian distribution (as described in Section 4.2.1), estimates the probability that a given query corresponds to a genuine event rather than background noise. The final classification score for each query is computed as the product of these two outputs. 
+
+4.2. WOOT Framework 4.2.1. Base Architecture 
+
+Our proposed framework is built upon PROB[11] as it achieves the best performance compared to other baselines. The core idea is to decouple the prediction into two parts: a classification head f t
+
+> cls
+
+(q) that predicts the class assuming an event is present, and an eventness head f t
+
+> event
+
+(q) that predicts the probability of the query containing an event. The final prediction is their product: 
+
+p(l|q) = f t
+
+> cls
+
+(q) · f t
+
+> event
+
+(q). (9) To achieve this, the distribution of all queries is modeled with a single, class-agnostic multivariate Gaussian distribution, N (μ, Σ) . The eventness 14 score for a query q is then calculated from its Mahalanobis distance dM (q)
+
+to the center of this distribution: 
+
+f t
+
+> event
+
+(q) = exp  −(q − μ)⊤Σ−1(q − μ) = exp  −dM (q)2 . (10) The model is trained by estimating the Gaussian parameters ( μ, Σ) from queries in each batch. The eventness loss penalizes the distance of queries matched to ground-truth objects, encouraging them to be near the center of the learned object distribution. The eventness loss is defined as: 
+
+Le = X
+
+> i∈Z
+
+dM (qi)2. (11) where Z is the set of indices for matched queries. The PROB loss function is a weighted sum of three components: the classification loss Lcls , the temporal localization loss Lloc , and the eventness loss Le:
+
+Lprob = Lcls + Lloc + λeLe. (12) where λe is a hyperparameter balancing the eventness contribution. The clas-sification loss Lcls is computed as the standard cross-entropy loss between the ground-truth labels and the predictions. Meanwhile, the temporal localiza-tion loss Lloc is defined as a weighted combination of an L1 regression loss and an IoU-based loss: 
+
+Lloc = λL1LL1 + λIOU LIOU . (13) Finally, to mitigate forgetting when learning new tasks, a replay buffer is employed to retain knowledge of previously seen events. A balanced exemplar set is maintained, and the model undergoes fine-tuning on this set following each incremental training phase. At all times, at least Nex instances per class are preserved in the buffer to maintain performance on earlier tasks. 
+
+4.2.2. Feature Disentangle 
+
+A key challenge in open-world sound event detection is that features use-ful for identifying whether a region contains any event are often entangled with class-specific cues required for classification. This coupling causes two main issues. First, it limits the model’s ability to generalize to unknown events, since the representation is overly tied to known class identities. Sec-ond, it harms incremental learning, since updating class-specific features can overwrite those used for detecting past or unseen events. 15 To address this, we propose to disentangle the feature of each object query into two components: a class-agnostic feature and a class-specific feature. The class-agnostic feature is used for computing the eventness loss, while the class-specific feature is used for classification. The original query feature is retained for temporal localization. To achieve this disentanglement, we introduce a disentanglement block composed of multiple linear layers. Given a query embedding q, we compute the class-agnostic feature qagn as: 
+
+qagn = fdis (q), (14) where fdis (·) denotes the disentanglement block. The class-specific feature 
+
+qspec is then obtained by subtracting the agnostic component from the origi-nal: 
+
+qspec = q − qagn . (15) To further encourage the independence between class-agnostic feature and class-specific feature, we add a disentangle loss, which is defined as: 
+
+Ldis = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+q(i) 
+
+> agn
+
+· q(i)
+
+> spec
+
+∥q(i)
+
+> agn
+
+∥ ∥ q(i)
+
+> spec
+
+∥ . (16) where N is the total number of object queries. This design allows the model to independently model event presence and class identity. It not only improves detection of unknown events by focusing on generalizable features but also reduces forgetting in incremental learning by reducing interference from new class updates and helping retain prior knowledge. 
+
+4.2.3. Two-Stage Training Strategy 
+
+Unlike in object detection, where detecting only part of an object is typ-ically not meaningful, in sound event detection, even partial segments of an event often still belong to the same class. However, conventional one-to-one matching strategies assign only one query per ground-truth event, poten-tially discarding other valid queries that partially or fully cover the same event. For example, a query whose predicted segment lies entirely within a ground-truth interval might be ignored due to a higher localization cost. To tackle this issue, we employ a one-to-many matching strategy. Specif-ically, after performing standard bipartite matching, the matched queries are 16 considered fully-matched . We then additionally consider unmatched queries as semi-matched if they satisfy two conditions: (1) the predicted class con-fidence is greater than a threshold α, and (2) the ratio of its intersection with a same-class ground-truth segment to its own predicted segment length is greater than a threshold β. The semi-matched queries are then used for training in the same way as fully-matched queries, except that their localiza-tion loss is set to 0.However, this one-to-many matching strategy introduces a new issue: multiple queries may be optimized to represent the same ground-truth event, leaving fewer queries available to represent unknown events. Moreover, un-matched queries intended to capture unknown events may redundantly focus on different segments of the same unknown event. To mitigate these prob-lems, we propose a diversity loss that encourages the unmatched queries to produce diverse representations. The diversity loss is defined as: 
+
+Ldiv = 1
+
+|Q um |(|Q um | − 1) 
+
+X
+
+> i,j ∈Q um
+> i̸=j
+
+ qi · qj
+
+∥qi∥ ∥ qj ∥
+
+
+
+. (17) where Qum is the set of unmatched queries. To allow the model to fully exploit the semi-matched queries, we do not apply the diversity loss during the initial training phase (referred to as stage 1). After a certain number of epochs, we enter stage 2 , where the diversity loss is applied to promote diversity among unmatched queries. To summarize, our loss function is: 
+
+Ltotal = Lcls + Lloc + λeLe + λdis Ldis + λdiv Ldiv . (18) where in stage 1, λdiv equals to 0.
+
+5. Experiments and Results 
+
+5.1. Open-World Evaluation Protocol 5.1.1. Data split 
+
+The full set of classes is partitioned into distinct, non-overlapping tasks 
+
+{T1, · · · , T t, · · · } , where each group Tτ becomes available only at time step 
+
+t = τ . During training on task Tt, classes introduced in all previous and current tasks {Tτ | τ ≤ t} are treated as known, while those from future 17 Table 1: Task configuration and data split statistics for the URBAN-SED dataset. 
+
+Task 1 Task 2 Task 3 Class split air conditioner, engine idling, jackhammer street music, dog bark, children playing car horn, drilling, gun shot, siren # training audios 4493 4469 5006 # test audios 1472 1483 1659 # train instances 7865 7872 10705 # test instances 2562 2620 3620                
+
+> Table 2: Task configuration and data split statistics for the DESED dataset.
+> Task 1 Task 2 Task 3 Class split alarm bell ringing, cat, running water, vacuum cleaner dishes, dog, frying speech, blender, electric shaver toothbrush # training audios 4746 3956 9339 # test audios 332 252 361 # train instances 6117 7976 18003 # test instances 641 1019 1105
+
+tasks {Tτ | τ > t } remain unknown. Specifically, we split classes of URBAN-SED [15] and DESED [16] dataset into 3 tasks, as shown in Table 1 and Table 2 . We use the training set of each dataset for training, while evaluation is performed on the URBAN-SED test set and the DESED public evaluation set. 
+
+5.1.2. Evaluation Metric 
+
+There are two popular ways for evaluating sound event detection sys-tems: event-based and segment-based. Among these, the event-based metric is more suitable for open-world SED, as it directly evaluates the ability to localize and classify individual sound events in time, including unseen cat-egories. In contrast, the segment-based metric only measures whether each class is active within a segment. In the open-world setting, the “unknown” label may correspond to many different actual classes. If multiple unknown events with different ground-truth labels occur in the same segment, cor-rectly detecting only one of them is sufficient for the segment-based metric to count the prediction as correct, thereby masking missed detections of other unknown events. Therefore, we adopt the event-based F1-score for known 18 sound event detection. For unknown sound event detection, we use event-based macro recall as the main metric, as the dataset does not include annotations for every potential unknown event. Using recall under such conditions is consistent with prior studies [11, 12, 10]. 
+
+5.2. Implementation Details 
+
+All experiments were conducted using two NVIDIA RTX 6000 GPUs, each equipped with 24 GB of VRAM. In each task, the WOOT framework is first trained for 200 epochs, followed by an additional 200 epochs of fine-tuning during the incremental learning step. The final 100 epochs of each task are designated as stage 2 training. Models are optimized using the AdamW optimizer with a batch size of 128 , an initial learning rate of 10 −4,and a weight decay of 10 −4. The learning rate is decreased by a factor of 
+
+10 during the fine-tuning phase of the incremental step. The number of queries is set to 18 in all experiments. Our model contains approximately 37.4M trainable parameters. For the loss coefficients, we set λL1 = 5 , λ IOU =2, λ e = 8 × 10 −4, λ dis = 10 −3, λ div = 10 −2. For the exemplar replay, we choose Nex = 200 .
+
+5.3. Open-World Sound Event Detection Results 
+
+In this section, a series of detailed experiments is conducted to evaluate the performance of the proposed WOOT framework. Our method is com-pared against leading approaches in the OWOD domain. Table 3 presents the comparative results based on the Unknown Class Recall (U-Recall) and 
+
+Table 3: Performance comparison of WOOT and state-of-the-art OWOD-derived methods on URBAN-SED. “-” indicates that the metric is not applicable to the method. In Task 3, U-Recall is not computed, as it contains only known classes.                                                                            
+
+> Task IDs (→)Task 1 Task 2 Task 3
+> U-Recall ( ↑)F1 ( ↑)U-Recall ( ↑)F1 ( ↑)F1 ( ↑)Cur known Prev known Cur known Both Prev known Cur known Both 1D DETR [6] + Finetuning -34 .7±0.5-11 .4±0.420 .7±0.515 .8±0.67.9±0.328 .9±0.416 .3±0.3
+> Ours: 1D DDETR + Finetuning -47 .1±0.5-21 .2±0.828 .4±0.424 .8±0.315 .5±0.336 .5±0.823 .9±0.4
+> OW-DETR [13] 18 .8±0.543 .1±0.125 .8±0.716 .7±0.625 .0±0.520 .9±0.612 .6±1.133 .8±0.721 .2±0.9
+> SS OW-DETR [39] 15 .5±0.642 .3±0.820 .8±0.815 .6±0.624 .2±0.719 .3±0.612 .3±0.533 .7±0.520 .7±0.4
+> PROB [11] (Baseline) 21 .4±0.446 .1±0.527 .7±0.818 .2±0.925 .3±0.621 .6±0.615 .1±0.735 .3±0.523 .2±0.5
+> CAT [12] 19 .5±0.845 .1±0.529 .3±0.918 .0±1.222 .8±0.321 .5±0.714 .8±0.836 .2±0.723 .3±0.3
+> Ours: WOOT 28 .6±0.548 .4±0.133 .4±0.323 .5±0.425 .9±0.424 .6±0.517 .1±0.834 .5±0.924 .1±0.2
+
+19 the F1 score for Known Classes. To ensure robustness, all experiments are repeated with multiple random seeds, and we report the mean performance along with the standard deviation. First, the performance of the proposed 1D Deformable DETR architecture is compared with that of the standard 1D DETR model introduced in [6] for the sound event detection task across the three datasets described in the preceding section (Task 1, Task 2, and Task 3). For a fair comparison, both models are fine-tuned on Tasks 2 and 3 to mitigate catastrophic forgetting. Since 1D DETR and 1D DDETR are designed solely for classifying events into known categories, they cannot accommodate unknown class detection, and therefore, U-Recall is not applicable to them. Based on the results in Table 3, the 1D DDETR consistently outperforms 1D DETR across all evaluation metrics. In Task 1, the improvement reaches nearly 13% , while for the remaining tasks, the F1 score of 1D DDETR is generally higher by approximately 8 - 9% . These results demonstrate the superior capability of the proposed architecture in modeling temporal dependencies and capturing discriminative features, thereby yielding more accurate event localization and classification compared to the conventional 1D DETR. With the strong performance of the 1D DDETR architecture, all sub-sequent experiments incorporating Open World Learning techniques were conducted using this architecture to ensure fairness in comparison. State-of-the-art methods in the OWOD domain were evaluated. These methods can be broadly grouped into two categories: (i) Pseudo-labeling based ap-proaches, including OW-DETR [13], SS OW-DETR [39], and CAT [12], which rely on iterative refinement of pseudo-labels to handle unknown in-stances; and (ii) Probabilistic frameworks for objectness estimation, repre-sented by PROB [11], which models objectness as a probabilistic variable to improve classification confidence for both known and unknown classes. Owing to the differences between the OWOD and OW-SED tasks, the core OWL techniques proposed in each work were adapted and integrated into the 1D DDETR architecture. Specifically, for OW-DETR, the attention-driven pseudo-labeling, novel classification layer, and objectness scoring modules were adopted, with the objectness scoring mechanism modified to operate over the temporal dimension instead of the 2D spatial domain. For SS OW-DETR, the Object Query Guided Pseudo-Labeling strategy was also adapted to the one-dimensional setting. In the case of CAT, both the Cascade De-coupled Decoding and the Self-Adaptive Pseudo-Labeling Mechanism were fully incorporated. Similarly, for PROB, the Probabilistic Objectness mod-20 ule was applied in its entirety to classify events. The detailed results of these experiments are presented in the lower part of Table 3. Within the pseudo-labeling group, CAT achieves the best overall perfor-mance. It attains 19 .5 ± 0.8 U-Recall in Task 1 and 29 .3 ± 0.9 in Task 2, surpassing OW-DETR ( 18 .8 ± 0.5, 25 .8 ± 0.7) and SS OW-DETR ( 15 .5 ±
+
+0.6, 20 .8 ± 0.8). Its known-class F1 scores remain competitive, reaching 
+
+21 .5 ± 0.7 (Both) in Task 2 and 23 .3 ± 0.3 (Both) in Task 3. PROB, de-spite belonging to a different methodological category, delivers comparable results and remains a strong baseline: it achieves the highest U-Recall among prior works in Task 1 ( 21 .4 ± 0.4), and shows consistently strong F1 across both previous and current known classes (e.g., 18 .2 ± 0.9 and 25 .3 ± 0.6 in Task 2; 15 .1 ± 0.7 and 35 .3 ± 0.5 in Task 3). This suggests that probabilis-tic modeling of objectness is a compelling alternative to pseudo-labeling for open-world scenarios. While CAT and PROB establish strong baselines within their respec-tive methodological categories, the proposed WOOT pushes the performance boundary even further. Our framework surpasses all baselines across most metrics, with especially pronounced improvements in unknown event detec-tion. WOOT achieves 28 .6 ± 0.5 U-Recall in Task 1 and 33 .4 ± 0.3 in Task 2, corresponding to improvements of + 9.1 and + 4.1 over CAT, and + 7.2
+
+and + 5.7 over PROB, the previous best performers for that metric. These correspond to relative improvements of approximately 33 .6 (Task 1) and 14 .0
+
+(Task 2) compared to the strongest baseline in each case. Notably, these gains are achieved while retaining high accuracy on known classes. Moreover, to explicitly report catastrophic forgetting, we quantify forgetting between two consecutive tasks t − 1 → t as the drop in performance on the classes learned in the previous task after adapting to the new task: 
+
+Ft−1→t = F 1cur (t − 1) − F 1prev (t) (19) where lower values indicate better retention. Under this definition, WOOT exhibits reduced forgetting from Task 1 to Task 2, achieving F1→2 = 48 .4 −
+
+23 .5 = 24 .9, which is the lowest among all compared open-world frameworks (OW-DETR: 26.4, SS OW-DETR: 26.7, PROB: 27.9, CAT: 27.1), while si-multaneously attaining the highest retained performance on old classes after Task 2 ( 23 .5 ± 0.4). From Task 2 to Task 3, WOOT incurs a 8.8 drop (25 .9 − 17 .1) yet still preserves the strongest performance on old classes in Task 3 ( 17 .1 ± 0.8), reflecting robust resistance to catastrophic forgetting under continued class expansion. 21 Table 4: Performance comparison of WOOT and state-of-the-art OWOD-derived methods on DESED. 
+
+Task IDs (→) Task 1 Task 2 Task 3 
+
+U-Recall ( ↑) F1 ( ↑) U-Recall ( ↑) F1 ( ↑) F1 ( ↑)Cur known Prev known Cur known Both Prev known Cur known Both 1D DETR [6] + Finetuning - 21 .4±0.5 - 14 .3±0.7 18 .6±0.9 16 .2±0.8 10 .4±0.7 14 .2±0.6 11 .4±0.4
+
+Ours: 1D DDETR + Finetuning - 33 .8±0.8 - 30 .6±0.8 28 .6±1.7 29 .7±1.1 16 .0±1.2 22 .1±1.7 17 .9±0.5
+
+OW-DETR [13] 10 .8±1.4 29 .0±0.5 11 .2±0.7 24 .7±1.2 26 .0±0.4 25 .2±1.2 12 .6±0.9 15 .1±0.4 14 .0±0.5
+
+SS OW-DETR [39] 7.7±0.9 29 .3±0.5 10 .0±0.7 24 .8±0.4 24 .5±1.1 24 .7±0.9 11 .5±0.8 14 .1±0.6 12 .4±0.6
+
+PROB [11] (Baseline) 15 .5±0.3 31 .0±0.8 12 .4±0.4 28 .1±0.5 27 .7±0.4 27 .9±0.2 16 .3±0.7 23 .6±0.7 18 .5±0.7
+
+CAT [12] 13 .0±0.6 30 .8±0.6 13 .2±0.6 23 .7±1.3 26 .2±0.4 24 .5±1.8 15 .5±0.7 18 .8±1.2 16 .6±1.0
+
+Ours: WOOT 18 .3±0.2 32 .5±0.7 14 .0±0.3 30 .4±0.6 28 .1±0.5 29 .4±0.2 17 .0±0.5 25 .7±0.1 19 .6±0.4
+
+A similar performance trend is observed on the DESED dataset, as shown in Table 4. Our proposed WOOT framework achieves superior performance across all metrics compared to established baselines. Specifically, WOOT improves the U-Recall by approximately 18% in Task 1 and 13% in Task 2 relative to the strongest previous method (PROB). Furthermore, our ap-proach demonstrates a strong ability to retain knowledge of previously known classes, achieving the highest F1 scores of 30 .4 ± 0.6 in Task 2 and 17 .0 ± 0.5
+
+in Task 3. These results confirm that the effectiveness of our approach gen-eralizes well across different acoustic environments and is not limited to a single dataset. 
+
+Table 5: Effect of gradually incorporating our proposed components into the baseline model. “FD” denotes feature disentangle and “TSTS” indicates two-stage training strategy. Results are averaged over multiple random seeds (mean). 
+
+Task IDs (→) Task 1 Task 2 Task 3 
+
+U-Recall ( ↑) F1 ( ↑) U-Recall ( ↑) F1 ( ↑) F1 ( ↑)Cur known Prev known Cur known Both Prev known Cur known Both Baseline 21.4 46.1 27.7 18.2 25.3 21.6 15.1 35.3 23.2 Basline + TSTS 23.0 47.1 29.4 19.1 26.4 22.7 16.2 34.0 23.5 Baseline + FD 25.2 47.3 31.3 20.1 26.3 23.2 16.3 34.5 23.6 Final: WOOT 28.6 48.4 33.4 23.5 25.9 24.6 17.1 34.5 24.1 
+
+5.4. Ablation Study on WOOT framework Impact of core components 
+
+An ablation analysis is performed to assess the impact of each core com-ponent independently, as well as their combined effect in our WOOT frame-work: the feature disentangle (FD) module and the two-stage training strat-22 egy (TSTS). Table 5 presents the performance when progressively integrating these components into the baseline. TSTS improves both unknown-event detection and known-event recog-nition across all three tasks. For example, in Task 2, adding TSTS to the baseline raises unknown-event recall from 27 .7 to 29 .4, and improves current-known F1 from 25 .3 to 26 .4 and previous-known F1 from 18 .2 to 19 .1. Similar upward trends are observed in Task 1 and Task 3, confirming that TSTS’s strategy of treating more queries as positive matches provides richer learning signals, thereby enhancing both generalization to unseen classes and reten-tion of known ones. On the other hand, FD produces a stronger boost in unknown detection performance. In Task 1, adding FD increases unknown-event recall from 
+
+21 .4 to 25 .2, and in Task 2, it jumps from 27 .7 to 31 .3. This aligns with its purpose: FD explicitly disentangles class-agnostic “eventness” features from class-specific information, enabling the model to learn a more stable and invariant eventness representation that is particularly valuable for identifying unseen events. When both methods are combined, their effects are cumulative. The full WOOT model achieves the highest scores in nearly all metrics. This synergy suggests that TSTS expands the amount of effective training supervision, while FD enhances the quality of the learned representations, together form-ing a more robust and generalizable framework. For further understanding, we visualize some outputs of PROB, our ap-proach, and the ground truth in Figure 3. As shown in (a), (c), and (d), the PROB outputs often produce an unknown prediction whenever a known class is detected, either as a sub-segment or as a heavily overlapping region. This happens because, in PROB’s original training, such overlapping regions were treated as unknown/background classes, and since they share high similarity with the known class predictions, they often receive high eventness scores. Together, these factors lead them to be classified as unknown. Consequently, this reduces the unknown recall by limiting the number of free queries avail-able for detecting other unknown classes. Our approach overcomes this issue through the concept of semi-matched queries. Moreover, as shown in (b) and (c), the PROB outputs frequently contain multiple unknown predic-tions that should ideally be collapsed into a single larger segment or two unknown queries corresponding to the same event. In contrast, our method addresses this problem by introducing a diversity loss, which encourages dif-ferent queries to focus on different unknown events. Furthermore, as shown 23 PROB 
+
+WOOT 
+
+GT       
+
+> 0.85
+> 0.77
+> 0.89
+> 0.91
+> 0.83
+> 0.72
+> 0.63
+> 0.92
+> 0.81
+> 0.78
+> 0.71
+> 0.64
+> 0.92
+> 0.67
+> 0.84
+> 0.79
+> 0.92 0.58
+> 0.78
+> 0.54
+> 0.80
+> 0.56
+> 0.59 0.34
+> 0.51
+> 0.79
+> 0.96
+> 0.91 0.82
+> 0.86
+> 0.28
+> 0.63
+> (b) (a) (c) (d)
+> Known  unKnown  Known  unKnown  Known  unKnown
+> 0.68
+> 0.69
+> 0.85
+> 0.93
+> 0.92
+> 0.89
+> 0.54
+> 0.71
+> 0.78 0.31
+> 0.43
+> 0.90
+> 0.49
+> 0.84
+> 0.90
+> 0.81
+> 0.93
+> 0.83
+> 0.92
+> 0.57
+
+Figure 3: Visualization of the outputs from PROB and our framework compared with the ground truth (GT) in Task 1 of URBAN-SED. Each color corresponds to a different class, while grey indicates an unknown prediction. The number in each segment indicates the confidence score, computed using Equation 9. The dashed line in the middle separates known and unknown regions. Note that for clearer visualization, only a subset of the unknown predictions is shown. 
+
+in (c) and (d), our method not only yields more accurate known and un-known predictions but also assigns higher confidence scores to the correct predictions. 
+
+Impact of the Number of Queries 
+
+Table 6 presents how adjustments in the number of queries influence the proposed 1D-DDETR architecture. The goal of this experiment is to exam-ine how query capacity influences performance across incremental tasks in the open-world SED setting. The results show that raising the number of queries generally leads to improvements in U-Recall, particularly in Task 1 
+
+Table 6: Impact of varying query numbers in the 1D-DDETR architecture of the WOOT model. Results are averaged over multiple random seeds (mean). 
+
+#Queries Task 1 Task 2 Task 3 
+
+U-Recall ( ↑) F1 ( ↑) U-Recall ( ↑) F1 ( ↑) F1 ( ↑)(↓) Cur known Prev known Cur known Both Prev known Cur known Both 
+
+12 20 .9 47 .9 25 .5 22 .4 26 .5 24 .4 15 .7 33 .4 22 .818 28 .6 48 .4 33 .4 23 .5 25 .9 24 .6 17 .1 34 .5 24 .124 30 .1 46 .4 37 .4 23 .0 25 .5 24 .3 16 .8 34 .7 24 .130 36 .2 46 .3 41 .0 22 .9 25 .4 24 .0 16 .6 34 .4 23 .9
+
+24 (from 20.9 with 12 queries up to 36.2 with 30 queries) and Task 2 (from 25.5 to 41.0). This indicates that more queries provide greater flexibility in cap-turing diverse unknown events. However, the F1 score, especially for current and previous known classes, remains relatively stable or slightly decreases as queries increase, with the best balance observed at 18 queries. At this set-ting, U-Recall significantly improves over 12 queries (28.6 compared to 20.9 in Task 1; 33.4 compared to 25.5 in Task 2), while F1 scores remain slightly better than larger query sizes. This suggests that using 18 queries achieves a favorable trade-off, offering sufficient capacity to represent unknown events without diluting the discriminative power for known classes. 
+
+5.5. Closed-World Sound Event Detection Results 
+
+We also evaluate our proposed 1D-DDETR in a closed-world setting. Following previous work [6], we report results for both CRNN-based and Transformer-based models (denoted as “CTrans”), as well as their variants post-processed by adaptive median filtering, referred to as CRNN-CWin and CTrans-CWin, respectively. Table 7 presents the performance in terms of Eb (event-based macro F1), Sb (segment-based macro F1), and At (audio tagging macro F1). On URBAN-SED, 1D-DDETR improves substantially on Eb over 1D-DETR ( 32 .71 → 37 .02 ), while Sb and At are roughly com-parable to 1D-DETR but remain below CRNN and CTrans baselines. This trend is consistent with the design of DETR-family detectors, which optimize a set-prediction objective with bipartite matching and therefore emphasize a compact set of unique event instances with accurate temporal boundaries. In contrast, Sb and At benefit more from dense frame or segment evidence and from modeling temporal continuity. As a result, frame-based SED ar-chitectures such as CRNN and CTrans, which are trained to produce dense time-frame predictions, often retain an advantage on Sb and At. 
+
+5.6. Ablation Study on 1D-Deformable DETR 
+
+In this section, the impact of deformable attention is examined in com-parison to standard dense attention. As shown in Table 8, the deformable attention in the are replaced encoder, decoder, and both modules by dense attention to analyze its impact. The results clearly highlight that both the deformable encoder and deformable decoder play critical roles in improving detection accuracy. This is primarily due to dense attention’s inability to effectively capture local context. In audio, consecutive segments are often highly similar. Dense attention treats all positions equally, which dilutes 25 Table 7: Evaluation results on the URBAN-SED testing dataset 
+
+Model Eb [%] Sb [%] At [%] 
+
+CTrans 31 .33 64 .51 74 .67 
+
+CTrans-CWin 34 .36 64 .73 74 .05 
+
+CRNN 35 .26 65 .75 74 .64 
+
+CRNN-CWin 36 .75 65 .74 74 .19 
+
+1D-DETR 32 .71 60 .64 70 .90 
+
+1D-DDETR (Ours) 37 .02 60 .77 71 .15 
+
+> Table 8: Ablation study on the impact of deformable encoder and deformable decoder in 1D-Deformable DETR
+
+.Deformable Enc. Deformable Dec. Eb [%] Sb [%] At [%] 
+
+✗ ✗ 31.12 59.39 69.16 
+
+✓ ✗ 33.58 60.75 70.51 
+
+✗ ✓ 35.73 59.48 70.02 
+
+✓ ✓ 37.02 60.77 71.15 the focus on truly informative temporal cues and increases computational burden. 
+
+6. Conclusions 
+
+In this study, the Open-World Sound Event Detection (OW-SED) prob-lem was introduced, extending the open-world learning paradigm from the visual domain to audio understanding. A novel 1D Deformable architecture was proposed to address the unique temporal characteristics of sound events, allowing the model to adaptively attend to informative temporal regions while maintaining locality awareness. Building upon this backbone, an Open-World Deformable Sound Event Detection Transformer (WOOT) framework was developed that incorporates feature disentanglement, enabling improved generalization to unseen classes, together with a two-stage training strategy that combines one-to-many matching and a diversity loss to promote repre-sentational diversity. Experimental results on the URBAN-SED and DESED datasets demonstrated that the proposed method performs competitively un-der the closed-world scenarios and surpasses existing approaches in open-26 world scenarios, thereby validating its effectiveness and robustness. Overall, this study lays the groundwork for advancing future research in open-world audio understanding, paving the way toward more adaptive, generalizable, and realistic sound event detection systems. Future research will focus on extending OW-SED evaluation beyond the current benchmarks to larger-scale and more heterogeneous datasets that capture the variability of real-world acoustic environments, thereby providing a more rigorous assessment of scalability and robustness. Another promis-ing direction is the integration of self-supervised pretraining and contrastive learning strategies, which can enrich the class-agnostic feature space and improve the transferability of learned representations to novel sound events with minimal supervision. In parallel, extending OW-SED to multimodal scenarios, particularly joint audio-visual event detection, could leverage com-plementary cues from vision to resolve challenges such as temporally over-lapping or context-dependent acoustic events. Such multimodal extensions not only promise more robust and accurate detection but also improve the interpretability and applicability of OW-SED systems in complex real-world deployments. 
+
+Acknowledgments 
+
+This research was funded by a project of Vietnam National University, Hanoi under Project No. QG.23.66. 
+
+References 
+
+[1] M. Crocco, M. Cristani, A. Trucco, V. Murino, Audio surveillance: A systematic review, ACM Computing Surveys (CSUR) 48 (4) (2016) 1– 46. [2] J. Salamon, J. Bello, C. Silva, O. Nov, R. DuBois, A. Arora, C. Mydlarz, H. Doraiswamy, Sonyc: A system for the monitoring analysis and miti-gation of urban noise pollution, Communications of the ACM 5 (2018). [3] N. C. Phuong, T. Do Dat, Sound classification for event detection: Ap-plication into medical telemonitoring, in: 2013 International Conference on Computing, Management and Telecommunications (ComManTel), IEEE, 2013, pp. 330–333. 27 [4] S. Hershey, S. Chaudhuri, D. P. Ellis, J. F. Gemmeke, A. Jansen, R. C. Moore, M. Plakal, D. Platt, R. A. Saurous, B. Seybold, et al., Cnn archi-tectures for large-scale audio classification, in: 2017 ieee international conference on acoustics, speech and signal processing (icassp), IEEE, 2017, pp. 131–135. [5] S. Adavanne, P. Pertilä, T. Virtanen, Sound event detection using spatial features and convolutional recurrent neural network, in: 2017 IEEE international conference on acoustics, speech and signal process-ing (ICASSP), IEEE, 2017, pp. 771–775. [6] Z. Ye, X. Wang, H. Liu, Y. Qian, R. Tao, L. Yan, K. Ouchi, Sound event detection transformer: An event-based end-to-end model for sound event detection, arXiv preprint arXiv:2110.02011 (2021). [7] H. Zhang, I. McLoughlin, Y. Song, Robust sound event recognition using convolutional neural networks, in: 2015 IEEE international conference on acoustics, speech and signal processing (ICASSP), IEEE, 2015, pp. 559–563. [8] Y. Li, M. Liu, K. Drossos, T. Virtanen, Sound event detection via dilated convolutional recurrent neural networks, in: ICASSP 2020-2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), IEEE, 2020, pp. 286–290. [9] E. Cakır, G. Parascandolo, T. Heittola, H. Huttunen, T. Virtanen, Con-volutional recurrent neural networks for polyphonic sound event detec-tion, IEEE/ACM Transactions on Audio, Speech, and Language Pro-cessing 25 (6) (2017) 1291–1303. [10] K. Joseph, S. Khan, F. S. Khan, V. N. Balasubramanian, Towards open world object detection, in: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, 2021, pp. 5830–5840. [11] O. Zohar, K.-C. Wang, S. Yeung, Prob: Probabilistic objectness for open world object detection, in: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2023, pp. 11444–11453. [12] S. Ma, Y. Wang, Y. Wei, J. Fan, T. H. Li, H. Liu, F. Lv, Cat: Local-ization and identification cascade detection transformer for open-world 28 object detection, in: Proceedings of the IEEE/CVF Conference on Com-puter Vision and Pattern Recognition, 2023, pp. 19681–19690. [13] A. Gupta, S. Narayan, K. Joseph, S. Khan, F. S. Khan, M. Shah, Ow-detr: Open-world detection transformer, in: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, 2022, pp. 9235–9244. [14] X. Zhu, W. Su, L. Lu, B. Li, X. Wang, J. Dai, Deformable detr: De-formable transformers for end-to-end object detection, arXiv preprint arXiv:2010.04159 (2020). [15] J. Salamon, D. MacConnell, M. Cartwright, P. Li, J. P. Bello, Scaper: A library for soundscape synthesis and augmentation, in: 2017 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA), 2017, pp. 344–348. doi:10.1109/WASPAA.2017.8170052 .[16] N. Turpault, R. Serizel, A. P. Shah, J. Salamon, Sound event detection in domestic environments with weakly labeled data and soundscape syn-thesis, in: Workshop on Detection and Classification of Acoustic Scenes and Events, 2019. [17] A. Mesaros, T. Heittola, A. Eronen, T. Virtanen, Acoustic event detec-tion in real life recordings, in: 2010 18th European Signal Processing Conference, 2010, pp. 1267–1271. [18] D. Stowell, D. Giannoulis, E. Benetos, M. Lagrange, M. D. Plumbley, Detection and classification of acoustic scenes and events, IEEE Trans-actions on Multimedia 17 (10) (2015) 1733–1746. doi:10.1109/TMM. 2015.2428998 .[19] K. J. Piczak, Environmental sound classification with convolutional neural networks, in: 2015 IEEE 25th International Workshop on Ma-chine Learning for Signal Processing (MLSP), 2015, pp. 1–6. doi: 10.1109/MLSP.2015.7324337 .[20] H. Nam, S.-H. Kim, B.-Y. Ko, Y.-H. Park, Frequency Dynamic Con-volution: Frequency-Adaptive Pattern Recognition for Sound Event Detection, in: Proc. Interspeech 2022, 2022, pp. 2763–2767. doi: 10.21437/Interspeech.2022-10127 .29 [21] K. Li, Y. Song, L.-R. Dai, I. McLoughlin, X. Fang, L. Liu, Ast-sed: An effective sound event detection method based on audio spectrogram transformer, in: ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), IEEE, 2023, pp. 1–5. [22] A. Gulati, J. Qin, C.-C. Chiu, N. Parmar, Y. Zhang, J. Yu, W. Han, S. Wang, Z. Zhang, Y. Wu, R. Pang, Conformer: Convolution-augmented transformer for speech recognition., in: H. Meng, B. Xu, T. F. Zheng (Eds.), INTERSPEECH, ISCA, 2020, pp. 5036–5040. [23] S. Barahona, D. de Benito-Gorrón, D. T. Toledano, D. Ramos, En-hancing conformer-based sound event detection using frequency dy-namic convolutions and beats audio embeddings, IEEE/ACM Transac-tions on Audio, Speech, and Language Processing 32 (2024) 3896–3907. 
+
+doi:10.1109/TASLP.2024.3444490 .[24] N. Carion, F. Massa, G. Synnaeve, N. Usunier, A. Kirillov, S. Zagoruyko, End-to-end object detection with transformers, in: European conference on computer vision, Springer, 2020, pp. 213–229. [25] H. Yin, J. Chen, J. Bai, M. Wang, S. Rahardja, D. Shi, W. seng Gan, Multi-granularity acoustic information fusion for sound event detection, Signal Processing 227 (2025) 109691. doi:https://doi.org/10.1016/ j.sigpro.2024.109691 .[26] J. You, W. Wu, J. Lee, Open set classification of sound event, Scientific Reports 14 (01 2024). doi:10.1038/s41598-023-50639-7 .[27] P. Cai, Y. Song, Q. Gu, N. Jiang, H. Song, I. McLoughlin, Detect any sound: Open-vocabulary sound event detection with multi-modal queries (2025). arXiv:2507.16343 .URL https://arxiv.org/abs/2507.16343 
+
+[28] J. Hai, H. Wang, W. Guo, M. Elhilali, Flexsed: Towards open-vocabulary sound event detection (2025). arXiv:2509.18606 .URL https://arxiv.org/abs/2509.18606 
+
+[29] Y. Xiao, R. K. Das, Ucil: An unsupervised class incremental learning approach for sound event detection (2025). arXiv:2407.03657 .URL https://arxiv.org/abs/2407.03657 
+
+30 [30] R. Pandey, M. Mulimani, A. Politis, A. Mesaros, Class-incremental learning for sound event localization and detection (2024). arXiv: 2411.12830 .URL https://arxiv.org/abs/2411.12830 
+
+[31] N. Dong, Y. Zhang, M. Ding, G. H. Lee, Open world detr: Transformer based open world object detection, arXiv preprint arXiv:2212.02969 (2022). [32] D. Pershouse, F. Dayoub, D. Miller, N. Sünderhauf, Addressing the chal-lenges of open-world object detection, arXiv preprint arXiv:2303.14930 (2023). [33] A. Bendale, T. Boult, Towards open set deep networks, in: Computer Vision and Pattern Recognition (CVPR), 2016 IEEE Conference on, IEEE, 2016. [34] L. Shu, H. Xu, B. Liu, DOC: Deep open classification of text docu-ments, in: M. Palmer, R. Hwa, S. Riedel (Eds.), Proceedings of the 2017 Conference on Empirical Methods in Natural Language Process-ing, Association for Computational Linguistics, Copenhagen, Denmark, 2017, pp. 2911–2916. doi:10.18653/v1/D17-1314 .URL https://aclanthology.org/D17-1314/ 
+
+[35] G. Zamzmi, T. Oguguo, S. Rajaraman, S. Antani, Open-world active learning for echocardiography view classification, in: Medical Imaging 2022: Computer-Aided Diagnosis, Vol. 12033, SPIE, 2022, pp. 138–148. [36] L. Zheng, D. Liu, T. Wu, Y. Chen, Stwwgram-odcbam: Mul-timodal feature fusion and dynamic attention mechanism for anomalous sound detection, Signal Processing 239 (2026) 110218. 
+
+doi:https://doi.org/10.1016/j.sigpro.2025.110218 .URL https://www.sciencedirect.com/science/article/pii/ S0165168425003329 
+
+[37] K. He, X. Zhang, S. Ren, J. Sun, Deep residual learning for image recognition, in: Proceedings of the IEEE conference on computer vision and pattern recognition, 2016, pp. 770–778. [38] J. Chen, J. Hao, K. Chen, D. Xie, S. Yang, S. Pu, An end-to-end audio classification system based on raw waveforms and mix-training 31 strategy, in: Interspeech 2019, 2019, pp. 3644–3648. doi:10.21437/ Interspeech.2019-1579 .[39] S. S. Mullappilly, A. S. Gehlot, R. M. Anwer, F. S. Khan, H. Cholakkal, Semi-supervised open-world object detection, in: Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 38, 2024, pp. 4305– 4314. 32

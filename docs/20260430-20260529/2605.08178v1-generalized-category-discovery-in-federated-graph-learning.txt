@@ -1,0 +1,741 @@
+Title: Generalized Category Discovery in Federated Graph Learning
+
+URL Source: https://arxiv.org/pdf/2605.08178v1
+
+Published Time: Tue, 12 May 2026 00:05:32 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# Generalized Category Discovery in Federated Graph Learning 
+
+## Zhongzheng Yuan a, Lianshuai Guo a, Xunkai Li b, Wenyu Wang a,∗ and Meixia Qu a,∗
+
+> a
+
+Shandong University, School of Airspace Science and Engineering, Weihai 264209, China 
+
+> b
+
+Beijing Institute of Technology, School of Computer Science and Technology, Beijing 100081, China 
+
+A R T I C L E I N F O 
+
+Keywords :Federated Graph Learning Generalized Category Discovery Open-World Learning Non-IID Data 
+
+A B S T R A C T 
+
+Federated Graph Learning (FGL) enables collaborative learning over distributed graph data, yet existing approaches largely rely on a closed-world assumption, limiting their applicability in dynamic environments where novel categories continuously emerge. To bridge this gap, we target the practical scenario of Federated Graph Generalized Category Discovery (FGGCD), aiming to collaboratively discover novel categories across decentralized graph clients while retaining knowledge of known categories. We observe that FGGCD introduces two fundamental challenges: (1) the Neighborhood Absorption Effect, where structural fragmentation leads to biased neighborhood aggregation, causing novel nodes to be misclassified as known categories; and (2) Global Semantic Inconsistency, where the aforementioned local biases propagate to the server and are amplified by heterogeneous subgraph distributions, hindering cross-client knowledge integration. To address these issues, we propose GCD-FGL, an FGL framework for GCD that integrates a client-side Topology-Reliable Semantic Alignment and Discovery process to mitigate the neighborhood absorption effect, and a server-side Hierarchical Prototype Alignment strategy to resolve global semantic inconsistency. Extensive experiments on five real-world graph datasets demonstrate that GCD-FGL consistently outperforms state-of-the-art baselines, achieving an average absolute gain of +4.86 in HRScore. 
+
+## 1. Introduction 
+
+Graph Neural Networks (GNNs) Jiang et al. (2019) have become a standard approach for modeling relational data, driving significant advancements across diverse domains in-cluding social networks Guo and Wang (2021), recommender systems Yu et al. (2022); He et al. (2023), and healthcare Liu et al. (2022); Wang et al. (2023). In many practical scenarios, however, graph data is naturally partitioned across multi-ple distributed data owners, a setting widely observed in applications such as financial and recommendation systems. Due to strict privacy regulations, these data silos cannot be directly centralized. Federated Graph Learning (FGL) Chen et al. (2022) offers a viable paradigm for collaborative graph model training under such privacy-preserving constraints. Despite the remarkable success of FGL, existing paradigms largely rely on a closed-world assumption. This assumes that the label space encountered during training is identical to that during inference. However, in many real-world applications, models are deployed in highly dynamic, open-world scenarios where novel categories continually emerge over time. This fundamental gap between closed-world training and open-world realities restricts the adaptability of existing FGL models to unseen categories in the wild. To take a step towards bridging this gap, Generalized Category Discovery (GCD) Vaze et al. (2022) has been proposed as a critical component of open-world learning. Given an unlabeled dataset drawn from a mixed label space 
+
+𝑘𝑛𝑜𝑤𝑛 ∪𝑛𝑜𝑣𝑒𝑙 , GCD aims to simultaneously classify known categories and discover novel ones, leveraging knowledge from a labeled dataset defined solely on 𝑘𝑛𝑜𝑤𝑛 . Unlike Out-of-Distribution (OOD) detection Hendrycks and Gimpel  
+
+> genhz@mail.sdu.edu.cn
+
+(Z. Yuan); goluis.cc@gmail.com (L. Guo);  
+
+> cs.xunkai.li@gmail.com
+
+(X. Li); hochi@sdu.edu.cn (W. Wang);  
+
+> mxqu@sdu.edu.cn
+
+(M. Qu) 
+
+Figure 1: The neighborhood absorption effect under a global graph versus isolated subgraphs on Cora. Isolated nodes be-longing to novel categories (y-axis) exhibit severe overconfident misclassification towards known categories (x-axis). 
+
+(2017), which simply rejects unfamiliar samples, or Novel Class Discovery (NCD) Han et al. (2019), which assumes all unlabeled data belongs to 𝑛𝑜𝑣𝑒𝑙 , GCD operates under a much more realistic and challenging open-world setting. It requires the model to precisely distinguish between known and novel categories while concurrently clustering the unknowns into meaningful semantic categories. Recently, efforts have been made to extend GCD to complex data structures. For instance, Graph Generalized Category Discovery (GGCD) Deng et al. (2025) has emerged to tackle category discovery on graph data, assuming a holistic graph, while Federated GCD Pu et al. (2024) has been explored for federated learning but only in image data. However, the intersection of GCD and FGL remains largely unexplored. Federated Graph Generalized Category Discovery (FGGCD) aims to collaboratively discover novel categories across distributed graph silos. Yet, simply applying existing GGCD methods to a federated environment fails to 
+
+Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 1 of 14 
+
+> arXiv:2605.08178v1 [cs.LG] 5 May 2026 Generalized Category Discovery in Federated Graph Learning
+
+work effectively. Specifically, extending GGCD to federated settings faces two primary challenges: 
+
+Challenge 1: Structural Truncation and the Neigh-borhood Absorption Effect. Applying GCD to federated environments introduces a fundamental conflict: GCD re-quires a holistic data distribution to discover novel clusters, while federated settings physically isolate the graph Liu et al. (2023). For a novel-category node 𝑣 (𝑦 𝑣 ∈ 𝑛𝑜𝑣𝑒𝑙 ), this structural truncation deprives it of sufficient intra-class support. Consequently, its local observation is frequently dominated by known-category neighbors. During the GNN message-passing process, the learned representation ℎ𝑣 be-comes biased toward these known-category signals. This representation collapse, characterized by the neighborhood absorption effect, leads to structural semantic dilution: 𝑃 (ℎ𝑣 ∣
+
+𝑦 𝑣 ∈ 𝑛𝑜𝑣𝑒𝑙 ) → 𝑃 (ℎ𝑣 ∣ 𝑦 𝑣 ∈ 𝑘𝑛𝑜𝑤𝑛 ). To empirically validate this, we conduct a motivating study on the Cora dataset (see Figure 1) comparing representations trained on an intact global graph versus isolated subgraphs. We observe that structural truncation induces an increase in the rate at which novel nodes are absorbed and misclassified into known categories. This absorption degrades the structural semantics essential for GCD exploration, posing an obstacle to reliable novel cluster discovery. To tackle this, we design a client-side Topology-Aware Graph Contrastive Flow module, as further detailed in Section 3.2. 
+
+Challenge 2: Global Semantic Inconsistency Propa-gated by Local Collapse. The local representation collapse outlined above propagates to the server, driving and ampli-fying semantic inconsistency at the global level. Federated graphs inherently exhibit non-IID (non-independent and iden-tically distributed) characteristics Li et al. (2023); Zhu et al. (2024) driven by the homophily assumption, where nodes sharing similar labels concentrate within specific clients. When local representations of novel nodes are distorted by their specific, skewed local known-category neighbors (Challenge 1), the resulting local semantic spaces become largely client-specific. Because novel categories lack explicit supervision and are dynamically explored on local clients, this interplay between local representation offset and graph-induced label skew means that novel clusters formed by different clients often possess divergent semantic meanings. Consequently, accurately matching and aligning these iso-lated novel clusters at the server side becomes challenging. This challenge is exacerbated in FGGCD scenarios where the total number of global categories is unknown. Without a mechanism to reconcile these misaligned local semantic spaces, the framework is prone to global semantic incon-sistency. Within our GCD-FGL framework, we resolve this misalignment through a server-side Hierarchical Prototype Alignment strategy, as detailed in Section 3.3. To address these challenges, we propose GCD-FGL, a federated framework tailored for FGGCD. Specifically, to tackle Challenge 1 on the client side, we introduce a Topology-Reliable Semantic Alignment and Discovery process guided by the Topology Reliability Guidance (TRG) mechanism. This integration effectively calibrates isolated node representations, mitigating the local representation bias and the neighborhood absorption effect caused by structurally truncated subgraphs. To address Challenge 2 on the server side, we couple a Hierarchical Prototype Alignment strategy. This architecture harmonizes the global semantic space, effectively resolving the global semantic inconsistency propagated by local representation collapse across highly heterogeneous label spaces. The main contributions of this work are as follows: 
+
+New Observation. To the best of our knowledge, this is the first work to pioneer and formalize the challenging problem of FGGCD, bridging the gap between GCD and FGL. 
+
+New Method. We propose GCD-FGL, a novel framework that integrates a client-side Topology-Reliable Semantic Alignment and Discovery process and a server-side Hier-archical Prototype Alignment strategy, tailored specifically for FGGCD scenarios. SOTA Performance. We conduct extensive experiments on five real-world graph benchmark datasets. The results show that GCD-FGL consistently out-performs state-of-the-art baselines, achieving an average gain of +4.86 in HRScore. 
+
+## 2. Preliminaries and Related Work 
+
+2.1. Preliminaries and Problem Formulation 
+
+Table 1 summarizes the main notations used in this paper. We consider a global graph  partitioned into 𝑁 isolated local subgraphs {1, … , 𝑁 } across distributed clients. The global label space  = 𝑘𝑛𝑜𝑤𝑛 ∪ 𝑛𝑜𝑣𝑒𝑙 comprises disjoint known and novel categories. For each client 𝑖 , its local graph 𝑖 consists of a labeled set 𝐿 𝑖 (where 𝑦 𝑣 ∈ 𝑘𝑛𝑜𝑤𝑛 ) and an unlabeled set 𝑈 𝑖 (where 
+
+𝑦 𝑣 ∈ 𝑘𝑛𝑜𝑤𝑛 ∪ 𝑛𝑜𝑣𝑒𝑙 ). Specifically, each client contains both labeled known categories and unlabeled samples. Due to data heterogeneity, novel categories are not necessarily shared across clients and may be highly heterogeneous. Under privacy-protected constraints, cross-client edges are unobservable, meaning the union of local edges is a strict subset of global edges ( ⋃𝑁 𝑖 =1 𝑖 ⊂ ). The primary goal of FGGCD is to collaboratively learn global parameters 𝜔 that minimize empirical risk across clients without sharing local data. Ultimately, it seeks a unified representation space for both known-category clas-sification and dynamic novel-category discovery, and this balance is quantitatively evaluated by the HRScore. The global objective is formulated as: 
+
+min 
+
+> 𝜔 𝑁
+
+∑
+
+> 𝑖 =1
+
+|𝑖 ||| 𝑡𝑜𝑡𝑎𝑙 (𝜔 ; 𝐿 𝑖 , 𝑖 ) + 𝑔𝑙𝑜𝑏𝑎𝑙 (𝜔 ). (1) where 𝑡𝑜𝑡𝑎𝑙 (𝜔 ; 𝐿 𝑖 , 𝑖 ) denotes the local optimization objective evaluated on client 𝑖 over its local subgraph 𝑖 ,guided by the available labeled set 𝐿 𝑖 . To achieve a globally consistent semantic space despite data isolation, 𝑔𝑙𝑜𝑏𝑎𝑙 (𝜔 )
+
+acts as a conceptual global alignment regularization term. This abstract formulation establishes the theoretical goal of FGGCD; the specific realizations of the local discovery   
+
+> Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 2 of 14
+
+Generalized Category Discovery in Federated Graph Learning 
+
+Table 1 
+
+Summary of main notations used in GCD-FGL.                                                            
+
+> Notation Description
+> Graph & Data Space
+> ,𝑖 Global graph / Local subgraph on client 𝑖
+> ,Global node set / Global edge set
+> 𝐿 𝑖 ,𝑈 𝑖 Labeled set / Unlabeled set on client 𝑖
+> 𝑖 (𝑣 ),𝑑 𝑣 Local neighborhood / Local degree of node 𝑣
+> 𝑘𝑛𝑜𝑤𝑛 ,𝑛𝑜𝑣𝑒𝑙 Set of known categories / Set of novel categories
+> Federated Setting & Reliability
+> 𝑁 ,𝜔 ,𝜔 𝑖 Total clients / Global model / Local model
+> 𝑆 (𝑣 )
+> 𝑐𝑜𝑛𝑓 ,𝑆 (𝑣 )
+> ℎ𝑜𝑚𝑜 Predictive confidence / Structural smoothness of 𝑣 𝑤 𝑣 ,𝑤 𝑖 TPR score of node 𝑣 / Average TPR of client 𝑖
+> 𝐜 𝑖 = { 𝑐 𝑖,𝑘 }Set of local sample densities on client 𝑖 𝑀 𝑣 Boolean mask for confident pseudo-labels
+> Server & Prototype Management
+> 𝑔𝑙𝑜𝑏𝑎𝑙 Global prototype buffer at the server
+> 𝑃 (𝑡 )
+> 𝑘 Global prototype for category 𝑘 at round 𝑡
+> 𝑘𝑛𝑜𝑤𝑛 𝑖 ,𝑛𝑜𝑣𝑒𝑙 𝑖 Local known prototypes / Local novel prototypes
+> 𝐾 𝑙𝑜𝑐𝑎𝑙 Relaxed local cluster count for prototype extraction
+> 𝑣 𝑖,𝑘 Joint density-reliability weight
+> 𝑛𝑜𝑣 Global discovery pool of unassigned sub-prototypes
+> 𝑐𝑎𝑛𝑑 ,ℎ𝑖𝑠𝑡 Global candidate centers / Historical novel prototypes
+> Objectives & Hyperparameters
+> 𝑠𝑢𝑝 ,𝑢𝑛𝑠𝑢𝑝 ,𝑎𝑙𝑖𝑔𝑛
+> Supervised Flow / TPR-Guided Unsup. Flow / Dual-flow Semantic Alignment Loss ( 𝑠𝑢𝑝 +𝑢𝑛𝑠𝑢𝑝 )
+> 𝑔𝑐𝑙 Topology-Aware Graph Contrastive Flow loss
+> 𝜏 ,𝜏 𝑠ℎ𝑎𝑟𝑝 Dynamic temperature / Sharpened temperature
+> 𝜃 ∗,𝜆 ℎ𝑐 Optimal Threshold Cut / Hierarchical penalty
+> 𝜏 𝑏𝑎𝑠𝑒 ,𝜏 𝑑𝑒𝑛𝑠𝑖𝑡𝑦 Base matching threshold / Density filter threshold
+> 𝐴 𝑟,𝑐 Boolean assignment matrix for prototype matching
+> 𝜌 EMA Momentum Update decay factor
+
+objectives and the global alignment mechanisms will be thoroughly detailed in Section 3.2 and Section 3.3. 
+
+2.2. Generalized Category Discovery 
+
+The ability to identify both known and novel categories in unlabeled data is crucial for open-world learning. Early paradigms addressing unseen categories primarily focused on OOD detection Hendrycks and Gimpel (2017), which merely rejects unfamiliar samples without further categorizing them, or NCD Han et al. (2019), which operates under the strict assumption that all unlabeled data belongs to the set of novel categories. To relax strict NCD assumptions, AutoNovel Han et al. (2020) proposed transferring knowledge from known to novel categories through self-supervised representation learning, but it still struggled to handle realistic scenarios where unlabeled data contain a mixture of known and unknown categories. To address this mixed-data challenge, ORCA Cao et al. (2021) introduced an open-world semi-supervised learning framework using uncertainty modeling, but its complex multi-stage objective often led to subopti-mal feature alignment. Subsequently, the pioneering work GCD Vaze et al. (2022) formally defined the GCD problem and established a strong baseline by using contrastive pre-training followed by non-parametric 𝐾 -means clustering; however, this two-stage pipeline fundamentally decoupled representation learning from cluster assignment. To over-come this disconnect, SimGCD Wen et al. (2023) introduced a parametric framework that jointly optimizes representations and cluster prototypes end-to-end, significantly improving the accuracy of novel-category discovery on image data. While GCD has been extended to federated settings via works like FedGCD Pu et al. (2024), these advances are strictly confined to independent image data. Existing methods assume either globally intact graphs or independent samples, and these assumptions collapse in FGL. In FGL, geographically distributed yet interconnected data suffers severe structural truncation across client silos. Consequently, discovering novel categories on decentralized graphs with heterogeneous label spaces and severed structural dependen-cies remains a formidable challenge. 
+
+2.3. Federated Graph Learning 
+
+To collaboratively train GNNs Kipf and Welling (2017) over distributed subgraphs without centralizing raw data, FedAvg McMahan et al. (2017) serves as the standard optimization strategy. Specifically, the global aggregation at communication round 𝑡 is computed as: ̃𝜔 𝑡 =
+
+> 𝑁
+
+∑
+
+> 𝑖 =1
+
+|𝑖 ||| 𝜔 𝑡 −1  
+
+> 𝑖
+
+. (2) where ̃𝜔 𝑡 is the global model, and 𝜔 𝑡 −1  
+
+> 𝑖
+
+is the local model updated by client 𝑖 in the previous round. Upon receiving ̃𝜔 𝑡 ,client 𝑖 performs local updates via gradient descent: 
+
+𝜔 𝑡 𝑖 =̃𝜔 𝑡 − 𝜂 ∇𝑓 (̃𝜔 𝑡 , 𝑖 ). (3) where 𝜂 is the learning rate and ∇𝑓 (⋅) denotes the gradient of the Total Loss over the isolated subgraph 𝑖 .While FedAvg supports isolated training, it performs poorly on non-IID client data and struggles to capture the unique cross-client dependencies of graph-structured data. To address this, FedSage+ Zhang et al. (2021) trained a missing-edge generator to reconstruct cross-subgraph links, mitigating structural truncation, but it focuses mainly on structural com-pletion. Subsequently, FedProto Tan et al. (2022) introduced prototype sharing to alleviate label distribution heterogeneity without transmitting model gradients, yet it largely overlooks topological structures. To simultaneously capture structure and heterogeneity, FedPub Baek et al. (2023) proposed functional embeddings for personalized subgraph training, and AdaFGL Li et al. (2024) along with FedGTA Li et al. (2023) integrated topology-confidence strategies to improve structure-aware aggregation. More recently, FedTAD Zhu et al. (2024) employed topology-aware, data-free distillation to achieve structure-sensitive aggregation, thereby reducing reliance on raw feature sharing. Concurrently, standard FGL paradigms enforce a strict closed-world assumption, rendering them incapable of dis-covering novel categories that dynamically emerge across isolated clients. Integrating open-world discovery into FGL is therefore essential for robust deployment in real-world envi-ronments. Our proposed GCD-FGL framework is specifically designed to bridge this exact gap. 
+
+Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 3 of 14 Generalized Category Discovery in Federated Graph Learning  
+
+> Figure 2: Overview of the proposed GCD-FGL framework.
+
+## 3. Methodology 
+
+3.1. Overview of the GCD-FGL Framework 
+
+The core principle of GCD-FGL is to treat global pro-totypes Snell et al. (2017) as the primary semantic bridge across clients, progressively refining these representations through reliability-aware local extraction and hierarchical global alignment. As illustrated in Figure 2, unlike standard FGL frameworks McMahan et al. (2017) that are sensitive to subgraph distribution discrepancy and heterogeneous label spaces, GCD-FGL is driven by two systematically designed structural components: 
+
+Topology-Reliable Semantic Alignment and Discovery (Client Side): To mitigate the neighborhood absorption effect, we introduce a comprehensive alignment and discov-ery process guided by the TRG mechanism. This process filters noisy edges, directly mitigating the neighborhood absorption effect and preventing representation collapse for novel categories. 
+
+Hierarchical Prototype Alignment (Server Side): To resolve global semantic inconsistency across non-IID clients, the server performs Hierarchical Prototype Alignment to harmonize the global semantic space. By incorporating a Density-TPR weighting mechanism into the aggregation pro-cess, Hierarchical Prototype Alignment unifies decentralized knowledge and dynamically identifies novel categories with-out predefining the cluster count ( 𝐾 ), effectively preventing amplified catastrophic forgetting. 
+
+Collaborative Optimization Protocol. The complete GCD-FGL training paradigm iteratively executes local topology-aware extraction and global hierarchical alignment. More specifically, the corresponding client-side local update procedure is detailed in Algorithm 1, while the overarching server-side aggregation and category discovery workflow is subsequently summarized in Algorithm 2. 
+
+Algorithm 1 GCD-FGL-Client 
+
+Require: Client ID 𝑖 , global prototypes 𝑔𝑙𝑜𝑏𝑎𝑙 , global model 
+
+𝜔 (𝑡 −1) , local epochs 𝐸  
+
+> 1:
+
+Initialize local model 𝜔 𝑖 ← 𝜔 (𝑡 −1)  
+
+> 2:
+
+for 𝑒 = 1 , ..., 𝐸 do  
+
+> 3:
+
+Compute node embeddings ̃ 𝑍 via local GNN 
+
+TPR Estimation:  
+
+> 4:
+
+Compute TPR score 𝑤 𝑣 for 𝑣 ∈ 𝑖 via Eq. 6 
+
+Reliability-Aware Semantic Alignment:  
+
+> 5:
+
+Update 𝜔 𝑖 by optimizing 𝑡𝑜𝑡𝑎𝑙 = 𝑎𝑙𝑖𝑔𝑛 + 𝛽 𝑔𝑐𝑙 via Eq. 12  
+
+> 6:
+
+end for 
+
+Local Category Discovery & Extraction:  
+
+> 7:
+
+Extract local prototypes 𝑘𝑛𝑜𝑤𝑛 𝑖 and 𝑛𝑜𝑣𝑒𝑙 𝑖 via clustering  
+
+> 8:
+
+Compute average TPR 𝑤 𝑖 and the set of local sample densities 𝐜 𝑖 = { 𝑐 𝑖,𝑘 } 
+
+> 9:
+
+return {𝜔 𝑖 , 𝑖 , 𝑤 𝑖 , 𝐜 𝑖 }, where 𝑖 = 𝑘𝑛𝑜𝑤𝑛 𝑖 ∪ 𝑛𝑜𝑣𝑒𝑙 𝑖   
+
+> Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 4 of 14
+
+Generalized Category Discovery in Federated Graph Learning 
+
+Algorithm 2 GCD-FGL-Server 
+
+Require: rounds 𝑅 , momentum 𝜌 , hierarchical penalty 𝜆 ℎ𝑐  
+
+> 1:
+
+for each round 𝑡 = 1 , ..., 𝑅 do  
+
+> 2:
+
+Sample a subset of clients 𝑆 𝑡  
+
+> 3:
+
+for each client 𝑖 ∈ 𝑆 𝑡 in parallel do  
+
+> 4:
+
+{𝜔 𝑖 , 𝑖 , 𝑤 𝑖 , 𝐜 𝑖 } ← CLIENT (𝑖, 𝑔𝑙𝑜𝑏𝑎𝑙 , 𝜔 (𝑡 −1) ) 
+
+> 5:
+
+end for 
+
+Step 1: Density-Aware Prototype Aggregation  
+
+> 6:
+
+Update global model via Eq. 2  
+
+> 7:
+
+Compute updated global prototypes 𝑃 (𝑡 ) 
+
+> 𝑘
+
+via Eq. 14 
+
+Step 2: Hierarchical Prototype Alignment  
+
+> 8:
+
+Decompose each 𝑖 into 𝑘𝑛𝑜𝑤𝑛 𝑖 and 𝑛𝑜𝑣𝑒𝑙 𝑖 based on global known prototypes  
+
+> 9:
+
+Form global discovery pool 𝑛𝑜𝑣 = ⋃ 
+
+> 𝑖 ∈𝑆 𝑡
+
+𝑛𝑜𝑣𝑒𝑙 𝑖  
+
+> 10:
+
+Extract candidate novel centers 𝑐𝑎𝑛𝑑 via Eq. 15 
+
+Step 3 & 4: EMA Update & Global Memory Routing  
+
+> 11:
+
+Update memory 𝑔𝑙𝑜𝑏𝑎𝑙 with 𝑐𝑎𝑛𝑑 via Eq. 17  
+
+> 12:
+
+Broadcast 𝜔 (𝑡 ) and 𝑔𝑙𝑜𝑏𝑎𝑙 to clients 𝑆 𝑡  
+
+> 13:
+
+end for 
+
+3.2. Client Side: Topology-Reliable Semantic Alignment and Discovery 
+
+Motivation. Structural truncation in isolated subgraphs exacerbates the neighborhood absorption effect, thereby inducing representation collapse for novel categories. Solu-tion. To address this issue, we propose a Topology-Reliable Semantic Alignment and Discovery process, which utilizes the ToPology Reliability (TPR) metric to evaluate node trustworthiness to filter heterophilous noise. 
+
+TPR Estimation. For a given node 𝑣 ∈ 𝑖 on client 
+
+𝑖 , its predictive confidence 𝑆 (𝑣 ) 
+
+> 𝑐𝑜𝑛𝑓
+
+(distinguishing between states of High Confidence and Low Confidence) is derived from the normalized Shannon entropy over the predicted probability distribution 𝑝 𝑣,𝑐 , a standard proxy for model uncertainty Grandvalet and Bengio (2004): 
+
+𝑆 (𝑣 ) 
+
+> 𝑐𝑜𝑛𝑓
+
+= 1 − − ∑𝐶 𝑐 =1 𝑝 𝑣,𝑐 log( 𝑝 𝑣,𝑐 + 𝜖 )max(log 𝐶, 𝜖 ) . (4) Concurrently, the structural smoothness 𝑆 (𝑣 ) 
+
+> ℎ𝑜𝑚𝑜
+
+measures the semantic consistency between node 𝑣 and its immediate local neighborhood 𝑖 (𝑣 ):
+
+𝑆 (𝑣 ) 
+
+> ℎ𝑜𝑚𝑜
+
+= 1max(1 , 𝑑 𝑣 )
+
+∑
+
+> 𝑢 ∈𝑖 (𝑣 )
+
+max(0 ,̃𝑧 ⊤𝑣 ̃𝑧 𝑢 ). (5) where 𝑑 𝑣 is the local degree. The max(0 , ⋅) operation explicitly functions to filter negative heterophilous edges. 
+
+Intuition. The final TPR score is designed as a strict logical conjunction to filter heterophilous noise, ensuring that a node influences subsequent alignments only if it simultaneously exhibits high predictive certainty ( 𝑆 𝑐𝑜𝑛𝑓 ) and local semantic homophily ( 𝑆 ℎ𝑜𝑚𝑜 ). 
+
+𝑤 𝑣 = 𝑆 (𝑣 ) 
+
+> ℎ𝑜𝑚𝑜
+
+⋅ 𝑆 (𝑣 ) 
+
+> 𝑐𝑜𝑛𝑓
+
+. (6) 
+
+Topology-Aware Graph Contrastive Flow. To capture intrinsic graph topology and mitigate representation collapse in structurally truncated regions Chuang et al. (2020), we employ a semantic graph contrastive loss ( 𝑔𝑐𝑙 ) Zhu et al. (2020). Specifically, let 𝑀 𝑣 ∈ {0 , 1} denote a boolean mask indicating confident assignment ( 𝑀 𝑣 ≡ 1 for labeled nodes), and ̃𝑦 𝑣 denote the semantic label, which is the ground-truth 
+
+𝑦 𝑣 for labeled nodes or the assigned pseudo-label ̂ 𝑦 𝑣 for unlabeled nodes. The adjusted positive similarity 𝑠 𝑝𝑜𝑠 (𝑣, 𝑢 )
+
+between connected nodes (𝑣, 𝑢 ) ∈ 𝑖 is formulated as follows: 
+
+𝑠 𝑝𝑜𝑠 (𝑣, 𝑢 ) = 
+
+⎧⎪⎨⎪⎩
+
+10 −8 , if 𝑀 𝑣 ∧ 𝑀 𝑢 and ̃𝑦 𝑣 ≠̃𝑦 𝑢 
+
+exp 
+
+(̃𝑧 ⊤𝑣 ̃𝑧 𝑢 
+
+> 𝜏
+
+)
+
+, otherwise . (7) where setting the similarity to 10 −8 avoids numerical instability in subsequent logarithmic calculations. The overall contrastive loss, which is symmetric for negative samples, is defined as follows. 
+
+Intuition. Unlike conventional contrastive objectives that uniformly pull all connected nodes together, this topology-aware loss employs the false-positive truncation mechanism (𝑠 𝑝𝑜𝑠 ) to nullify the pull of confident heterophilous edges. 
+
+𝑔𝑐𝑙 = 1
+
+|𝑖 |∑
+
+> 𝑣 ∈𝑖
+
+1
+
+𝑑 𝑣 
+
+∑
+
+> 𝑢 ∈𝑖 (𝑣 )
+
+− log 
+
+( 𝑠 𝑝𝑜𝑠 (𝑣, 𝑢 )
+
+𝑠 𝑝𝑜𝑠 (𝑣, 𝑢 ) + ∑𝑢 ′ 𝑠 𝑛𝑒𝑔 (𝑣, 𝑢 ′)
+
+)
+
+.
+
+(8) where 𝑠 𝑛𝑒𝑔 (𝑣, 𝑢 ′) = exp 
+
+(̃𝑧 ⊤𝑣 ̃𝑧 𝑢 ′
+
+> 𝜏
+
+)
+
+for negative samples 
+
+𝑢 ′ ∉ 𝑖 (𝑣 ), following the standard InfoNCE formulation. 
+
+Supervised Flow. For nodes with ground-truth labels 
+
+𝐿 𝑖 , the supervised flow employs a cross-entropy objective to align local embeddings against the global prototype buffer 
+
+𝑔𝑙𝑜𝑏𝑎𝑙 broadcasted by the server: 
+
+𝑠𝑢𝑝 = 1
+
+|𝐿 𝑖 |∑
+
+> 𝑣 ∈𝐿 𝑖
+
+CE 
+
+(̃𝑧 𝑣 ⊤𝑔𝑙𝑜𝑏𝑎𝑙 
+
+𝜏 , 𝑦 𝑣 
+
+)
+
+. (9) where CE (⋅, ⋅) denotes the cross-entropy loss applied to the softmax-normalized logits. 
+
+TPR-Guided Unsupervised Flow. For unlabeled nodes 
+
+𝑈 𝑖 , we generate pseudo-labels ̂𝑦 𝑣 using a sharpened temper-ature 𝜏 𝑠ℎ𝑎𝑟𝑝 over the currently available global prototypes in 
+
+𝑔𝑙𝑜𝑏𝑎𝑙 . To filter out noisy assignments, a dynamic threshold 
+
+𝛾 is calculated based on batch confidence statistics: 
+
+𝛾 = max(0 .5, 𝜇 𝑞 + 𝛼 ⋅ 𝜎 𝑞 ). (10) where 𝜇 𝑞 and 𝜎 𝑞 are the mean and standard deviation of prediction confidences within the current batch. Unlike fixed thresholds that may discard too many samples early in training Sohn et al. (2020), this batch-adaptive formulation dynamically scales with the model’s learning pace. The 
+
+Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 5 of 14 Generalized Category Discovery in Federated Graph Learning 
+
+boolean mask is formally defined as 𝑀 𝑣 = 𝕀 (𝑞 𝑣 > 𝛾 ) to retain only reliable predictions. 
+
+Intuition. To robustly align with the global prototype, this loss employs two safety mechanisms: the adaptive mask (𝑀 𝑣 ) maintains a steady learning curriculum, while the TPR score ( 𝑤 𝑣 ) acts as a soft weight to suppress gradients from surviving heterophilous noise. 
+
+𝑢𝑛𝑠𝑢𝑝 = 1
+
+|𝑈 𝑖 |∑
+
+> 𝑣 ∈𝑈 𝑖
+
+[
+
+𝑤 𝑣 ⋅ 𝑀 𝑣 ⋅ CE 
+
+(̃𝑧 𝑣 ⊤𝑔𝑙𝑜𝑏𝑎𝑙 
+
+𝜏 ,̂𝑦 𝑣 
+
+)] 
+
+.
+
+(11) 
+
+Total Loss. The Total Loss optimized iteratively by client 𝑖 balances supervised discrimination, unsupervised alignment, and structural consistency: 
+
+𝑡𝑜𝑡𝑎𝑙 = 𝑠𝑢𝑝 + 𝑢𝑛𝑠𝑢𝑝 
+
+⏟⏞⏞⏞⏞⏞⏟⏞⏞⏞⏞⏞⏟ 
+
+> 𝑎𝑙𝑖𝑔𝑛
+
++𝛽 𝑔𝑐𝑙 . (12) Upon convergence, the client extracts known ( 𝑘𝑛𝑜𝑤𝑛 𝑖 )and novel ( 𝑛𝑜𝑣𝑒𝑙 𝑖 ) prototypes and their sample densities via local K-means on unlabeled data, sending them to the server. 
+
+Local Category Discovery. In the GCD setting, the true number of novel categories is unknown. Instead of a predefined 𝐾 , we employ relaxed over-clustering and density-filtering. For the local K-means, the relaxed local cluster count 
+
+𝐾 𝑙𝑜𝑐𝑎𝑙 is dynamically upper-bounded by the unlabeled graph volume to prevent over-fragmentation: 
+
+𝐾 𝑙𝑜𝑐𝑎𝑙 = max 
+
+(
+
+2, min 
+
+(
+
+𝐾 𝑚𝑎𝑥 , ⌊ |𝑈 𝑖 |
+
+3 ⌋)) 
+
+. (13) where 𝐾 𝑚𝑎𝑥 is an empirical upper bound for the expected number of novel categories. Equation 13 serves as a relaxed upper bound to encourage exploration. Consequently, in edge cases, such as a very small |𝑈 𝑖 | or when unlabeled nodes exclusively belong to known categories, this relaxation might propose spurious boundaries. However, the subsequent density filters out these false novel prototypes by accepting a local cluster 𝐶 𝑘 only if it satisfies a minimum sample density constraint |𝐶 𝑘 | > 𝜏 𝑑𝑒𝑛𝑠𝑖𝑡𝑦 with 𝜏 𝑑𝑒𝑛𝑠𝑖𝑡𝑦 = 5 . Finally, server-side hierarchical clustering structurally corrects any surviving spurious prototypes to mitigate false category generation. 
+
+3.3. Server Side: Hierarchical Category Discovery 
+
+Motivation. The local representation collapse often propagates to the server, interacting with label skew to drive and amplify global semantic inconsistency across clients. 
+
+Solution. We design a Hierarchical Prototype Alignment strategy to identify novel category candidates and maintain memory stability. The server performs a progressive semantic association process, where reliable local discoveries are first aggregated and subsequently structurally grouped, before being finally stabilized through temporal memory. 
+
+Step 1: Density-Aware Aggregation. To mitigate label skew, the server computes the updated global prototype 𝑃 (𝑡 )
+
+> 𝑘
+
+using a joint weight 𝑣 𝑖,𝑘 = 𝑤 𝑖,𝑘 ⋅ 𝑐 𝑖,𝑘 (where 𝑤 𝑖,𝑘 represents the cluster-specific average TPR score for local cluster 𝑘 and 
+
+𝑐 𝑖,𝑘 ∈ 𝐜 𝑖 represents the local Sample Density for category 𝑘 )within the central Aggregator: 
+
+𝑃 (𝑡 ) 
+
+> 𝑘
+
+= Normalize 
+
+( ∑ 𝑖 𝑣 𝑖,𝑘 𝑃 𝑖,𝑘 
+
+∑𝑖 𝑣 𝑖,𝑘 + 𝜖 
+
+)
+
+. (14) This joint weighting mitigates weight-shifting from non-IID distributions, preventing noisy clients from dominating the global space. Here, 𝑃 𝑖,𝑘 ∈ 𝑖 denotes the local prototype for category 𝑘 received from client 𝑖 .
+
+Step 2: Hierarchical Cluster for Server Category Discovery. Local known category prototypes 𝑘𝑛𝑜𝑤𝑛 𝑖 are absorbed during Step 1 aggregation. Therefore, only the unabsorbed local novel prototypes 𝑛𝑜𝑣𝑒𝑙 𝑖 are injected into the global discovery pool 𝑛𝑜𝑣 = ⋃ 
+
+> 𝑖 ∈𝑆 𝑡
+
+𝑛𝑜𝑣𝑒𝑙 𝑖 . To extract global candidate centers 𝑐𝑎𝑛𝑑 for novel categories, we introduce a penalized Silhouette score Rousseeuw (1987) to find the optimal Threshold Cut 𝜃 ∗ on the Constrained Hierarchical Clustering Dendrogram. 
+
+Intuition. Explicitly penalizing the cluster count enforces compact, meaningful semantic groupings and rejects frag-mented boundaries from isolated clients. 
+
+𝜃 ∗ = arg max 
+
+> 𝜃
+
+(𝑆 𝑠𝑖𝑙 (𝜃 ) − 𝜆 ℎ𝑐 ⋅ Ω( 𝜃 )) . (15) where Ω( 𝜃 ) = max(0 , 𝑁 𝑐𝑙𝑢𝑠𝑡 (𝜃 ) − ( |𝑘𝑛𝑜𝑤𝑛 | + 2)) repre-sents the hierarchical penalty, and 𝜆 ℎ𝑐 is the regularization factor. 
+
+Step 3: Prototype Matching. To match candidate centers 
+
+𝑐𝑎𝑛𝑑 with historical prototypes (𝑡 −1)  
+
+> ℎ𝑖𝑠𝑡
+
+, we compute the cosine similarity matrix 𝑆 ∈ ℝ|𝑐𝑎𝑛𝑑 |×|ℎ𝑖𝑠𝑡 |, where 𝑆 𝑟,𝑐 =cos( 𝑃 𝑐𝑎𝑛𝑑,𝑟 , 𝑃 (𝑡 −1)  
+
+> ℎ𝑖𝑠𝑡,𝑐
+
+). The optimal assignment is solved via the Hungarian algorithm to maximize the total similarity: 
+
+arg max 
+
+> 𝐴
+
+∑
+
+> 𝑟,𝑐
+
+𝐴 𝑟,𝑐 ⋅𝑆 𝑟,𝑐 , s.t. ∑
+
+> 𝑟
+
+𝐴 𝑟,𝑐 ≤ 1, ∑
+
+> 𝑐
+
+𝐴 𝑟,𝑐 ≤ 1. (16) where 𝐴 𝑟,𝑐 ∈ {0 , 1} is the boolean assignment matrix. To reject mismatches, a match is considered valid only if the similarity exceeds a dynamic threshold: 𝑆 𝑟,𝑐 > max( 𝜏 𝑏𝑎𝑠𝑒 ,̄ 𝑆 ),where ̄ 𝑆 is the mean similarity of the current matrix, and 𝜏 𝑏𝑎𝑠𝑒 
+
+is the base semantic similarity threshold empirically set to 0.3 across all datasets. 
+
+Step 4: EMA Update & Memory Routing. Valid matched pairs undergo an EMA update for temporal smooth-ing with the corresponding historical prototype 𝑃 (𝑡 −1)  
+
+> ℎ𝑖𝑠𝑡,𝑐
+
+, con-trolled by a momentum factor 𝜌 :
+
+𝑃 (𝑡 ) 
+
+> ℎ𝑖𝑠𝑡,𝑐
+
+= Normalize 
+
+(
+
+𝜌 ⋅ 𝑃 (𝑡 −1)  
+
+> ℎ𝑖𝑠𝑡,𝑐
+
++ (1 − 𝜌 ) ⋅ 𝑃 𝑐𝑎𝑛𝑑,𝑟 
+
+)
+
+. (17) where 𝑟 is the specific candidate index matched to the historical prototype 𝑐 via the aforementioned assignment matrix 𝐴 . Unmatched candidates are registered as new addi-tions to the global prototype buffer 𝑔𝑙𝑜𝑏𝑎𝑙 , while unmatched historical prototypes are preserved to prevent forgetting. 
+
+Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 6 of 14 Generalized Category Discovery in Federated Graph Learning                                           
+
+> Table 2
+> Statistical information and GCD split protocol of the experimental datasets.
+> Dataset Description Nodes Edges Features categories Train/Val/Test* Total Known / Novel
+> Cora Citation network 2,708 5,429 1,433 74 / 3 20% / 40% / 40% CiteSeer Citation network 3,327 4,732 3,703 63 / 3 20% / 40% / 40% Amazon Photo Co-purchase graph 7,487 119,043 745 84 / 4 20% / 40% / 40% Amazon Computers Co-purchase graph 13,381 245,778 767 10 5 / 5 20% / 40% / 40% Coauthor CS Co-authorship graph 18,333 81,894 6,805 15 8 / 7 20% / 40% / 40%
+> *Note: The 20%/40%/40% (Train/Val/Test) split applies only to Known categories; Novel categories remain entirely unlabeled.
+
+## 4. Experiments 
+
+In this section, we conduct extensive experiments to eval-uate the effectiveness of the proposed GCD-FGL framework. We first introduce the graph datasets, describe the GCD scenarios, and outline the baselines and evaluation metrics. Subsequently, we aim to answer the following research questions: Q1 (Performance Comparison): Compared with other state-of-the-art baselines, can GCD-FGL achieve better performance in GCD scenarios? Q2 (Ablation Study): 
+
+Where does the performance gain of GCD-FGL come from? 
+
+Q3 (Hyperparameter Sensitivity): How sensitive is GCD-FGL to the variations of key hyperparameters? Q4 (Ro-bustness): How robust is the proposed GCD-FGL method? 
+
+Q5 (Efficiency): How does GCD-FGL perform in terms of training efficiency and computational cost? 
+
+4.1. Experiments Setup 
+
+Datasets and GCD setup. To evaluate the effectiveness of GCD-FGL, we conduct experiments on five widely used graph benchmark datasets: Cora, CiteSeer, Amazon Photo, Amazon Computers, and Coauthor CS. To simulate a real-istic federated GCD environment, we employ the Louvain algorithm Blondel et al. (2023) to partition the global graph topology into 10 clients. As summarized in Table 2, our proposed two-stage GCD split protocol operates as follows. First, in the Global Category Split , we partition the global label space into disjoint Known and Novel categories. For datasets with an odd number of total categories ||, the number of Known categories is set to ⌈| |∕2 ⌉. Second, in the Local Data Masking stage, we construct the dataset masks within each client’s isolated subgraph under a transductive setting. Specifically, for Known categories, 20% of the instances are sampled to form the labeled training set, 40% are allocated to the validation set, and the remaining 40% are retained as unlabeled data. These unlabeled Known instances are then combined with 100% of the Novel category instances to concurrently form the unlabeled training set and the testing set, requiring the model to discover new categories across all local unlabeled data. 
+
+Baselines. We evaluate GCD-FGL against representative state-of-the-art baselines, which are broadly categorized into three groups: adapted computer vision GCD methods, adapted graph GCD methods, and dedicated federated GCD methods. For the adapted CV GCD methods, we select AutoNovel Han et al. (2020), ORCA Cao et al. (2021), GCD Vaze et al. (2022), and SimGCD Wen et al. (2023). Following standard adaptation protocols, we extend these centralized models to the federated graph setting by equipping them with a GCN backbone Kipf and Welling (2017) and employing standard FedAvg McMahan et al. (2017) for server-side aggregation. For the adapted graph GCD methods, we evaluate SWIRL Deng et al. (2025), a state-of-the-art approach tailored for holistic GGCD, which is similarly ex-tended to the federated setting via FedAvg. Finally, to ensure a comprehensive comparison against architectures explicitly designed for distributed scenarios, we benchmark against FedGCD Pu et al. (2024), a recent framework formulated specifically for federated generalized category discovery. 
+
+Evaluation Metrics. Following standard GCD evaluation protocols, we adopt a comprehensive metric system. Since the cluster assignments of novel categories are permutation-invariant, the Hungarian algorithm Kuhn (2010) is applied to find the optimal matching between the predicted cluster assignments and the ground-truth labels before computing accuracy. In line with the realistic GCD setting, the total number of clusters ( 𝐾 ) is not provided as an oracle prior. The evaluated metrics include New Acc (accuracy on novel nodes), Old Acc (accuracy on known nodes), All Acc (overall accuracy on the entire test set), and HRScore. It is important to clarify that All Acc is evaluated independently over the entire test set and is not a direct mathematical derivation of the Old and New accuracies. Specifically, in alignment with recent Graph GCD studies like SWIRL Deng et al. (2025), HRScore is defined as the harmonic mean of Old Acc and New Acc ( 2 × ( Old Acc × New Acc )∕( Old Acc +
+
+New Acc )). Because relying solely on overall accuracy, known-category accuracy, or novel-category accuracy in isolation cannot reflect a model’s comprehensive capability, we adopt HRScore as the primary evaluation metric to quantify the balance between old-knowledge retention and new-category exploration. 
+
+Implementation Details. All experiments and federated framework simulations are implemented based on the Open-FGL library Li et al. (2025). We consistently utilize a 2-layer GCN Kipf and Welling (2017) as the backbone architecture. Models are optimized using the Adam optimizer Kingma and Ba (2015) with an initial global learning rate of 0.001 and a   
+
+> Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 7 of 14
+
+Generalized Category Discovery in Federated Graph Learning 
+
+Table 3 
+
+Performance comparison across five graph datasets. The best results are highlighted in bold, and the second-best results are underlined. The ‘Gain‘ column shows the improvement between GCD-FGL and the best baseline. Datasets Metrics AutoNovel ORCA GCD SimGCD FedGCD SWIRL GCD-FGL Gain Cora HRScore 36 .98 ± 0 .21 34 .40 ± 0 .53 37 .75 ± 3 .59 32 .99 ± 0 .17 37 .44 ± 6 .79 48 .96 ± 0 .86 𝟓𝟐 .𝟖𝟓 ± 𝟏 .𝟐𝟒 +3.89 Old 58 .01 ± 0 .57 41 .67 ± 0 .26 42 .63 ± 8 .88 54 .17 ± 0 .26 52 .24 ± 16 .17 51 .60 ± 1 .72 𝟔𝟔 .𝟔𝟕 ± 𝟏 .𝟒𝟒 +8.66 New 27 .14 ± 0 .19 29 .29 ± 0 .76 33 .88 ± 1 .41 23 .72 ± 0 .17 29 .18 ± 6 .53 𝟒𝟔 .𝟓𝟖 ± 𝟎 .𝟔𝟔 43 .78 ± 1 .58 -2.80 All 31 .38 ± 0 .57 30 .99 ± 0 .65 35 .08 ± 1 .72 27 .90 ± 0 .14 32 .35 ± 3 .45 46 .27 ± 0 .81 𝟒𝟕 .𝟗𝟐 ± 𝟏 .𝟐𝟖 +1.65 CiteSeer HRScore 44 .62 ± 0 .57 49 .01 ± 0 .31 38 .81 ± 1 .81 40 .78 ± 0 .44 32 .01 ± 1 .64 57 .16 ± 1 .57 𝟓𝟗 .𝟕𝟖 ± 𝟏 .𝟎𝟖 +2.62 Old 52 .78 ± 0 .83 𝟔𝟔 .𝟎𝟕 ± 𝟎 .𝟒𝟎 38 .42 ± 0 .63 37 .70 ± 0 .75 59 .07 ± 1 .87 55 .66 ± 2 .21 60 .73 ± 2 .09 -5.34 New 38 .64 ± 0 .73 38 .95 ± 0 .37 39 .20 ± 3 .63 44 .41 ± 0 .15 21 .95 ± 1 .52 58 .75 ± 2 .21 𝟓𝟖 .𝟖𝟓 ± 𝟎 .𝟕𝟐 +0.10 All 41 .77 ± 0 .30 44 .95 ± 0 .20 39 .03 ± 2 .72 42 .93 ± 0 .20 30 .17 ± 1 .03 58 .07 ± 1 .24 𝟓𝟗 .𝟗𝟒 ± 𝟎 .𝟖𝟏 +1.87 CS HRScore 57 .77 ± 2 .37 59 .34 ± 8 .28 56 .01 ± 2 .34 54 .53 ± 0 .14 53 .63 ± 17 .45 63 .94 ± 3 .22 𝟕𝟐 .𝟑𝟎 ± 𝟔 .𝟔𝟑 +8.36 Old 62 .06 ± 5 .38 79 .87 ± 28 .21 67 .74 ± 6 .01 56 .37 ± 0 .12 41 .31 ± 20 .65 82 .19 ± 10 .39 𝟖𝟐 .𝟑𝟖 ± 𝟏𝟕 .𝟎𝟏 +0.19 New 54 .04 ± 0 .77 47 .21 ± 3 .56 47 .75 ± 1 .63 52 .80 ± 0 .24 𝟕𝟔 .𝟒𝟏 ± 𝟓 .𝟒𝟏 52 .32 ± 0 .96 64 .41 ± 2 .48 -12.00 All 55 .15 ± 0 .33 51 .74 ± 0 .94 50 .52 ± 1 .37 53 .30 ± 0 .23 66 .55 ± 3 .80 56 .45 ± 0 .73 𝟕𝟏 .𝟎𝟑 ± 𝟎 .𝟑𝟑 +4.48 Photo HRScore 48 .49 ± 0 .55 42 .54 ± 4 .32 47 .66 ± 3 .77 37 .68 ± 0 .69 45 .79 ± 5 .21 48 .61 ± 2 .86 𝟓𝟏 .𝟔𝟔 ± 𝟐 .𝟏𝟒 +3.05 Old 45 .78 ± 0 .68 38 .35 ± 6 .88 43 .30 ± 5 .34 33 .78 ± 0 .80 42 .22 ± 8 .03 62 .27 ± 5 .04 𝟔𝟐 .𝟐𝟗 ± 𝟒 .𝟑𝟎 +0.02 New 51 .53 ± 0 .91 47 .75 ± 2 .17 𝟓𝟑 .𝟎𝟎 ± 𝟒 .𝟕𝟕 42 .61 ± 1 .22 50 .01 ± 5 .25 39 .87 ± 3 .24 44 .13 ± 2 .25 -8.87 All 49 .83 ± 0 .84 44 .97 ± 0 .97 50 .13 ± 3 .21 40 .00 ± 0 .89 47 .71 ± 2 .92 46 .49 ± 2 .40 𝟓𝟎 .𝟏𝟗 ± 𝟏 .𝟐𝟔 +0.06 Computers HRScore 42 .17 ± 4 .70 33 .77 ± 5 .53 46 .21 ± 2 .32 48 .26 ± 1 .24 46 .07 ± 3 .05 40 .87 ± 0 .23 𝟓𝟒 .𝟔𝟐 ± 𝟒 .𝟒𝟗 +6.36 Old 56 .10 ± 2 .74 52 .75 ± 4 .51 45 .61 ± 3 .84 51 .70 ± 1 .68 45 .02 ± 3 .06 35 .02 ± 0 .28 𝟓𝟖 .𝟑𝟗 ± 𝟔 .𝟖𝟑 +2.29 New 33 .78 ± 5 .95 24 .83 ± 5 .90 46 .83 ± 2 .52 45 .25 ± 1 .67 47 .17 ± 5 .43 49 .08 ± 0 .36 𝟓𝟏 .𝟑𝟎 ± 𝟓 .𝟖𝟔 +2.22 All 45 .36 ± 1 .82 39 .31 ± 2 .33 46 .20 ± 1 .55 51 .50 ± 0 .39 46 .05 ± 3 .30 41 .79 ± 0 .52 𝟓𝟑 .𝟎𝟑 ± 𝟑 .𝟎𝟐 +1.53 
+
+weight decay of 5e-4, while the temperature parameter for contrastive learning is set to 0.1. For baseline comparisons, all methods are executed using the default hyperparameters specified in their original papers. Since this work is the first to explore GCD tasks under a federated graph learning challenge, there are no existing Fed-GCD-specific methods for direct comparison. To adapt existing centralized and non-graph GCD algorithms to the federated environment, we implement a standard federated baseline protocol. For visual baselines, we replace image augmentations with standard graph contrastive learning via edge dropping and feature masking Zhu et al. (2020). Specifically, during training, all baseline models employ FedAvg for model weight aggregation. During evaluation, to enable cross-client category discovery and ensure a fair comparison against our framework, we implement a naive global prototype aggregation mechanism on the server. This mechanism aligns local prototypes from isolated clients to global prototypes via Hungarian matching based on cosine distance, followed by simple averaging. This uniform baseline adaptation ensures that all models are evaluated under the exact same federated prototype-matching conditions. All experiments are con-ducted on an Ubuntu 22.04 workstation equipped with an Intel Core i9-13900K processor, an NVIDIA GeForce RTX 3090 GPU (24GB), CUDA 12.1, and 64GB of RAM. To ensure the reliability of our findings, we report the mean performance and standard deviation across multiple independent runs. 
+
+4.2. Performance Comparison 
+
+To answer Q1 , we evaluate the performance of GCD-FGL against baseline models across five benchmark graph datasets under the distributed federated setting (partitioned via the Louvain algorithm). Detailed results are presented in Table 3, with the best results highlighted in bold. Measured by the HRScore, which quantifies the balance between known category retention and novel category discovery, our proposed method consistently outperforms the baselines across all five datasets. Most notably, GCD-FGL achieves an average gain of +4.86 points in HRScore over the strongest competitors and secures the highest overall accuracy (All Acc) across all benchmarks. For instance, on the Coauthor CS dataset, GCD-FGL yields an HRScore of 72.30%, an improvement of 8.36% over the SWIRL baseline (63.94%). While GCD-FGL achieves state-of-the-art comprehen-sive performance, it occasionally yields to specific baselines on isolated metrics. For instance, on the Cora dataset, SWIRL achieves a marginally higher New Acc (46.58%) compared to GCD-FGL (43.78%). However, in FGGCD settings, ag-gressively optimizing for novel category discovery often induces feature space squeezing, inherently compromising known category retention. Consequently, SWIRL’s slight gain in New Acc comes at the expense of its Old Acc (51.60%, compared to GCD-FGL’s 66.67%). This trade-off emphasizes the critical importance of utilizing HRScore as 
+
+Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 8 of 14 Generalized Category Discovery in Federated Graph Learning 
+
+the primary evaluation metric, as it demonstrates that GCD-FGL achieves a superior harmonic balance without suffering from catastrophic forgetting of existing knowledge. The results also reveal performance fluctuations in exist-ing baselines, particularly concerning known category reten-tion (Old Acc). For instance, FedGCD (on the CS dataset) and SWIRL (on the Computers dataset) experience notable accuracy drops on known categories, occasionally falling below their respective performance on novel categories. This vulnerability stems from their respective architectural limitations. Although SWIRL is tailored for GGCD, it lacks mechanisms to address the subgraph distribution discrepancy and heterogeneous label spaces inherent in federated settings, thereby hindering its generalization across distributed clients. Conversely, while FedGCD explicitly accounts for federated heterogeneity, its core logic, originally designed for visual tasks, largely overlooks complex topological dependencies. Consequently, it is susceptible to structural truncation, limit-ing its convergence and representation quality, particularly on sparse datasets such as Cora and CiteSeer. 
+
+4.3. Method Interpretability 
+
+To answer Q2 , we conduct an ablation study to system-atically isolate and evaluate the individual contributions of the core components within GCD-FGL: the TPR-Guided Unsupervised Flow ( 𝑢𝑛𝑠𝑢𝑝 ), the Topology-Aware Graph Contrastive Flow ( 𝑔𝑐𝑙 ), and the TRG mechanism. This evaluation is performed under a standard distributed setting (partitioned via the Louvain algorithm). Quantitative results across all five datasets are comprehensively detailed in Fig-ure 3, with the corresponding final t-SNE feature distributions on the CiteSeer dataset further visualized in Figure 4. Each variant deactivates a specific mechanism corre-sponding to our core components to validate its necessity and effect on the overall model: 
+
+• w/o 𝑔𝑐𝑙 : Removes the Topology-Aware Graph Con-trastive Flow, evaluating its role as a structural false-positive truncation mechanism and its preservation of local structural information under heterophily. 
+
+• w/o 𝑢𝑛𝑠𝑢𝑝 : Removes the TPR-Guided Unsupervised Alignment Flow, examining the impact of the global semantic bridge on dynamically discovering novel cate-gories and capturing cross-client semantic consistency among unlabeled nodes. 
+
+• w/o TRG: Removes the TRG module by setting the TPR soft weights ( 𝑤 𝑣 ) to a uniform value in the unsupervised flow, assessing its mitigation of the neigh-borhood absorption effect by filtering heterophilous noise during prototype alignment. First, removing the Topology-Aware Graph Contrastive Flow ( w/o 𝑔𝑐𝑙 ) degrades both performance and represen-tation quality. As observed in Figure 4, the absence of 𝑔𝑐𝑙 
+
+causes node embeddings to merge into a continuous manifold lacking distinct decision boundaries. Algorithmically, 𝑔𝑐𝑙 
+
+introduces a false-positive truncation mechanism that pulls   
+
+> Figure 3: Quantitative ablation study across all five datasets. The error bars indicate performance variance.
+> Figure 4: t-SNE visualization of node feature distributions for different ablated variants on the CiteSeer dataset.
+
+homophilous neighbors together while pushing heterophilous ones apart, forcing representations to respect both semantic boundaries and intrinsic topological structures. Without this guidance, the GNN backbone becomes highly susceptible to neighborhood absorption and over-smoothing. This dimin-ishes intra-class distinctiveness and leads to performance variance, such as the 37 .21 ± 17 .91 variance on Cora demonstrated by the large error bars in Figure 3. Second, when the TPR estimation or the unsupervised alignment flow is disabled ( w/o TRG or w/o 𝑢𝑛𝑠𝑢𝑝 ), Figure 4 illustrates that the embedding space becomes fragmented, failing to form compact semantic clusters. The notable perfor-mance drop in the w/o TRG variant highlights the necessity of dynamically filtering noisy node-to-prototype assignments. While the TPR metric quantifies node trustworthiness via a logical conjunction of predictive confidence and structural                        
+
+> Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 9 of 14 Generalized Category Discovery in Federated Graph Learning
+> (a) Cora -𝛽 (b) Cora -𝜆 ℎ𝑐 (c) Cora -𝜌 (d) Cora -𝛼
+> (e) Photo -𝛽 (f) Photo -𝜆 ℎ𝑐 (g) Photo -𝜌 (h) Photo -𝛼
+> Figure 5: Hyperparameter sensitivity analysis of core components. We select Cora as a representative small-scale dataset and Photo as a larger-scale dataset. The variables 𝛽 ,𝜆 ℎ𝑐 ,𝜌 , and 𝛼 denote the contrastive loss weight, hierarchical clustering penalty, EMA momentum, and pseudo-label scaling factor, respectively. The z-axis represents the classification accuracy.
+
+smoothness, disabling TRG forces the unsupervised flow to assign a uniform soft weight to all pseudo-labels. This uniform weighting amplifies unreliable heterophilous signals, exacerbating the representation bias towards inaccurate local prototypes. Similarly, removing the unsupervised flow ( w/o 
+
+𝑢𝑛𝑠𝑢𝑝 ) deprives the unlabeled nodes of the semantic bridge provided by global prototypes, hindering the model’s capacity to reliably cluster dynamically discovered novel categories. Finally, as demonstrated by the Ours variant in Figure 4, the complete GCD-FGL framework integrates these com-ponents effectively. By leveraging the TRG mechanism to filter heterophilous noise and dynamically combining the con-trastive flow ( 𝑔𝑐𝑙 ) with the unsupervised alignment ( 𝑢𝑛𝑠𝑢𝑝 ), the Topology-Reliable Semantic Alignment and Discovery process calibrates the isolated node representations. This integration enforces intra-class compactness and inter-class separability, resulting in distinct clustering boundaries even under structural truncation. 
+
+4.4. Hyperparameter Sensitivity 
+
+To answer Q3 , we systematically analyze the hyperparam-eter sensitivity of the proposed GCD-FGL framework under the standard distributed setting (partitioned via the Louvain al-gorithm). We select Cora and Amazon Photo as representative small-scale and large-scale datasets, respectively. Figure 5 visualizes the resulting performance variations across varying values for four key parameters: the Topology-Aware Graph Contrastive Flow weight ( 𝛽 ), the Constrained Hierarchical Clustering penalty ( 𝜆 ℎ𝑐 ), the EMA Momentum Update decay factor ( 𝜌 ), and the dynamic threshold scaling factor ( 𝛼 ). The default values for each parameter are marked with dashed lines in the respective subplots. Empirical results demonstrate stable performance across most evaluated parameter ranges. Specifically, parameters governing temporal prototype smoothing ( 𝜌 ), server-side clus-ter regularization ( 𝜆 ℎ𝑐 ), and confident pseudo-label filtering (𝛼 ) exhibit minimal performance fluctuations on both datasets. This indicates that the dynamic thresholding and hierarchical routing mechanisms are stable, reducing the reliance on precise manual tuning. Sensitivity is observed primarily regarding the contrastive loss weight ( 𝛽 ) on the denser Amazon Photo dataset (Fig-ure 5e). In graphs with dense homophilous connections, such as Photo, the structural contrastive flow ( 𝑔𝑐𝑙 ) has a direct impact on the embedding space. Setting 𝛽 too low fails to fully exploit local topological homophily to counteract the neighborhood absorption effect. Conversely, a high 𝛽 value risks over-regularizing the representation space, potentially interfering with the TPR-Guided Unsupervised Flow and affecting the convergence of global prototypes. In contrast, on the sparser Cora dataset (Figure 5a), the model is less sensitive to 𝛽 variations due to its lower structural density. Ultimately, despite the localized sensitivity on denser graphs, the overall performance variations remain bounded, suggesting that GCD-FGL achieves reliable gener-alization without relying on extensive parameter tuning.   
+
+> Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 10 of 14
+
+Generalized Category Discovery in Federated Graph Learning 
+
+Table 4 
+
+Robustness results of GCD-FGL under random label sparsity across five graph datasets. The best results are highlighted in bold, and the second-best results are underlined. The ‘Gain‘ column shows the improvement between GCD-FGL and the best baseline. Datasets Metrics AutoNovel ORCA GCD SimGCD FedGCD SWIRL GCD-FGL Gain Cora HRScore 34 .12 ± 1 .77 23 .39 ± 0 .65 32 .67 ± 2 .97 19 .15 ± 2 .68 36 .38 ± 8 .25 43 .26 ± 1 .70 𝟓𝟓 .𝟕𝟕 ± 𝟐 .𝟐𝟓 +12.51 Old 42 .05 ± 5 .16 39 .59 ± 0 .35 32 .31 ± 5 .79 37 .99 ± 1 .43 37 .95 ± 17 .40 47 .63 ± 3 .20 𝟔𝟐 .𝟖𝟐 ± 𝟑 .𝟏𝟎 +15.19 New 28 .71 ± 0 .71 16 .60 ± 0 .31 33 .03 ± 0 .45 12 .80 ± 0 .30 34 .93 ± 3 .79 39 .62 ± 1 .80 𝟓𝟎 .𝟏𝟓 ± 𝟐 .𝟖𝟓 +10.53 All 30 .55 ± 0 .10 34 .38 ± 0 .54 32 .93 ± 0 .74 32 .95 ± 0 .23 35 .34 ± 4 .61 40 .72 ± 1 .30 𝟓𝟏 .𝟖𝟗 ± 𝟐 .𝟏𝟔 +11.17 CiteSeer HRScore 42 .32 ± 0 .45 47 .82 ± 0 .38 37 .35 ± 1 .35 40 .60 ± 0 .65 29 .23 ± 1 .63 54 .49 ± 7 .33 𝟔𝟏 .𝟏𝟓 ± 𝟐 .𝟏𝟕 +6.66 Old 47 .22 ± 0 .84 66 .07 ± 0 .63 36 .05 ± 1 .78 38 .06 ± 0 .67 61 .84 ± 0 .66 51 .35 ± 12 .85 𝟔𝟗 .𝟓𝟗 ± 𝟒 .𝟔𝟒 +3.52 New 38 .34 ± 0 .49 37 .47 ± 0 .42 38 .75 ± 2 .06 43 .51 ± 1 .20 18 .50 ± 1 .26 𝟓𝟖 .𝟎𝟓 ± 𝟐 .𝟔𝟖 54 .51 ± 3 .81 -3.54 All 40 .30 ± 0 .39 43 .80 ± 0 .66 38 .16 ± 1 .56 42 .31 ± 0 .85 29 .81 ± 1 .65 56 .57 ± 1 .81 𝟔𝟎 .𝟐𝟏 ± 𝟎 .𝟓𝟗 +3.64 CS HRScore 58 .09 ± 6 .97 20 .63 ± 0 .26 55 .84 ± 2 .11 54 .08 ± 0 .09 25 .35 ± 6 .02 56 .62 ± 8 .98 𝟔𝟗 .𝟑𝟐 ± 𝟏𝟔 .𝟕𝟒 +11.23 Old 59 .60 ± 14 .23 61 .17 ± 0 .19 70 .51 ± 5 .01 56 .19 ± 0 .12 77 .78 ± 4 .57 52 .72 ± 15 .50 𝟕𝟗 .𝟎𝟔 ± 𝟐𝟖 .𝟓𝟗 +1.28 New 56 .66 ± 3 .24 12 .41 ± 0 .03 46 .23 ± 1 .92 52 .13 ± 0 .12 15 .14 ± 4 .29 61 .14 ± 1 .95 𝟔𝟏 .𝟕𝟐 ± 𝟒 .𝟑𝟒 +0.58 All 57 .06 ± 1 .08 54 .41 ± 0 .02 49 .59 ± 1 .47 52 .69 ± 0 .11 23 .82 ± 3 .84 59 .98 ± 1 .79 𝟔𝟒 .𝟏𝟐 ± 𝟎 .𝟑𝟒 +4.14 Photo HRScore 41 .65 ± 5 .29 36 .59 ± 5 .71 42 .13 ± 2 .58 31 .56 ± 0 .72 43 .57 ± 9 .16 45 .34 ± 2 .96 𝟒𝟖 .𝟓𝟒 ± 𝟏𝟗 .𝟏𝟐 +3.20 Old 40 .60 ± 5 .45 30 .48 ± 7 .61 36 .84 ± 3 .74 24 .98 ± 0 .90 45 .40 ± 14 .63 54 .03 ± 6 .58 𝟔𝟎 .𝟏𝟓 ± 𝟏𝟎 .𝟗𝟕 +6.12 New 42 .75 ± 9 .36 45 .78 ± 4 .98 𝟒𝟗 .𝟏𝟖 ± 𝟐 .𝟐𝟒 42 .84 ± 0 .33 41 .89 ± 5 .55 39 .04 ± 2 .74 40 .69 ± 26 .39 -8.49 All 42 .12 ± 5 .70 41 .26 ± 2 .28 45 .53 ± 1 .61 37 .56 ± 0 .24 42 .93 ± 0 .82 43 .47 ± 1 .12 𝟓𝟒 .𝟒𝟎 ± 𝟕 .𝟔𝟓 +8.87 Computers HRScore 39 .48 ± 5 .49 46 .64 ± 7 .60 44 .85 ± 3 .63 48 .72 ± 4 .73 47 .80 ± 6 .53 39 .18 ± 6 .38 𝟒𝟗 .𝟐𝟑 ± 𝟎 .𝟓𝟒 +0.51 Old 48 .96 ± 10 .59 51 .85 ± 5 .55 41 .65 ± 6 .03 51 .21 ± 4 .05 47 .60 ± 8 .99 35 .47 ± 8 .95 𝟓𝟗 .𝟒𝟔 ± 𝟎 .𝟔𝟔 +7.61 New 33 .08 ± 6 .01 42 .37 ± 11 .99 𝟒𝟖 .𝟓𝟓 ± 𝟐 .𝟑𝟑 46 .48 ± 7 .15 48 .00 ± 9 .48 43 .72 ± 8 .25 42 .01 ± 0 .72 -6.54 All 41 .32 ± 6 .77 47 .29 ± 3 .97 44 .97 ± 2 .53 48 .93 ± 2 .10 47 .80 ± 3 .52 39 .44 ± 1 .30 𝟓𝟏 .𝟓𝟒 ± 𝟎 .𝟑𝟗 +2.61 
+
+Note: The random label sparsity rate is set to 10%. 
+
+4.5. Robustness 
+
+To answer Q4 , we evaluate the robustness of GCD-FGL under label sparsity within the distributed federated setting (partitioned via the Louvain algorithm). We set the random label sparsity rate to 10% across all clients. In FGGCD, limited supervisory signals, compounded by heterogeneous and partially overlapping label spaces, can predispose models to overfit local known categories, thereby limiting their capacity to discover novel categories. Quantitative results under this sparse regime are detailed in Table 4. Under these conditions, GCD-FGL demonstrates stable performance, achieving the highest HRScore and overall accuracy (All Acc) on all five benchmark datasets (Cora, CiteSeer, Coauthor CS, Amazon Photo, and Amazon Com-puters). For instance, on the CS dataset, the framework yields an HRScore of 69.32% and a novel category accuracy (New Acc) of 61.72%. On the Computers dataset, it records an HRScore of 49.23%. This performance is primarily attributed to the integration of the TRG mechanism and the client-side semantic alignment flow. When labeled anchors are scarce, these components filter heterophilous noise and regularize node-to-prototype assignments based on structural homophily, enabling the model to leverage unlabeled nodes for representation learning. While certain baseline methods perform well on isolated metrics or datasets, such as GCD regarding novel category discovery (New Acc) on the Amazon Photo dataset or ORCA regarding known category retention (Old Acc) on CiteSeer, they exhibit performance imbalances under sparse conditions. For example, on the CS dataset, FedGCD achieves an Old Acc of 77.78% but a degraded New Acc of 15.14%. This indicates that, without adequate structural regularization, baselines tend to exhibit local representation bias, overfit to the limited known labels, and struggle to generalize to novel categories. In contrast, GCD-FGL mitigates semantic divergence, main-taining balanced predictions across evaluation metrics despite sparsity. 
+
+4.6. Efficiency 
+
+To answer Q5 , we evaluate the training efficiency of GCD-FGL by analyzing the evolution of predictive performance rel-ative to wall-clock running time. This evaluation is conducted under the distributed setting (partitioned via the Louvain algorithm). Figure 6 illustrates the training efficiency curves, reporting the mean performance and standard deviation across four datasets (Cora, CiteSeer, Coauthor CS, and Amazon Photo). Regarding learning dynamics, the performance curves of GCD-FGL exhibit faster initial convergence across all datasets, reaching performance plateaus earlier than the baselines. This efficiency is driven by the Density-Aware Aggregation and the Hierarchical Prototype Alignment mech-anisms. By aligning the global semantic space and filtering out unreliable local updates, these components provide 
+
+Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 11 of 14 Generalized Category Discovery in Federated Graph Learning     
+
+> (a) Cora (b) CiteSeer
+> (c) Coauthor CS (d) Amazon Photo
+> Figure 6: Training efficiency on four datasets. Solid lines denote mean performance over multiple runs, and shaded regions indicate standard deviation.
+> Figure 7: Comparison of HRScore, All Acc, and average running time across four datasets.
+
+consistent optimization directions, reducing the total number of communication rounds required for convergence. However, a late-stage oscillation is observed on the Cora dataset, where classification accuracy degrades slightly during the final training epochs, likely due to over-regularization on its relatively sparse topology. In terms of computational cost, the efficiency of GCD-FGL shows a dependence on graph scale, as further visualized in Figure 7. On smaller datasets (Cora and CiteSeer), the total running time is comparable to the baselines. Conversely, on denser and larger datasets (CS and Photo), GCD-FGL incurs an increase in computational overhead per communication round. This discrepancy stems from the TRG mechanism and the Topology-Aware Graph Contrastive Flow calculations. As the graph volume expands, computing local structural smoothness and executing the false-positive truncation mech-anism introduce additional computational cost. Among the baselines, SWIRL demonstrates competitive convergence stability. As an architecture tailored for holistic GGCD, it leverages topological dependencies better than image-data GCD baselines (AutoNovel, ORCA, and GCD), which exhibit performance bottlenecks on these datasets. Nevertheless, lacking dedicated mechanisms to mitigate subgraph distribution discrepancies and heterogeneous label spaces, SWIRL’s convergence trajectory ultimately plateaus below that of GCD-FGL. Overall, while GCD-FGL incurs an increased per-round computational cost on large-scale graphs, Figure 7 demonstrates that this overhead is offset by its faster convergence rate and higher final accuracy, presenting a practical trade-off for realistic FGGCD scenarios. 
+
+## 5. Conclusion 
+
+In this paper, we propose GCD-FGL, a framework tailored for FGGCD. A primary challenge in FGGCD is the consistent alignment of dynamically discovered novel categories across isolated and heterogeneous clients, which complicates effective global knowledge aggregation. To ad-dress this issue, our method integrates a client-side Topology-Reliable Semantic Alignment and Discovery process, guided by the TRG mechanism, with a server-side Hierarchical Prototype Alignment strategy. Through this architecture, the proposed framework achieves cross-client alignment for novel categories and establishes distinct feature spaces that respect both semantic boundaries and topological homophily. Experiments across five benchmark datasets demonstrate that GCD-FGL achieves state-of-the-art performance. Ro-bustness and ablation analyses further validate the stability of our method, demonstrating its resilience to label sparsity without exacerbating catastrophic forgetting. While GCD-FGL improves accuracy and stability, it incurs a trade-off in training efficiency. The local Topology-Aware Graph Contrastive Flow and the global Hierarchical Prototype Alignment procedures entail higher computational overhead and longer per-round running times compared to baseline methods. Nevertheless, by addressing the cross-client novel category alignment problem, this work provides an effective and practical solution for FGGCD. 
+
+## CRediT authorship contribution statement 
+
+Zhongzheng Yuan: Conceptualization, Methodology, Software, Data Curation, Investigation, Formal analysis, Writing – original draft. Lianshuai Guo: Software, Writing – review & editing. Xunkai Li: Methodology, Visualization, Supervision, Writing – review & editing. Wenyu Wang: 
+
+Supervision. Meixia Qu: Supervision. 
+
+## Declaration of Competing Interest 
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.   
+
+> Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 12 of 14
+
+Generalized Category Discovery in Federated Graph Learning 
+
+## Acknowledgements 
+
+This research was supported by Shenzhen Fundamental Research Program (JCYJ20230807094104009) 
+
+## Data availability 
+
+The data used in this research are publicly available graph datasets. 
+
+## References 
+
+Baek, J., Jeong, W., Jin, J., Yoon, J., Hwang, S.J., 2023. Personalized subgraph federated learning, in: Krause, A., Brunskill, E., Cho, K., Engelhardt, B., Sabato, S., Scarlett, J. (Eds.), International Conference on Machine Learning, ICML 2023, 23-29 July 2023, Honolulu, Hawaii, USA, PMLR. pp. 1396–1415. URL: https://proceedings.mlr.press/ v202/baek23a.html .Blondel, V.D., Guillaume, J., Lambiotte, R., 2023. Fast unfolding of communities in large networks: 15 years later. CoRR abs/2311.06047. URL: https://doi.org/10.48550/arXiv.2311.06047 , doi: 10.48550/ARXIV. 2311.06047 , arXiv:2311.06047 .Cao, K., Brbic, M., Leskovec, J., 2021. Open-world semi-supervised learning. CoRR abs/2102.03526. URL: https://arxiv.org/abs/2102. 03526 , arXiv:2102.03526 .Chen, C., Zhou, J., Zheng, L., Wu, H., Lyu, L., Wu, J., Wu, B., Liu, Z., Wang, L., Zheng, X., 2022. Vertically federated graph neural network for privacy-preserving node classification, in: Raedt, L.D. (Ed.), Proceedings of the Thirty-First International Joint Conference on Artificial Intelligence, IJCAI 2022, Vienna, Austria, 23-29 July 2022, ijcai.org. pp. 1959– 1965. URL: https://doi.org/10.24963/ijcai.2022/272 , doi: 10.24963/ IJCAI.2022/272 .Chuang, C., Robinson, J., Lin, Y., Torralba, A., Jegelka, S., 2020. De-biased contrastive learning, in: Larochelle, H., Ranzato, M., Had-sell, R., Balcan, M., Lin, H. (Eds.), Advances in Neural Informa-tion Processing Systems 33: Annual Conference on Neural Infor-mation Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual. URL: https://proceedings.neurips.cc/paper/2020/hash/ 63c3ddcc7b23daa1e42dc41f9a44a873-Abstract.html .Deng, B., Fu, L., Chen, J., Huang, S., Liao, T., Tao, Z., Chen, C., 2025. Towards understanding parametric generalized category discovery on graphs, in: Singh, A., Fazel, M., Hsu, D., Lacoste-Julien, S., Berkenkamp, F., Maharaj, T., Wagstaff, K., Zhu, J. (Eds.), Forty-second International Conference on Machine Learning, ICML 2025, Vancouver, BC, Canada, July 13-19, 2025, PMLR / OpenReview.net. URL: https://proceedings. mlr.press/v267/deng25b.html .Grandvalet, Y., Bengio, Y., 2004. Semi-supervised learning by en-tropy minimization, in: Advances in Neural Information Processing Systems 17 [Neural Information Processing Systems, NIPS 2004, December 13-18, 2004, Vancouver, British Columbia, Canada], pp. 529–536. URL: https://proceedings.neurips.cc/paper/2004/hash/ 96f2b50b5d3613adf9c27049b2a888c7-Abstract.html .Guo, Z., Wang, H., 2021. A deep graph neural network-based mechanism for social recommendations. IEEE Trans. Ind. Informatics 17, 2776–2783. URL: https://doi.org/10.1109/TII.2020.2986316 , doi: 10.1109/TII.2020. 2986316 .Han, K., Rebuffi, S., Ehrhardt, S., Vedaldi, A., Zisserman, A., 2020. Auto-matically discovering and learning new visual categories with ranking statistics, in: 8th International Conference on Learning Representations, ICLR 2020, Addis Ababa, Ethiopia, April 26-30, 2020, OpenReview.net. URL: https://openreview.net/forum?id=BJl2_nVFPB .Han, K., Vedaldi, A., Zisserman, A., 2019. Learning to discover novel visual categories via deep transfer clustering, in: 2019 IEEE/CVF International Conference on Computer Vision, ICCV 2019, Seoul, Korea (South), October 27 - November 2, 2019, IEEE. pp. 8400–8408. URL: https: //doi.org/10.1109/ICCV.2019.00849 , doi: 10.1109/ICCV.2019.00849 .He, L., Wang, X., Wang, D., Zou, H., Yin, H., Xu, G., 2023. Simplifying graph-based collaborative filtering for recommendation, in: Chua, T., Lauw, H.W., Si, L., Terzi, E., Tsaparas, P. (Eds.), Proceedings of the Sixteenth ACM International Conference on Web Search and Data Mining, WSDM 2023, Singapore, 27 February 2023 - 3 March 2023, ACM. pp. 60–68. URL: https://doi.org/10.1145/3539597.3570451 ,doi: 10.1145/3539597.3570451 .Hendrycks, D., Gimpel, K., 2017. A baseline for detecting misclassified and out-of-distribution examples in neural networks, in: 5th International Conference on Learning Representations, ICLR 2017, Toulon, France, April 24-26, 2017, Conference Track Proceedings, OpenReview.net. URL: 
+
+> https://openreview.net/forum?id=Hkg4TI9xl
+
+.Jiang, B., Zhang, Z., Lin, D., Tang, J., Luo, B., 2019. Semi-supervised learning with graph learning-convolutional networks, in: IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2019, Long Beach, CA, USA, June 16-20, 2019, Computer Vision Foundation / IEEE. pp. 11313–11320. URL: http://openaccess. thecvf.com/content_CVPR_2019/html/Jiang_Semi-Supervised_Learning_ With_Graph_Learning-Convolutional_Networks_CVPR_2019_paper.html ,doi: 10.1109/CVPR.2019.01157 .Kingma, D.P., Ba, J., 2015. Adam: A method for stochastic optimization, in: Bengio, Y., LeCun, Y. (Eds.), 3rd International Conference on Learning Representations, ICLR 2015, San Diego, CA, USA, May 7-9, 2015, Conference Track Proceedings. URL: http://arxiv.org/abs/1412.6980 .Kipf, T.N., Welling, M., 2017. Semi-supervised classification with graph convolutional networks, in: 5th International Conference on Learning Representations, ICLR 2017, Toulon, France, April 24-26, 2017, Con-ference Track Proceedings, OpenReview.net. URL: https://openreview. net/forum?id=SJU4ayYgl .Kuhn, H.W., 2010. The hungarian method for the assignment problem, in: Jünger, M., Liebling, T.M., Naddef, D., Nemhauser, G.L., Pulleyblank, W.R., Reinelt, G., Rinaldi, G., Wolsey, L.A. (Eds.), 50 Years of Integer Programming 1958-2008 - From the Early Years to the State-of-the-Art. Springer, pp. 29–47. URL: https://doi.org/10.1007/978-3-540-68279-0_ 2, doi: 10.1007/978-3-540-68279-0\_2 .Li, X., Wu, Z., Zhang, W., Sun, H., Li, R., Wang, G., 2024. Adafgl: A new paradigm for federated node classification with topology heterogeneity, in: 40th IEEE International Conference on Data Engineering, ICDE 2024, Utrecht, The Netherlands, May 13-16, 2024, IEEE. pp. 2517– 2530. URL: https://doi.org/10.1109/ICDE60146.2024.00198 , doi: 10. 1109/ICDE60146.2024.00198 .Li, X., Wu, Z., Zhang, W., Zhu, Y., Li, R., Wang, G., 2023. Fedgta: Topology-aware averaging for federated graph learning. Proc. VLDB Endow. 17, 41–50. URL: https://www.vldb.org/pvldb/vol17/p41-li.pdf ,doi: 10.14778/3617838.3617842 .Li, X., Zhu, Y., Pang, B., Yan, G., Yan, Y., Li, Z., Wu, Z., Zhang, W., Li, R., Wang, G., 2025. Openfgl: A comprehensive benchmark for federated graph learning. Proc. VLDB Endow. 18, 1305–1320. URL: https://www. vldb.org/pvldb/vol18/p1305-li.pdf , doi: 10.14778/3718057.3718061 .Liu, L., Chen, J., Zhu, S., Zhang, J., Zhang, C., 2023. Federated graph learning with cross-subgraph missing links recovery, in: 2023 IEEE 3rd International Conference on Information Technology, Big Data and Artificial Intelligence (ICIBA), pp. 1223–1228. doi: 10.1109/ICIBA56860. 2023.10165462 .Liu, X., Song, C., Huang, F., Fu, H., Xiao, W., Zhang, W., 2022. Graphcdr: a graph neural network method with contrastive learning for cancer drug response prediction. Briefings Bioinform. 23. URL: https: //doi.org/10.1093/bib/bbab457 , doi: 10.1093/BIB/BBAB457 .McMahan, B., Moore, E., Ramage, D., Hampson, S., y Arcas, B.A., 2017. Communication-efficient learning of deep networks from decentralized data, in: Singh, A., Zhu, X.J. (Eds.), Proceedings of the 20th International Conference on Artificial Intelligence and Statistics, AISTATS 2017, 20-22 April 2017, Fort Lauderdale, FL, USA, PMLR. pp. 1273–1282. URL: 
+
+> http://proceedings.mlr.press/v54/mcmahan17a.html
+
+.Pu, N., Li, W., Ji, X., Qin, Y., Sebe, N., Zhong, Z., 2024. Federated generalized category discovery, in: IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2024, Seattle, WA, USA, June 16-22, 2024, IEEE. pp. 28741–28750. URL: https://doi.org/10.1109/ CVPR52733.2024.02715 , doi: 10.1109/CVPR52733.2024.02715 .
+
+Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 13 of 14 Generalized Category Discovery in Federated Graph Learning 
+
+Rousseeuw, P., 1987. Silhouettes: a graphical aid to the interpreta-tion and validation of cluster analysis. J. Comput. Appl. Math. 20, 53–65. URL: https://doi.org/10.1016/0377-0427(87)90125-7 , doi: 10. 1016/0377-0427(87)90125-7 .Snell, J., Swersky, K., Zemel, R.S., 2017. Prototypical networks for few-shot learning, in: Guyon, I., von Luxburg, U., Bengio, S., Wallach, H.M., Fergus, R., Vishwanathan, S.V.N., Garnett, R. (Eds.), Advances in Neural Information Processing Systems 30: Annual Conference on Neural Information Processing Systems 2017, December 4-9, 2017, Long Beach, CA, USA, pp. 4077–4087. URL: https://proceedings.neurips. cc/paper/2017/hash/cb8da6767461f2812ae4290eac7cbc42-Abstract.html .Sohn, K., Berthelot, D., Carlini, N., Zhang, Z., Zhang, H., Raffel, C., Cubuk, E.D., Kurakin, A., Li, C., 2020. Fixmatch: Simplifying semi-supervised learning with consistency and confidence, in: Larochelle, H., Ranzato, M., Hadsell, R., Balcan, M., Lin, H. (Eds.), Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual. URL: https://proceedings.neurips.cc/paper/2020/hash/ 06964dce9addb1c5cb5d6e3d9838f733-Abstract.html .Tan, Y., Long, G., Liu, L., Zhou, T., Lu, Q., Jiang, J., Zhang, C., 2022. Fedproto: Federated prototype learning across heterogeneous clients, in: Thirty-Sixth AAAI Conference on Artificial Intelligence, AAAI 2022, Thirty-Fourth Conference on Innovative Applications of Artificial Intelligence, IAAI 2022, The Twelveth Symposium on Educational Advances in Artificial Intelligence, EAAI 2022 Virtual Event, February 22 - March 1, 2022, AAAI Press. pp. 8432–8440. URL: https://doi. org/10.1609/aaai.v36i8.20819 , doi: 10.1609/AAAI.V36I8.20819 .Vaze, S., Han, K., Vedaldi, A., Zisserman, A., 2022. Generalized category discovery, in: IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2022, New Orleans, LA, USA, June 18-24, 2022, IEEE. pp. 7482–7491. URL: https://doi.org/10.1109/CVPR52688.2022. 00734 , doi: 10.1109/CVPR52688.2022.00734 .Wang, H., Dai, C., Wen, Y., Wang, X., Liu, W., He, S., Bo, X., Peng, S., 2023. GADRP: graph convolutional networks and autoencoders for cancer drug response prediction. Briefings Bioinform. 24. URL: 
+
+> https://doi.org/10.1093/bib/bbac501
+
+, doi: 10.1093/BIB/BBAC501 .Wen, X., Zhao, B., Qi, X., 2023. Parametric classification for generalized category discovery: A baseline study, in: IEEE/CVF International Conference on Computer Vision, ICCV 2023, Paris, France, October 1-6, 2023, IEEE. pp. 16544–16554. URL: https://doi.org/10.1109/ ICCV51070.2023.01521 , doi: 10.1109/ICCV51070.2023.01521 .Yu, J., Yin, H., Xia, X., Chen, T., Cui, L., Nguyen, Q.V.H., 2022. Are graph augmentations necessary?: Simple graph contrastive learning for recommendation, in: Amigó, E., Castells, P., Gonzalo, J., Carterette, B., Culpepper, J.S., Kazai, G. (Eds.), SIGIR ’22: The 45th International ACM SIGIR Conference on Research and Development in Informa-tion Retrieval, Madrid, Spain, July 11 - 15, 2022, ACM. pp. 1294– 1303. URL: https://doi.org/10.1145/3477495.3531937 , doi: 10.1145/ 3477495.3531937 .Zhang, K., Yang, C., Li, X., Sun, L., Yiu, S., 2021. Subgraph federated learning with missing neighbor generation, in: Ranzato, M., Beygelzimer, A., Dauphin, Y.N., Liang, P., Vaughan, J.W. (Eds.), Advances in Neural Information Processing Systems 34: Annual Conference on Neural Information Processing Systems 2021, NeurIPS 2021, December 6-14, 2021, virtual, pp. 6671–6682. URL: https://proceedings.neurips.cc/ paper/2021/hash/34adeb8e3242824038aa65460a47c29e-Abstract.html .Zhu, Y., Li, X., Wu, Z., Wu, D., Hu, M., Li, R., 2024. Fedtad: Topology-aware data-free knowledge distillation for subgraph federated learning, in: Proceedings of the Thirty-Third International Joint Conference on Artificial Intelligence, IJCAI 2024, Jeju, South Korea, August 3-9, 2024, ijcai.org. pp. 5716–5724. URL: https://www.ijcai.org/proceedings/ 2024/632 .Zhu, Y., Xu, Y., Yu, F., Liu, Q., Wu, S., Wang, L., 2020. Deep graph contrastive representation learning. CoRR abs/2006.04131. URL: 
+
+> https://arxiv.org/abs/2006.04131
+
+, arXiv:2006.04131 .
+
+Zhongzheng Yuan et al.: Preprint submitted to Elsevier Page 14 of 14

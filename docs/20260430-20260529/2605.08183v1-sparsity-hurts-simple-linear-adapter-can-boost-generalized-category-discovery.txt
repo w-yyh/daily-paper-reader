@@ -1,0 +1,918 @@
+Title: Sparsity Hurts: Simple Linear Adapter Can Boost Generalized Category Discovery
+
+URL Source: https://arxiv.org/pdf/2605.08183v1
+
+Published Time: Tue, 12 May 2026 00:09:27 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 1
+
+# Sparsity Hurts: Simple Linear Adapter Can Boost Generalized Category Discovery 
+
+Bo Ye, Kai Gan, Tong Wei, and Min-Ling Zhang, Senior Member, IEEE 
+
+Abstract —Generalized Category Discovery (GCD) seeks to identify novel categories from unlabeled data while retaining the classifica-tion ability of seen categories. Prior GCD methods commonly leverage transferable representations from pre-trained models, adapting to downstream datasets via partial fine-tuning (updating only the final ViT block) and visual prompt tuning (appending learnable vectors to inputs). However, conventional partial fine-tuning offers limited flexibility, as it fails to adapt the entire model; meanwhile, visual prompt tuning is prone to overfitting, due to its sensitivity to initialization and inherently constrained capacity. To address these limitations, we propose LAGCD, a simple yet effective GCD approach that embeds a residual linear adapter into each ViT block. From the perspective of feature sparsity, we systematically show that non-linearity in conventional adapters impairs performance, whereas our linear adapter enhances it by enabling more flexible model capacity. We further introduce an auxiliary distribution alignment loss to mitigate the negative impact of biased predictions between seen and novel categories. Extensive experiments on both generic and fine-grained datasets confirm that LAGCD consistently improves performance over many sophisticated baselines. The source code is available at https://github.com/yebo0216best/LAGCD. 
+
+Index Terms —Generalized category discovery, semi-supervised learning, novel class discovery, parameter-efficient fine-tuning. 
+
+✦Params(M) Fine-Grained(%) Generic(%) 
+
+7.1 7.2 
+
+6.4 
+
+1.8 
+
+SimGCD SPTNet AdaptGCD Ours 
+
+54.8 
+
+58.7 
+
+60.7 
+
+62.4 
+
+87.0 
+
+88.0 
+
+89.5 
+
+90.6 IN100  
+
+> CF100
+> CF10
+> CUB
+> SCars
+> Aircraft HB19
+
+Seen Classes  
+
+> IN100
+> CF100
+> CF10
+> CUB
+> SCars
+> Aircraft HB19
+
+Novel Classes 
+
+SimGCD SPTNet AdaptGCD Ours 
+
+Fig. 1: Performance comparisons with SimGCD [1], SPTNet [2], and AdaptGCD [3]. (a) We compare the number of tunable parameters of the ViT backbone, and accuracy averaged over four fine-grained and three generic datasets. (b) Seen and novel class accuracy of our method and existing methods on seven datasets. 
+
+1 INTRODUCTION 
+
+# RECENTLY , semi-supervised learning (SSL) [4]–[10] has emerged as a promising paradigm for leveraging large-scale unlabeled data. However, it struggles when unlabeled data contain novel categories which are not seen in labeled data, violating its core assumption of complete category cov-erage and hindering its ability to mining useful information from novel categories [11]–[13]. To tackle this, Generalized Category Discovery (GCD) has emerged as a widely studied topic in recent research [1]–[3], [12]–[15]. GCD tackles the dual task of identifying novel categories from unlabeled data while maintaining classification capability on seen categories. The limited supervision from seen categories, coupled with the absence of accurate information about 
+
+• Bo Ye, Kai Gan, Tong Wei, and Min-Ling Zhang are with the School of Computer Science and Engineering, Southeast University, Nanjing 210096, China, and the Key Laboratory of Computer Network and Information Integration (Southeast University), Ministry of Education, China. E-mail: {yeb, gank, weit, zhangml }@seu.edu.cn. 
+
+novel categories, makes it difficult for models to generalize effectively. Existing GCD methods [1], [13], [16] utilize DINO-pretrained Vision Transformer (ViT) [17], [18] as backbone to extract transferable semantic representations, while address-ing overfitting by adopting an effective partial fine-tuning strategy, wherein only the final ViT block is updated. To improve the flexibility of the backbone, several methods [2], [14] have built upon Visual Prompt Tuning (VPT) [19] as an enhancement over conventional partial fine-tuning. However, these methods reveal that direct adaptation of the backbone via visual prompts can induce training instability and degrade performance, highlighting the need for spe-cialized mitigation strategies. For example, PromptCAL [14] introduces a warm-up phase with discriminative prompt regularization to adapt the class token and visual prompts for downstream datasets, while SPTNet [2] employs a two-stage training paradigm that alternates between optimizing model parameters and visual prompts. Unlike fine-tuning  
+
+> arXiv:2605.08183v1 [cs.CV] 5 May 2026 JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 2
+
+paradigms discussed above, adapter-based tuning [20]–[22] still remains underexplored in GCD [3]. The paradigm uti-lizes a two-layer down →up bottleneck module with zero-initialized up-projection layers, ensuring new parameters initially approximate the behavior of the backbone. Addi-tionally, AdaptFormer [22] demonstrates that adapter-based tuning achieves greater stability when scaling up trainable parameters by expanding bottleneck dimensions, compared to VPT, which relies on increasing the number of visual prompts. AdaptGCD [3] pioneers the use of adapters for GCD. To address bias between seen and novel categories, it extends SimGCD [1] with a multi-expert adapter structure, where a routing layer assigns samples to experts specialized in seen or novel categories. However, this design introduces high computational overhead, requiring multiple adapters per ViT block and additional loss terms for expert balancing, potentially limiting applicability and generalization. In this paper, we propose a simple yet effective adapter-based tuning method for GCD. Instead of introducing com-plex architectural changes or focusing on tuning hyperpa-rameters, we investigate the crucial yet often neglected role of ReLU activation [23] within adapters [22]. Our analysis reveals that ReLU-induced sparsity could discard impor-tant information and further impair effective adaptation. Through extensive validation experiments, we find that a simple linear transformation by removing the activation achieves robust generalization, suggesting that the non-linearity and sparsity introduced by ReLU are not only unnecessary but may even hinder performance. We further observe that varying adapter hyperparameters yields stable performance for seen categories, driven by rapidly learned discriminative features, but leads to notable fluctuations on novel categories. In addition, directly applying adapter without ReLU activation still incurs prediction bias due to the inherent learning discrepancies between seen and novel categories [1], [12]. Moreover, the balanced sampling commonly used to balance supervised and unsupervised contrastive learning tends to oversample labeled data while undersampling unlabeled data, potentially exacerbating the bias. To alleviate this, we optimize an auxiliary distribution alignment loss without compromising contrastive represen-tation learning. As shown in Figure 1, our method outper-forms the baseline SimGCD [1] as well as the prompt-based method SPTNet [2] in terms of accuracy, while requiring fewer tunable parameters, with both methods relying on partial fine-tuning and SPTNet additionally incorporating visual prompts. Compared with the adapter-based method AdaptGCD [3], our method achieves superior performance with fewer trainable parameters. 
+
+Our contributions are as follows: (1) We systematically analyze the negative effects of feature sparsity caused by nonlinear activation function in adapters, which is over-looked in prior literature; (2) We propose LAGCD, a simple but effective GCD method by removing the activation func-tion within adapters, coupled with an auxiliary distribution alignment to ensure balanced predictions; (3) Our proposed method achieves state-of-the-art results across both generic and fine-grained benchmarks, establishing a strong baseline for future research in this field. 
+
+2 RELATED WORK 
+
+Generalized Category Discovery. GCD aims to detect novel categories in unlabeled data while retaining performance on seen categories [12], [13]. Current GCD methods can be di-vided into non-parametric [13]–[15], [24]–[26] and paramet-ric classifiers [1]–[3], [27]–[30]. Non-parametric classifier-based methods often combine semi-supervised contrastive learning for representation learning with semi-supervised 
+
+k-means for category assignment. SimGCD [1] tackles non-parametric classifier overhead with a parametric proto-type classifier and entropy maximization, improving per-formance and efficiency. Traditional GCD methods lean on partial fine-tuning. PromptCAL [14] and SPTNet [2] propose two-stage frameworks blending partial fine-tuning with visual prompts for better adaptation. AdaptGCD [3] is the first to introduce adapters [22] into GCD, proposing a multi-expert adapter structure. Diffierent from them, we explore how adapters can achieve the better adaptation by analyzing their activations. 
+
+Adapter-based Tuning. Fully fine-tuning large pretrained models can lead to training instability and limited trans-ferability. Recently, adapter-based tuning methods [20]– [22] have been proposed to address these challenges. These methods insert lightweight adapters, which are two-layer bottleneck-structured MLPs with residual connections, into pretrained models. Adapter [20], LoRA [21], Adapt-Former [22] are three representative adapters across various downstream tasks. Adapter [20] sequentially inserts two adapters into each transformer block: one after the Multi-head Self-Attention (MSA) and one after the MLP, adding few tunable parameters but matching the performance of full fine-tuning. LoRA [21] incorporates trainable low-rank decomposition matrices in parallel with the original weights in the MSA, achieving competitive performance without introducing extra inference latency. AdaptFormer [22] mod-ifies the original sequential Adapter design by introducing a scalable Adapter in parallel with the MLP, demonstrat-ing notable effectiveness in vision downstream tasks. In-spired by the effectiveness of AdaptFormer in downstream tasks [3], [31], we adopt it as our base adapter and conduct a detailed investigation into the role of activation functions within its architecture. 
+
+3 PRELIMINARY 
+
+3.1 Problem Formulation 
+
+Let D denote the whole dataset, which consists of two subsets: a labeled set Dl = {(xi, y i)}Nl 
+
+> i=1
+
+⊂ X l × Y l and an unlabeled set Du = {xj }Nl+Nu 
+
+> j=Nl+1
+
+⊂ X u, where x represents an image sample and y represents a label. The label space for the labeled and unlabeled samples is given by Yl = Cs and 
+
+Yu = C = Cs ∪ C n, where C is the set of all categories, and 
+
+Cs and Cn represent the label sets for the Seen , and Novel 
+
+categories, respectively. The objective of the GCD task is to categorize all the unlabeled images in Du, specifically by classifying samples from the seen category set Cs and clustering samples from the novel category set Cn.JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 3
+
+3.2 Baseline: SimGCD 
+
+SimGCD [1] is a representative baseline, containing two key components. One focuses on representation learning, while the other targets parametric prototype classification. 
+
+Representation Learning. The representation learning ob-jective of SimGCD is based on GCD [13], which incorporates supervised contrastive learning [32] for labeled samples and self-supervised contrastive learning [33] for all samples. For-mally, given two augmented views, xi and x′
+
+> i
+
+, of the same image in a mini-batch B, the self-supervised contrastive loss is defined as follows: 
+
+Lu 
+
+> rep
+
+= 1
+
+|B|
+
+X
+
+> i∈B
+
+− log exp  z⊤ 
+
+> i
+
+z′
+
+> i
+
+/τ u
+
+Pn̸=in exp  z⊤ 
+
+> i
+
+z′
+
+> n
+
+/τ u
+
+ (1) where the feature zi = g (f (xi)) is ℓ2-normalized, with 
+
+f and g denoting the backbone and the projection head, respectively, and τu being the temperature value. The super-vised contrastive loss Ls 
+
+> rep
+
+is similar, with the key difference being that positive samples are matched according to their labels. The overall representation learning loss is balanced with λsup : Lrep = (1 − λsup )Lu 
+
+> rep
+
++ λsup Ls
+
+> rep
+
+.
+
+Parametric Classification. The parametric classification of SimGCD follows self-distillation [18], [34]. With K = |Y l ∪Yu| categories, a set of prototypes C = {c1, . . . , cK } is randomly initialized. SimGCD calculate the probability for each augmented view xi by applying softmax on the cosine similarity between the hidden feature hi = f (xi) and prototypes: 
+
+p(k) 
+
+> i
+
+= exp 
+
+ 1 
+
+> τs
+
+(hi/|| hi|| 2)⊤(ck/|| ck|| 2)
+
+P 
+
+> k′
+
+exp 
+
+ 1 
+
+> τs
+
+(hi/|| hi|| 2)⊤(ck′ /|| ck′ || 2)
+
+ (2) where τs is a hyperparameter that adjusts the ‘student’ probability, and k denotes the k-th class. The classification objective is the cross-entropy ℓ(y, p) = − P 
+
+> k
+
+y(k) log p(k).For labeled data, Ls 
+
+> cls
+
+is computed directly using their one-hot ground-truth labels, while for unlabeled samples, we derive soft pseudo-labels q′ 
+
+> i
+
+from another view x′ 
+
+> i
+
+using a sharper temperature τt than τs, as defined in Eq. 2. The supervised and unsupervised losses are: 
+
+Ls 
+
+> cls
+
+= 1
+
+|Bl|
+
+X
+
+> i∈Bl
+
+ℓ(yi, pi) (3) 
+
+Lu 
+
+> cls
+
+= 1
+
+|B|
+
+X
+
+> i∈B
+
+ℓ(q′
+
+> i
+
+, pi) − λent H(p) (4) where yi denotes the one-hot label of xi. H(p) is the maximum entropy regularization [34], [35], and λent is the weight hyperparameter. The detailed form of H(p) is: 
+
+H(p) = − X
+
+> k
+
+p(k) log p(k) (5) where p = 12|B|
+
+P 
+
+> i∈B
+
+(pi + p′
+
+> i
+
+) denotes the mean predicted probability of a batch. The total classification objective is 
+
+Lcls = (1 − λsup )Lu 
+
+> cls
+
++ λsup Ls
+
+> cls
+
+, where λsup is the same as 
+
+λsup of Lrep , and the overall objective of SimGCD is simply 
+
+Lrep + Lcls .
+
+3.3 Base Adapter: AdaptFormer 
+
+In this paper, we primarily investigate enhancements based on AdaptFormer [22] due to its simplicity and effectiveness. AdaptFormer introduces an additional branch within the MLP block of ViT, which is a lightweight module de-signed for task-specific fine-tuning. Specifically, the branch is designed as a bottleneck structure, comprising a down-projection layer with parameters Wdown ∈ Rd× ˆd and 
+
+bdown ∈ R ˆd, and an up-projection layer with parameters 
+
+Wup ∈ R ˆd×d and bup ∈ Rd, where ˆd represents the bot-tleneck dimension. It also incorporates the ReLU activation function between Wdown and Wup for non-linearity. And the branch is integrated with the original MLP via residual connection, scaled by a factor sa. Formally, given an input feature x′
+
+> ℓ
+
+, the additional branch generates the adapted feature ˜xℓ:
+
+˜xℓ = ReLU(LN( x′
+
+> ℓ
+
+) · W⊤ 
+
+> down
+
++ bdown ) · W⊤ 
+
+> up
+
++ bup (6) Subsequently, both the adapted feature ˜xℓ and MLP feature are fused with the input feature x′ 
+
+> ℓ
+
+via a residual connection: 
+
+xℓ = MLP(LN( x′
+
+> ℓ
+
+)) + x′ 
+
+> ℓ
+
++ ˜xℓ · sa (7) where sa is the scaling factor, and LN( ·) denotes the layer normalization. During fine-tuning, only the parameters of the bottleneck modules are updated and the rest are frozen. 
+
+4 METHOD 
+
+4.1 Analyzing the Sparsity of Adapter 
+
+In GCD, models often exhibit pronounced bias fluctuations during training, as labeled data primarily drives learning of the seen categories and only indirectly supports generaliza-tion to novel ones [1], [12]. This intrinsic challenge imposes substantial difficulties for effective adaptation. When tack-ling complex downstream tasks, optimizing models with adapters is largely influenced by the choice of the bot-tleneck dimension ˆd and the scaling factor sa. Intuitively, excessively large values may introduce training instability and overfitting, whereas overly small values can result in insufficient adaptation to downstream datasets. In this work, we examine a crucial yet often neglected component in adapters: the intrinsic ReLU activation func-tion, which introduces non-linearity and sparsity to enhance performance [22]. Rather than emphasizing the tuning of the bottleneck dimension ˆd and the scaling factor sa in adapters, we instead examine how activation functions influence model adaptation. Based on the evaluation of ReLU and its variants in deep neural networks, Xu et al. [36] demon-strated that introducing a non-zero slope for negative inputs in ReLU consistently improves performance. Intuitively, ReLU-induced sparsity through zeroing negative values may discard important information during feature propaga-tion, potentially constraining model adaptation. Motivated by this consideration, we perform a systematic analysis of ReLU’s role in the adapter-based GCD setting and address a central question: Does ReLU-induced non-linearity or sparsity within adapters truly enhance their adaptability? 
+
+Analysis Methods: To quantify the sparsity of ReLU and analyze its impact more effectively, we design experiments JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 4
+
+from three perspectives: the activation gradient perspective, where Leaky-ReLU is used to adjust the gradient magnitude of negative values; the activation range perspective, where Threshold-ReLU is employed to directly control the ex-tent of zero-valued outputs; and the activation distribution perspective, where ELU is adopted to introduce smooth negative activations and alleviate the strict sparsity. 
+
+Leaky-ReLU [37] introduces a small fixed non-zero slope 
+
+α (with the special case of 0 ≤ α ≤ 1 in our analysis) to provide the tunable gradient for negative inputs, which transforms ReLU’s inherently sparse activation pattern into a dense pattern. Leaky-ReLU generalizes activation behav-iors: as α approaches 0, it converges to ReLU, while as α ap-proaches 1, it converges to linear transformation. Formally, Leaky-ReLU is defined as follows: 
+
+Leaky -ReLU( x) = 
+
+(
+
+x, x ≥ 0
+
+αx, x < 0 (8) 
+
+Threshold-ReLU [38] introduces a fixed threshold t to replace the zero-threshold mechanism in ReLU. This mod-ification makes the sparsity of ReLU adjustable, which still maintains its sparse nature and is more intuitive compared to Leaky-ReLU. The threshold t controls sparsity levels with improved interpretability: higher t values force more activations to zero, creating greater sparsity. Specifically, Threshold-ReLU is defined as follows: 
+
+Threshold -ReLU( x) = 
+
+(
+
+x, x ≥ t
+
+0, x < t (9) 
+
+ELU (Exponential Linear Unit) [39] extends ReLU by allowing negative outputs in an exponential form, which alleviates strict sparsity and shifts the mean activation closer to zero, thereby facilitating gradient flow during training. For large negative inputs, ELU saturates at a fixed value 
+
+−β(β > 0) . A larger β amplifies negative responses and re-duces sparsity, whereas as β approaches 0, ELU degenerates to ReLU. Formally, ELU is defined as: 
+
+ELU( x) = 
+
+(
+
+x, x ≥ 0
+
+β(ex − 1) , x < 0 (10) 0 0.01 0.5 0.99 1        
+
+> 55
+> 60
+> 65
+> Accuracy (%)
+> FGVC-Aircraft
+> All Seen Novel
+> 00.01 0.5 0.99 1
+> 50
+> 60
+> 70
+> 80
+> Accuracy (%)
+> Stanford Cars
+> All Seen Novel
+
+Fig. 2: Different slopes α in Leaky-ReLU. For experimental validation, we employ SimGCD [1] with adapters on two challenging fine-grained datasets FGVC-Aircraft [40] and Stanford Cars [41], where ReLU is replaced with Leaky-ReLU, Threshold-ReLU, or ELU. We linear -2 -1 0 1 2         
+
+> t
+> 45
+> 50
+> 55
+> 60
+> 65
+> 70
+> Accuracy (%)
+> FGVC-Aircraft
+> All Seen Novel
+> linear -2 -1 012
+> t
+> 40
+> 50
+> 60
+> 70
+> 80 80
+> Accuracy (%)
+> Stanford Cars
+> All Seen Novel
+
+Fig. 3: Different thresholds t in Threshold-ReLU. 0 1.0 2.0 3.0 linear         
+
+> 55
+> 60
+> 65
+> Accuracy (%)
+> FGVC-Aircraft
+> All Seen Novel
+> 01.0 2.0 3.0 linear
+> 50
+> 60
+> 70
+> 80
+> Accuracy (%)
+> Stanford Cars
+> All Seen Novel
+
+Fig. 4: Different slopes β in ELU. explore different activation settings by varying the slope α ∈{0, 0.01 , 0.5, 0.99 , 1}, the threshold t ∈ {− 2, −1, 0, 1, 2},and the slope β ∈ { 0, 1, 2, 3}, while keeping all other hy-perparameters consistent. In addition, to examine whether different adapters induce overfitting or underfitting, we compute feature similarity for each sample before and after fine-tuning the pre-trained model. 
+
+Analysis Results: In the Leaky-ReLU experiments, as shown in Figure 2, performance closely correlates with α
+
+values, with outcomes near the extremes resembling those observed at α = 0 and α = 1 . It is evident that adapters using Leaky-ReLU with multiple non-zero α values outper-form those using ReLU ( α = 0 ), especially in terms of novel category accuracy. Interestingly, the strong performance ob-served in the purely linear case ( α = 1 ) suggests that the sparsity and non-linearity induced by ReLU may not be essential, and can even be detrimental. In the Threshold-ReLU experiments, as shown in Figure 3, performance ex-hibits a clear dependence on the threshold t. Specifically, Threshold-ReLU with negative thresholds ( t ∈ {− 2, −1})achieves better results than standard ReLU ( t = 0 ), whereas positive thresholds ( t ∈ { 1, 2}) lead to a substantial drop in performance. The results in Figure 3 also illustrate a clear trend from highly sparse settings ( t = 2 ) to dense (purely linear case, approximated as t = −∞ ), further highlighting the negative impact of ReLU-induced sparsity. In the ELU experiments, as shown in Figure 4, enlarging the slope β leads to consistent improvements, with all non-zero values ( β > 0) outperforming the standard ReLU (β = 0 ). These results indicate that enhancing the response to negative values within a reasonable range is conducive to more effective adaptation, whereas merely suppressing negative values to enforce non-linearity does not necessarily JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 50.1 0.2 0.3 0.4 0.5 0.6 0.7                   
+
+> Adapter Scaling Factor
+> 61
+> 62
+> 63
+> 64
+> 65
+> 66
+> 67
+> 68
+> 69
+> Accuracy (%)
+> Seen Accuracy
+> Linear
+> ReLU
+> 0.1 0.2 0.3 0.4 0.5 0.6 0.7
+> Adapter Scaling Factor
+> 46
+> 48
+> 50
+> 52
+> 54
+> 56
+> 58
+> Accuracy (%)
+> Novel Accuracy
+> Linear
+> ReLU
+> 16 32 64 96 128 256 512
+> Bottleneck Dimension
+> 62
+> 63
+> 64
+> 65
+> 66
+> 67
+> Accuracy (%)
+> Seen Accuracy
+> Linear
+> ReLU
+> 16 32 64 96 128 256 512
+> Bottleneck Dimension
+> 48
+> 50
+> 52
+> 54
+> 56
+> 58
+> Accuracy (%)
+> Novel Accuracy
+> Linear
+> ReLU
+
+Fig. 5: Performance comparison between ReluAdapter and LinearAdapter . Across different adapter scaling factors sa and bottleneck dimensions ˆd on the FGVC-Aircraft, LinearAdapter demonstrates superior overall accuracy. yield benefits. Furthermore, Figure 6 reveals that adapters without ReLU yield lower feature similarity but better per-formance, suggesting they enable more effective adaptation compared to those with ReLU. Overall, the results of the three ReLU variants indicate that, in the context of adapters, the non-linearity intro-duced by activation functions is not essential for effective adaptation, whereas their inherent sparsity can suppress informative signals, ultimately hindering adaptation. 0.2 0.0 0.2 0.4 0.6     
+
+> Similarity
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> Frequency
+> FGVC-Aircraft
+> w ReLU
+> w/o ReLU
+> 0.2 0.0 0.2 0.4 0.6
+> Similarity
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> Frequency
+> Stanford Cars
+> w ReLU
+> w/o ReLU
+
+Fig. 6: Similarity between pre-trained and fine-tuned fea-tures. The results indicate that features fine-tuned using adapters without ReLU present lower similarity to pre-trained features, in comparison to those fine-tuned with ReLU-based adapters. 
+
+4.2 Eliminating the Sparsity of Adapter 
+
+In the above analysis, we observed that mitigating the spar-sity induced by ReLU can yield notable performance gains. Although using a fixed α in Leaky-ReLU, a fixed threshold t
+
+in Threshold-ReLU or a fixed β in ELU can lead to improve-ments, determining suitable values for these parameters often requires extensive empirical tuning. Our experiments reveal that a simple linear transformation not only exhibits strong generalization capability but also provides superior computational efficiency compared to the non-linear alter-natives Leaky-ReLU, Threshold-ReLU, and ELU. Based on these findings, we simply define LinearAdapter as follows: 
+
+˜xℓ = (LN( x′
+
+> ℓ
+
+) · W⊤ 
+
+> down
+
++ bdown ) · W⊤ 
+
+> up
+
++ bup (11) where Wdown and Wup represent the down-projection and up-projection matrices with their corresponding bias terms 
+
+bdown and bup . The implementation of LinearAdapter, as shown in Figure 7, modifies the adapter by removing ReLU. We further experiment with different combinations of the bottleneck dimension ˆd and the scaling factor sa. As shown in Figure 5, LinearAdapter shows improvements in both performance and stability. The results also suggest that both small ˆd and sa limit model adaptation, whereas large values lead to training instability. 
+
+class LinearAdapter(nn.Module): 
+
+def forward(self, x): x = self.layer_norm(x) x = self.down_proj(x) 
+
+# x = nn.ReLU(x) 
+
+x = self.drop_out(x) x = self.up_proj(x) x = x * self.s 
+
+return x
+
+Fig. 7: A simple modification in PyTorch pseudo-code. Discussion. Further analysis reveals that the effects of hyperparameters differ between seen and novel categories. We find that variations cause only minor fluctuations in seen category accuracy, but have a significant impact on novel category accuracy, as shown in Figure 5. Specifically, increasing sa or ˆd rarely leads to improvements in seen category accuracy; instead, gains in overall accuracy are typically driven by better novel category clustering. This is mainly because the presence of labeled data causes the model to prioritize learning discriminative features from seen categories, which restricts novel category learning when the adapter’s capacity is limited. However, setting either parameter too high leads to degraded performance on seen categories, suggesting potential overfitting. In this context, LinearAdapter leverages its dense representations to achieve a more favorable trade-off between adaptability and stability than the sparse ReluAdapter .Moreover, other smooth activation functions, such as GeLU and Swish, can also be employed to mitigate feature sparsity, as examined in the subsequent section. Neverthe-less, we find that the overall performance is more strongly associated with the output range and gradient saturation of the activation functions, rather than with the specific form of non-linearity. In general, the less compressive the activation function, the better the performance. This observation, to some extent, explains why a simple linear transformation can outperform these non-linear counterparts. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 60 50 100 150 200 
+
+> Epoch
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Ratio
+
+Stanford Cars 
+
+> Seen Ratio
+> Prior
+> RA
+> LA
+> LA+DA
+> Novel Ratio
+> RA
+> LA
+> LA+DA
+> Novel Ratio
+> RA
+> LA
+> LA+DA
+
+Fig. 8: Fluctuations in predicted bias between seen and novel categories. We track the change of predictions on the entire dataset to examine how the ratio of samples classified as seen versus novel categories changes across epochs. 25 50 75 100 125 150 175   
+
+> Sorted Class Index
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+> 8
+> Predicted Distribution
+> 1e 3
+
+Stanford Cars 
+
+> w/o DA
+> w DA
+> Prior
+
+Fig. 9: Comparison of predicted distributions without and with distribution alignment (DA) . The x-axis indicates sorted class indices, with seen categories in the first half and novel categories in the second half. 
+
+4.3 Debiasing with Distribution Alignment 
+
+GCD methods often suffer from severe bias arising from the asymmetric learning paces between seen and novel categories [12]. As shown in Figure 8, when SimGCD is com-bined with either ReluAdapter (RA) or LinearAdapter (LA), the model still exhibits a clear gap between the predicted and the prior seen sample ratio. This is often caused by an early bias toward seen categories, which could hinder the model’s ability to capture key patterns for novel categories. Notably, LinearAdapter shows greater adaptability than ReluAdapter, enabling the model to identify novel classes earlier and ultimately achieve better overall performance. Moreover, an often overlooked detail is that most existing GCD methods rely on a balanced sampler to maintain an equal proportion of labeled and unlabeled samples within each batch, thus achieving a trade-off between supervised and unsupervised contrastive learning. The balanced sam-pler inevitably oversamples labeled data and undersamples unlabeled data, which in turn accelerates convergence on seen categories, as labeled samples provide accurate cross-entropy supervision. The resulting bias is reflected in the predicted probability distributions: some novel categories receive overconfident predictions, and the distributions of novel categories exhibit higher variance compared to seen categories, as shown in Figure 9. To address this potential bias without compromising contrastive representation learning, we introduce an aux-iliary distribution alignment method. Specifically, we first construct an unaugmented dataset Dv containing labeled samples from Dl and unlabeled samples from Du. We then compute the predicted probability for each sample by traversing the dataset Dv once, and estimate the overall predicted distribution πv by averaging predictions: πv =
+
+Normalize ( P 
+
+> xi∈D v
+
+pi ), where pi is obtained by Eq.(2). Based on the default balanced distribution πb, we calculate the distribution alignment vector π = log ( πv /πb) · sd,where sd is a scaling factor. Then we modify the unsuper-vised classification loss Lu 
+
+> cls
+
+in Eq.(4) by replacing its ℓ(q′, p)
+
+with the alignment loss ℓalign (q′, p):
+
+ℓalign (q′, p) = − X
+
+> k
+
+q′(k) log (( p + π)(k)) (12) Additionally, to enable smoother adjustment and leverage more reliable pseudo-labels, we only apply the alignment loss ℓalign after the warm-up phase ends. Interestingly, empirical results indicate that even when the distribution 
+
+πv is computed only once at the end of the warm-up phase and sd is set to an appropriate value, which is the default setting in our experiments, the alignment is also effective. As shown in Figure 8 and Figure 9, applying distribution alignment enhances consistency with the prior and results in less biased predictions for novel categories. 
+
+5 EXPERIMENT 
+
+5.1 Experimental Setup 
+
+Datasets. We evaluate our method on three generic im-age recognition datasets: CIFAR-10/100 [42] and ImageNet-100 [43], as well as three fine-grained datasets: CUB200 [44], Stanford Cars [41], and FGVC-Aircraft [40], which are part of the Semantic Shift Benchmark (SSB) [45], and the challenging large-scale imbalanced fine-grained dataset, Herbarium-19 [46]. For each dataset, we first subsample |C s|
+
+seen (labeled) categories from the entire set of categories. Following [13], we subsample 80% of the samples from the seen categories in CIFAR-100 and 50% of the samples in the other datasets to construct labeled dataset Dl, with the remaining images assigned to unlabeled Du. The detailed statistics of the datasets are provided in the Table 1. 
+
+Evaluation protocol. Following previous works, we eval-uate our method using clustering accuracy. The accuracy metric compares ground-truth labels yi with predicted la-bels ˆyi under optimal label assignment, formally defined as: accuracy = 1
+
+> |D ′|
+
+P|D ′| 
+
+> i=1
+
+1(yi = G(ˆ yi)) , where G denotes the optimal mapping between predicted and ground-truth labels, and D′ denotes either the entire unlabeled data or the novel unlabeled data. Specifically, we evaluate performance across three complementary aspects: (1) seen category accu-racy, computed as a standard classification task; (2) novel category accuracy, obtained by solving the assignment be-tween novel-category predictions and their corresponding JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 7
+
+TABLE 1: Dataset details and training configurations. Labeled Unlabeled Configs Dataset Type #Num #Class #Num #Class lr λent ˆd sa sd
+
+CIFAR10 Generic/Balanced 12.5K 5 37.5K 10 0.1 1.0 64 0.1 0.2 CIFAR100 Generic/Balanced 20.0K 80 30.0K 100 0.2 2.0 96 0.1 0.2 ImageNet100 Generic/Balanced 31.9K 50 95.3K 100 0.2 1.0 96 0.1 0.2 CUB200 Fine-grained/Balanced 1.5K 100 4.5K 200 0.1 2.0 64 0.1 0.2 Stanford Cars Fine-grained/Balanced 2.0K 98 6.1K 196 0.1 1.0 64 0.25 0.2 FGVC-Aircraft Fine-grained/Balanced 1.7K 50 5.0K 50 0.1 1.0 64 0.25 0.2 Herbarium19 Fine-grained/Imbalanced 8.9K 341 25.4K 683 0.2 1.0 64 0.1 0.2 TABLE 2: Experimental results on the fine-grained benchmark. Our results are obtained from three runs with fixed random seeds (0, 1, 2) for reproducibility, and we report mean and standard deviation. Bold and underlined values indicate the best and second-best results, respectively. 
+
+Methods CUB200 Stanford Cars FGVC-Aircraft Herbarium19 Avg. 
+
+All Seen Novel All Seen Novel All Seen Novel All Seen Novel 
+
+k-means [48] 34.3 38.9 32.1 12.8 10.6 13.8 16.0 14.4 16.8 13.0 12.2 13.4 19.0 RankStats+ [49] 33.3 51.6 24.2 28.3 61.8 12.1 26.9 36.4 22.2 27.9 55.8 12.8 32.8 UNO+ [50] 35.1 49.0 28.1 35.5 70.5 18.6 40.3 56.4 32.2 28.3 53.7 14.7 38.5 ORCA [12] 35.3 45.6 30.2 23.5 50.1 10.7 22.0 31.8 17.1 35.4 51.0 27.0 31.6 GCD [13] 51.3 56.6 48.7 39.0 57.6 29.9 45.0 41.1 46.9 20.9 30.9 15.5 40.3 XCon [24] 52.1 54.3 51.0 40.5 58.8 31.7 47.7 44.4 49.4 - - - -DCCL [51] 63.5 60.8 64.9 43.1 55.7 36.2 - - - - - - -GPC [52] 55.4 58.2 53.1 42.8 59.2 32.8 46.3 42.5 47.9 - - - -SimGCD [1] 60.3 65.6 57.7 53.8 71.9 45.0 54.2 59.1 51.8 44.0 58.0 36.4 54.8 PromptCAL [14] 62.9 64.4 62.1 50.2 70.1 40.6 52.2 52.2 52.3 37.0 52.0 28.9 52.1 AMEND [53] 64.9 75.6 59.6 56.4 73.3 48.2 52.8 61.8 48.3 44.2 60.5 35.4 56.8 
+
+μGCD [16] 65.7 68.0 64.6 56.5 68.1 50.9 53.8 55.4 53.0 45.8 61.9 37.2 56.7 SPTNet [2] 65.8 68.8 65.1 59.0 79.2 49.3 59.3 61.8 58.1 43.4 58.7 35.2 58.7 CMS [26] 68.2 76.5 64.0 56.9 76.1 47.6 56.0 63.4 52.3 36.4 54.9 26.4 56.6 LegoGCD [27] 63.8 71.9 59.8 57.3 75.7 48.4 55.0 61.5 51.7 45.1 57.4 38.4 57.2 ProtoGCD [54] 63.2 68.5 60.5 53.8 73.7 44.2 56.8 62.5 53.9 44.5 59.4 36.5 56.5 AdaptGCD [3] 68.8 74.5 65.9 62.7 80.6 54.0 57.9 65.2 54.3 45.7 60.6 37.7 60.7 
+
+LAGCD (ours) 69.1 ±1.6 75.2 ±0.9 66.1 ±2.8 63.6 ±1.2 79.6 ±1.6 55.9 ±1.2 59.6 ±1.0 67.4 ±0.9 55.7 ±1.4 49.3 ±0.4 67.2 ±0.1 39.6 ±0.7 62.4 
+
+targets using the Hungarian algorithm [47]; and (3) overall accuracy, calculated through optimal assignment across the entire unlabeled dataset. 
+
+Implementation details. Following previous works, we adopt a DINO-pretrained ViT-B/16 [17], [18] as our back-bone, followed by a projection head for contrastive repre-sentation learning and a parametric prototype classifier. We take the feature of the CLS token from the backbone as the image feature. And we employ a batch size of 128 over 200 epochs , with an initial learning rate of lr that follows a cosine decay schedule. Following SimGCD [1], we set the supervised balancing factor λsup = 0 .35 , temperature parameters τu = 1.0, and τc = 0.07 for Lu 
+
+> rep
+
+and Ls
+
+> rep
+
+,respectively. For the classification objective, we employ a temperature parameter τs = 0.1. The temperature τt is initialized as 0.07 and gradually annealed to 0.04 over the first 30 epochs following a cosine schedule. Unlike previous methods, we integrate adapters into each ViT block with a bottleneck dimension of ˆd, and keep all backbone pa-rameters frozen . Detailed hyperparameters, including lr ,
+
+λent , ˆd, sa, and sd, are provided in the Table 1. Experimental results in the Table 2 and Table 3 are conducted using a single NVIDIA Tesla V100 GPU. In the Table 1, we provide the detailed information about the datasets and hyperparameters. For datasets, we utilize seven commonly used datasets in the GCD task, including four fine-grained datasets and three generic datasets. More-over, we only introduce two necessary hyperparameters ( ˆd
+
+and sa) for adapter-based tuning, as well as the scaling factor sd for distribution alignment, and most of them are consistent without much tuning. 
+
+5.2 Comparison with Existing Methods 
+
+Baselines. We conduct comprehensive comparison against multiple SOTA GCD methods, including AdaptGCD [3], ProtoGCD [54], LegoGCD [27], CMS [26], SPTNet [2], AMEND [53], μGCD [16], PromptCAL [14], DCCL [51], GPC [52], SimGCD [1], XCon [24], GCD [13] and ORCA [12]. We compare ours against NCD baselines RankStats+ [49] and UNO+ [50], and also compare against the k-means clustering [48] applied to features extracted from the pre-trained DINO [18]. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 8
+
+TABLE 3: Experimental results on the generic benchmark. Our results are obtained from three runs with fixed random seeds (0, 1, 2) for reproducibility, and we report mean and standard deviation. Bold and underlined values indicate the best and second-best results, respectively. 
+
+Methods CIFAR10 CIFAR100 ImageNet100 Avg. 
+
+All Seen Novel All Seen Novel All Seen Novel 
+
+k-means [48] 83.6 85.7 82.5 52.0 52.2 50.8 72.7 75.5 71.3 69.6 RankStats+ [49] 46.8 19.2 60.5 58.2 77.6 19.3 37.1 61.6 24.8 45.0 UNO+ [50] 68.6 98.3 53.8 69.5 80.6 47.2 70.3 95.0 57.9 71.2 ORCA [12] 81.8 86.2 79.6 69.0 77.4 52.0 73.5 92.6 63.9 75.1 GCD [13] 91.5 97.9 88.2 73.0 76.2 66.5 74.1 89.8 66.3 80.3 XCon [24] 96.0 97.3 95.4 74.2 81.2 60.3 77.6 93.5 69.7 82.8 DCCL [51] 96.3 96.5 96.9 75.3 76.8 70.2 80.5 90.5 76.2 87.2 GPC [52] 92.2 98.2 89.1 77.9 85.0 63.0 76.9 94.3 71.0 83.1 SimGCD [1] 97.1 95.1 98.1 80.1 81.2 77.8 83.0 93.1 77.9 87.0 PromptCAL [14] 97.9 96.6 98.5 81.2 84.2 75.3 83.1 92.7 78.3 87.5 AMEND [53] 96.8 94.6 97.8 81.0 79.9 83.3 83.2 92.9 78.3 87.5 SPTNet [2] 97.3 95.0 98.6 81.3 84.3 75.6 85.4 93.2 81.4 88.0 CMS [26] - - - 82.3 85.7 75.5 84.7 95.6 79.2 -LegoGCD [27] 97.1 94.3 98.5 81.8 81.4 82.5 86.3 94.5 82.1 88.7 ProtoGCD [54] 97.3 95.3 98.2 81.9 82.9 80.0 84.0 92.2 79.9 88.0 AdaptGCD [3] 97.9 95.5 99.0 84.0 86.2 79.7 86.4 94.9 82.1 89.5 
+
+LAGCD (ours) 98.6 ±0.0 97.6 ±0.2 99.1 ±0.1 86.3 ±1.1 87.8 ±0.5 83.5 ±3.4 85.9 ±0.9 94.9 ±0.1 81.4 ±1.3 90.6 
+
+TABLE 4: Ablation study on CUB200, Stanford Cars and Herbarium19. CUB200 Stanford Cars Herbarium19 SimGCD RA LA DA All Seen Novel All Seen Novel All Seen Novel 
+
+✓ 60.3 65.6 57.7 53.8 71.9 45.0 44.0 58.0 36.4 
+
+✓ ✓ 67.5 73.9 64.3 58.7 77.0 49.9 48.0 66.7 38.0 
+
+✓ ✓ 68.8 74.9 65.7 62.1 78.5 54.2 48.8 66.7 39.2 
+
+✓ ✓ ✓ 69.1 75.2 66.1 63.6 79.6 55.9 49.3 67.2 39.6 
+
+Results on fine-grained datasets. Table 2 presents results on four fine-grained datasets. Fine-grained category discovery poses a greater challenge compared to generic category discovery. This enhanced complexity manifests through multiple factors: fine-grained datasets exhibit larger intra-class and smaller inter-class variations, while containing more categories but fewer samples per category. Compared to the baseline SimGCD , our method achieves signifi-cant performance improvements, with an average accuracy gain of 7.6%. Compared to SPTNet , the state-of-the-art method utilizing visual prompts, our method achieves su-perior performance, surpassing SPTNet by 0.3% on FGVC-Aircraft, 3.3% on CUB-200, 4.6% on Stanford Cars, and 5.9% on Herbarium19. Compared to GCD methods with partial fine-tuning , our method achieves at least a 5.2% improvement. Compared to AdaptGCD , our method stands out for architectural simplicity and implementation effi-ciency. While AdaptGCD employs multi-expert adapters with routing constraints to separate seen and novel class processing, requiring multiple adapters per ViT block and additional loss terms for expert balancing, our method imropves adaptation by simply removing ReLU activation in adapters, creating a streamlined linear transformation without added complexity. Our method achieves superior performance with a simpler modification, attaining a higher average accuracy of 62.4% compared to 60.7%. 
+
+Results on generic datasets. Table 3 presents results on three generic datasets. Overall, these datasets exhibit higher average accuracy than fine-grained ones, making further improvements more challenging. Nevertheless, our method achieves SOTA performance by improving the accuracy on CIFAR10 from the previous best of 97.9% (PromptCAL and AdaptGCD) to 98.6%, and on CIFAR100 from 84.0% (AdaptGCD) to 86.3%. Notably, our method demonstrates a 1.1% improvement in average accuracy across all three datasets compared to AdaptGCD. 
+
+Tunable parameters. Our method is an end-to-end one-stage adapter-based method that no longer fine-tunes the last block of the backbone. The total number of parameters introduced to pre-trained model is (d× ˆd×2+ ˆd+d+d×2) ×n,where d and ˆd denote the input and bottleneck dimension, and n denotes the number of adapted blocks. We insert adapters into all 12 ViT blocks and set ˆd to two values: 96 and 64, introducing 1.8M and 1.2M tunable parameters, respectively. Most GCD methods exclusively fine-tune the last block of the backbone, which contains 7.1M parameters. While prompt-based methods (SPTNet and PromptCAL) utilize lightweight visual prompts, they still rely on fine-JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 90.1 0.2 0.3 0.4 0.5         
+
+> Adapter Scaling Factor
+> 45
+> 50
+> 55
+> 60
+> 65
+> 70
+> Accuracy (%)
+> FGVC-Aircraft
+> All Seen Novel
+> 0.1 0.2 0.3 0.4 0.5
+> Adapter Scaling Factor
+> 50
+> 60
+> 70
+> 80
+> 90
+> Accuracy (%)
+> Stanford Cars
+> All Seen Novel
+
+Fig. 10: Sensitivity of the scale sa of adapter. 16 32 64 96 128          
+
+> Bottleneck Dimension
+> 50
+> 55
+> 60
+> 65
+> 70
+> Accuracy (%)
+> FGVC-Aircraft
+> All Seen Novel
+> 16 32 64 96 128
+> Bottleneck Dimension
+> 50
+> 60
+> 70
+> 80
+> 90
+> Accuracy (%)
+> Stanford Cars
+> All Seen Novel
+
+Fig. 11: Sensitivity of the bottleneck dimension ˆd.12 11 10 98    
+
+> Block Number
+> 45
+> 50
+> 55
+> 60
+> 65
+> 70
+> Accuracy (%)
+> FGVC-Aircraft
+> All Seen Novel
+> 12 11 10 98
+> Block Number
+> 50
+> 60
+> 70
+> 80
+> 90
+> Accuracy (%)
+> Stanford Cars
+> All Seen Novel
+
+Fig. 12: Sensitivity of the number n of adapted blocks. 0.1 0.2 0.3 0.4         
+
+> Alignment Scaling Factor
+> 52
+> 54
+> 56
+> 58
+> 60
+> 62
+> 64
+> 66
+> 68
+> Accuracy (%)
+> FGVC-Aircraft
+> All Seen Novel
+> 0.1 0.2 0.3 0.4
+> Alignment Scaling Factor
+> 50
+> 55
+> 60
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> Accuracy (%)
+> Stanford Cars
+> All Seen Novel
+
+Fig. 13: Sensitivity of the alignment scaling factor sd.tuning the last block like conventional GCD methods to achieve better adaptation. And the adapter-based method AdaptGCD requires 6.4M and 4.8M parameters due to its multi-expert adapter structure. 
+
+5.3 Ablation Study 
+
+To evaluate our method LAGCD, we conduct ablation studies on three datasets: CUB200, Stanford Cars, and Herbarium19. All results are averaged over three runs. We analyze the contributions of the baseline SimGCD and components: ReluAdapter (RA), LinearAdapter (LA), and distribution alignment (DA). Table 4 presents the detailed results. The baseline SimGCD, which adopts the partial fine-tuning, achieves overall accuracies of 60.3%, 53.8%, and 44.0% on the three datasets respectively. Incorporating Re-luAdapter significantly improves performance, increasing overall accuracy by 7.2%, 4.9%, and 4.0%, demonstrating the effectiveness of adapter-based tuning. By removing the intrinsic ReLU activation, LinearAdapter further enhances performance to 68.8% (+1.3%), 62.1% (+3.4%), and 48.8% (+0.8%). The improvement indicates that the non-linearity and sparsity introduced by ReLU within the adapters are not essential and may even hinder overall performance. Moreover, integrating LA with DA consistently yields per-formance gains, most notably on the Stanford Cars dataset, where overall accuracy improves by 1.5%. 
+
+5.4 Sensitivity Study 
+
+For the sensitivity study, we investigate four key com-ponents of LAGCD. Regarding adapters, we evaluate the impact of three hyperparameters: the scaling factor sa, the bottleneck dimension ˆd, and the number n of adapted blocks. For distribution alignment, we focus on its scaling factor sd. These experiments are primarily conducted on the FGVC-Aircraft and Stanford Cars datasets. 
+
+5.4.1 The scaling factor of adapter 
+
+The scaling factor sa is utilized to balance features between two branches: task-agnostic features from the frozen original branch and task-related features from the tunable bottleneck branch. As illustrated in Figure 10, when the scaling factor 
+
+sa is too small, the model tends to underfit, resulting in suboptimal performance. As sa increases to an appropri-ate value, such as around 0.3, the performance improves significantly. However, when sa becomes excessively large, the model suffers from overfitting, leading to a decline in overall performance. 
+
+5.4.2 The bottleneck dimension of adapter 
+
+The bottleneck dimension ˆd serves as a key hyperparameter that controls the trade-off between computational efficiency and effective adaptation. Our systematic analysis in the previous section shows that smaller bottleneck dimensions, while reducing the parameter count, often degrade per-formance, whereas larger dimensions increase capacity but may introduce overfitting and training instability. As illus-trated in Figure 11, results reveal a consistent trend across both datasets: accuracy improves as ˆd increases from 16 to 32, plateaus between 32 and 128, and then shows no further gain. This indicates that a moderate bottleneck dimension such as around 64 achieves the trade-off between efficiency and accuracy. Importantly, variations in ˆd primarily affect novel category accuracy, while performance on seen cate-gories remains relatively stable. 
+
+5.4.3 The number of adapted blocks 
+
+Since adapters have been shown to be more effective in the upper blocks of ViT (those farther from the input im-age) [22], we systematically examine model performance by varying the number of adapted blocks from top to bottom. As illustrated in Figure12, increasing the number n
+
+of adapted blocks consistently enhances adaptability across datasets. Notably, the results indicate that adapting as few as eight blocks is sufficient to achieve competitive per-formance. This finding suggests a practical threshold that balances effective adaptation with computational efficiency. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 10 DINO ReLU Linear 
+
+> Novel
+> Sample 1
+> Original Image
+> Novel
+> Sample 2
+
+Fig. 14: FGVC-Aircraft Novel Categories. DINO ReLU Linear  
+
+> Seen
+> Sample 1
+> Seen
+> Sample 2
+> Original Image
+
+Fig. 15: FGVC-Aircraft Seen Categories. DINO ReLU Linear 
+
+> Novel
+> Sample 1
+> Novel
+> Sample 2
+> Original Image
+
+Fig. 16: Stanford Cars Novel Categories. DINO ReLU Linear  
+
+> Seen
+> Sample 1
+> Seen
+> Sample 2
+> Original Image
+
+Fig. 17: Stanford Cars Seen Categories. 
+
+5.4.4 The scaling factor of distribution alignment 
+
+The scaling factor sd influences the models focus on global class-level information during training as well as its reliance on balanced learning. In practice, it is difficult to accu-rately capture the true data distribution; thus, a uniform distribution is often employed to balance learning across classes, ensuring that underrepresented categories can still be improved. Previous methods have addressed this issue through a maximum-entropy regularization term, which encourages balanced learning, but its effectiveness remains limited. To mitigate the sensitivity of parameter tuning, we introduce distribution alignment as a complementary mechanism. As shown in Figure 13, performance remains relatively stable across scaling factors from 0.1 to 0.4. A slight decline is observed at sd = 0 .4, particularly in novel-category accuracy. These results suggest that although the model is not highly sensitive to sd, excessively large sd can hinder generalization. 
+
+5.5 Visualization 
+
+We also provide attention maps to show why LinearAdapter outperforms ReluAdapter by visualizing the [CLS] token’s self-attention patterns (averaged all attention heads in the fi-nal block). The visualization leverages 8 challenging images from Stanford Cars and Aircraft datasets that include archi-tectural distractions, color variations, and multiple similar objects, providing the robust evaluation across both seen and novel classes. As shown in Figure 14-17, LinearAdapter demonstrates a superior capability in capturing more com-plete patterns of objects compared to ReluAdapter, which is highly beneficial for the GCD task. 
+
+5.6 Incorporating Alternative Activations 
+
+In the previous section, we examined ReLU and its variants, including Leaky ReLU, Threshold ReLU, and ELU, to as-sess whether the sparsity induced by ReLU constrains the model’s adaptability. In this section, we extend the analysis to other commonly used activation functions and inves-tigate how replacing ReLU with these alternatives influ-ences model performance. We begin by providing detailed descriptions and comparisons of the activation functions under consideration: 
+
+5.6.1 Sigmoid 
+
+The Sigmoid activation function [55], commonly used in binary classification and probabilistic tasks, maps inputs to a range between 0 and 1, making it well-suited for modeling probabilities. It is defined as: 
+
+σ(x) = 11 + e−x , (13) While Sigmoid is useful in output layers, it has two key limitations. First, its non-zero-centered outputs introduce gradient bias during backpropagation, which can slow con-vergence. Second, the gradient saturation occurs for large inputs, where σ(x) approaches 0 or 1.
+
+5.6.2 Tanh 
+
+The Tanh (hyperbolic tangent) activation function [56] is commonly used due to its zero-centered output, which can improve training dynamics. It is defined as: 
+
+tanh( x) = ex − e−x
+
+ex + e−x = sinh( x)cosh( x) , (14) JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 11 
+
+TABLE 5: Detailed property comparisons of different activation functions Activation Output Range Zero-Centered Gradient Saturation Computational Cost Derivative Properties Linear (-∞,∞) Yes No Very Low Constant gradient Sigmoid (0, 1) No Yes Medium Smooth, max = 0 .25 at 0 Tanh (-1, 1) Yes Yes Medium Smooth, symmetric ReLU [0, ∞) No Only for x < 0 Low Discontinuous at 0 Swish (-0.3, ∞) No Partial Medium Smooth, non-monotonic GeLU (-0.28, ∞) No Partial High Smooth, continuous TABLE 6: Evaluation results on three fine-grained datasets. All experimental results were obtained from three runs of the experiment, with the corresponding mean and variance calculated. Bold values represent the best results. 
+
+Method CUB200 FGVC-Aircraft Stanford Cars Avg. 
+
+All Seen Novel All Seen Novel All Seen Novel Linear 68.77 ±1.74 74.81 ±0.48 65.76 ±2.82 58.88 ±0.76 65.43 ±0.44 55.61 ±0.94 62.10 ±0.83 78.24 ±0.19 54.31 ±1.31 64.88 
+
+Swish 67.60 ±0.88 75.34 ±0.90 63.73 ±1.37 56.08 ±1.02 64.39 ±0.85 51.93 ±1.13 59.81 ±0.98 78.83 ±1.49 50.62 ±2.01 63.15 ReLU 67.48 ±0.74 73.91 ±1.22 64.26 ±1.71 56.85 ±0.74 65.39 ±1.65 52.58 ±0.57 58.73 ±1.53 76.66 ±0.97 50.07 ±2.45 62.88 GeLU 67.01 ±0.76 74.40 ±0.31 63.32 ±1.03 56.37 ±1.99 65.01 ±0.42 52.05 ±2.81 59.00 ±1.22 76.58 ±2.42 50.52 ±2.30 62.70 Tanh 66.42 ±1.32 72.98 ±1.63 63.14 ±1.15 55.91 ±1.62 63.81 ±0.26 51.96 ±2.53 58.66 ±0.81 75.69 ±1.48 50.43 ±1.01 62.11 Sigmoid 65.38 ±1.01 72.36 ±1.18 61.88 ±0.92 51.46 ±0.55 61.88 ±0.42 46.26 ±0.63 55.97 ±0.69 71.48 ±1.60 48.48 ±0.26 59.46 where sinh( x) and cosh( x) are the hyperbolic sine and cosine functions, respectively. Tanh maps inputs to the range 
+
+(−1, 1) , providing outputs centered around zero, which helps balance gradients during training and can acceler-ate convergence. However, Tanh suffers from the gradient saturation: for inputs with large magnitudes, tanh( x) ap-proaches ±1, causing its derivative to shrink towards zero, which could hinder the learning capacity. 
+
+5.6.3 Swish 
+
+The Swish activation function [57] is a smooth, non-linear function. It is defined as: Swish (x) = x · σ(x) = x
+
+1 + e−x , (15) where σ(x) is the sigmoid function. Swish introduces a continuous and differentiable gating mechanism, smoothly suppressing negative inputs while preserving positive ones. Unlike ReLU, which abruptly discards negative values, Swish allows small negative activations, enabling richer feature representation. 
+
+5.6.4 GeLU 
+
+The GeLU (Gaussian Error Linear Unit) activation func-tion [58] also offers a smoother and more flexible alternative to ReLU. Formally, GeLU is defined as: GeLU (x) = x · Φ( x) = x · 12
+
+
+
+1 + erf 
+
+ x
+
+√2
+
+ 
+
+, (16) where Φ( x) is the cumulative distribution function (CDF) of the standard normal distribution, and erf (·) is the er-ror function. GeLU combines the strengths of both ReLU and sigmoid-like functions. Its smooth, non-linear form improves gradient flow, while its non-monotonic behavior allows for more complex transformations. 
+
+5.6.5 Performance Comparison 
+
+From the comparisons of these properties in Table 5, it can be observed that most activation functions introduce certain feature transformations that enhance the non-linear expressiveness. Nevertheless, such benefits typically come at the cost of compromising the output range, leading to value compression and gradient saturation. In the context of adapters, however, the advantage of introducing such non-linearity and sparsity remains unclear, since the setting does not involve training a randomly initialized model end-to-end, but rather adapting to small-scale downstream datasets. When replacing ReLU with alternative activation functions such as Sigmoid, Tanh, Swish, and GeLU, we observe no clear performance gains and in some cases even a decline compared to ReLU across all three datasets, as shown in Figure 6. Specifically, sigmoid shows a consider-able performance gap compared with other activation func-tions. On FGVC-Aircraft and Stanford Cars, Linear exceeds the others by over 2%, suggesting that activation functions in these cases hinder rather than enhance performance. Upon closer comparison, it becomes evident that the models performance is more closely associated with the output range and gradient saturation of the activation func-tions, while the specific form of non-linear transformation appears to play a relatively minor role such as Swish and GeLU. For instance, Sigmoid performs noticeably worse than the other activation functions due to its severe gradient saturation and strong compression of features. In contrast, as the output range and gradient saturation improve with Tanh, Swish, and GeLU, the performance exhibits a clear enhancement. Interestingly, simply removing the activation functions, i.e. adopting the linear case, preserves the fea-tures, provides the widest output range and stable gradi-ents, and achieves better adaptation than adapters with non-linear activations. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 12 
+
+6 CONCLUSION AND LIMITATION 
+
+This paper introduces LAGCD, a simple yet effective adapter-based tuning method for Generalized Category Dis-covery (GCD). LAGCD enhances the models adaptability by integrating a lightweight linear adapter into each ViT block, achieving superior performance over prior methods relying on partial fine-tuning or visual prompt tuning. Our systematic analysis reveals that ReLU-induced feature sparsity and biased seen/novel predictions hinder overall generalization in GCD. To address these issues, we eliminate the activation function in adapters and optimize an auxiliary distribution alignment loss, which together facilitate more effective adaptation and balanced category learning. Ex-tensive experiments demonstrate that our method achieves state-of-the-art performance across diverse fine-grained and generic datasets. This work highlights the overlooked role of activation functions in adapter design and introduces a method that establishes a strong baseline. Although our method achieves competitive performance with significantly fewer parameters, along with improved stability and adaptability, some limitations remain to be addressed. For instance, while the removal of ReLU helps alleviate feature sparsity and enhances generalization in GCD, the general applicability of this design across diverse tasks has yet to be thoroughly investigated. 
+
+REFERENCES 
+
+[1] X. Wen, B. Zhao, and X. Qi, “Parametric classification for gen-eralized category discovery: A baseline study,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023, pp. 16 590–16 600. [2] H. Wang, S. Vaze, and K. Han, “Sptnet: An efficient alterna-tive framework for generalized category discovery with spatial prompt tuning,” arXiv preprint arXiv:2403.13684 , 2024. [3] Y. Qu, Y. Tang, C. Zhang, and W. Zhang, “Adaptgcd: Multi-expert adapter tuning for generalized category discovery,” arXiv preprint arXiv:2410.21705 , 2024. [4] D.-H. Lee, “Pseudo-label: The simple and efficient semi-supervised learning method for deep neural networks,” in Work-shop on challenges in representation learning, ICML , 2013. [5] M. Sajjadi, M. Javanmardi, and T. Tasdizen, “Regularization with stochastic transformations and perturbations for deep semi-supervised learning,” in Neural Information Processing Systems ,2016. [6] S. Laine and T. Aila, “Temporal Ensembling for Semi-Supervised Learning,” arXiv: Neural and Evolutionary Computing , 2016. [7] K. Sohn, D. Berthelot, C.-L. Li, Z. Zhang, N. Carlini, E. D. Cubuk, A. Kurakin, H. Zhang, and C. Raffel, “FixMatch: Simplifying semi-supervised learning with consistency and confidence,” in Neural Information Processing Systems , 2020. [8] T. Wei and K. Gan, “Towards realistic long-tailed semi-supervised learning: Consistency is all you need,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2023, pp. 3469–3478. [9] K. Gan and T. Wei, “Erasing the bias: Fine-tuning foundation models for semi-supervised learning,” in Forty-first International Conference on Machine Learning , 2024. [10] K. Gan, B. Ye, M.-L. Zhang, and T. Wei, “Semi-supervised clip adaptation by enforcing semantic and trapezoidal consistency,” in 
+
+The Thirteenth International Conference on Learning Representations .[11] A. Oliver, A. Odena, C. A. Raffel, E. D. Cubuk, and I. Good-fellow, “Realistic evaluation of deep semi-supervised learning algorithms,” in Neural Information Processing Systems , 2018. [12] K. Cao, M. Brbic, and J. Leskovec, “Open-world semi-supervised learning,” in International Conference on Learning Representations ,2022. [13] S. Vaze, K. Han, A. Vedaldi, and A. Zisserman, “Generalized category discovery,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 7492–7501. [14] S. Zhang, S. Khan, Z. Shen, M. Naseer, G. Chen, and F. S. Khan, “Promptcal: Contrastive affinity learning via auxiliary prompts for generalized novel category discovery,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2023, pp. 3479–3488. [15] Y. Sun, Z. Shi, and Y. Li, “A graph-theoretic framework for understanding open-world semi-supervised learning,” Advances in Neural Information Processing Systems , vol. 36, pp. 23 934–23 967, 2023. [16] S. Vaze, A. Vedaldi, and A. Zisserman, “No representation rules them all in category discovery,” Advances in Neural Information Processing Systems , vol. 36, 2024. [17] A. Dosovitskiy, “An image is worth 16x16 words: Transformers for image recognition at scale,” arXiv preprint arXiv:2010.11929 , 2020. [18] M. Caron, H. Touvron, I. Misra, H. J´ egou, J. Mairal, P. Bojanowski, and A. Joulin, “Emerging properties in self-supervised vision transformers,” in Proceedings of the IEEE/CVF international confer-ence on computer vision , 2021, pp. 9650–9660. [19] M. Jia, L. Tang, B.-C. Chen, C. Cardie, S. Belongie, B. Hariharan, and S.-N. Lim, “Visual prompt tuning,” in European Conference on Computer Vision . Springer, 2022, pp. 709–727. [20] N. Houlsby, A. Giurgiu, S. Jastrzebski, B. Morrone, Q. De Larous-silhe, A. Gesmundo, M. Attariyan, and S. Gelly, “Parameter-efficient transfer learning for nlp,” in International conference on machine learning . PMLR, 2019, pp. 2790–2799. [21] E. J. Hu, Y. Shen, P. Wallis, Z. Allen-Zhu, Y. Li, S. Wang, L. Wang, and W. Chen, “Lora: Low-rank adaptation of large language models,” arXiv preprint arXiv:2106.09685 , 2021. [22] S. Chen, C. Ge, Z. Tong, J. Wang, Y. Song, J. Wang, and P. Luo, “Adaptformer: Adapting vision transformers for scalable visual recognition,” Advances in Neural Information Processing Systems ,vol. 35, pp. 16 664–16 678, 2022. [23] V. Nair and G. E. Hinton, “Rectified linear units improve restricted boltzmann machines,” in Proceedings of the 27th international confer-ence on machine learning (ICML-10) , 2010, pp. 807–814. [24] Y. Fei, Z. Zhao, S. Yang, and B. Zhao, “Xcon: Learning with experts for fine-grained category discovery,” arXiv preprint arXiv:2208.01898 , 2022. [25] Y. Sun and Y. Li, “Opencon: Open-world contrastive learning,” 
+
+arXiv preprint arXiv:2208.02764 , 2022. [26] S. Choi, D. Kang, and M. Cho, “Contrastive mean-shift learning for generalized category discovery,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 23 094–23 104. [27] X. Cao, X. Zheng, G. Wang, W. Yu, Y. Shen, K. Li, Y. Lu, and Y. Tian, “Solving the catastrophic forgetting problem in general-ized category discovery,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 16 880–16 889. [28] H. Lin, W. An, J. Wang, Y. Chen, F. Tian, M. Wang, Q. Wang, G. Dai, and J. Wang, “Flipped classroom: Aligning teacher attention with student in generalized category discovery,” Advances in Neural Information Processing Systems , vol. 37, pp. 60 897–60 935, 2024. [29] H. Wang, S. Vaze, and K. Han, “Hilo: A learning framework for generalized category discovery robust to domain shifts,” arXiv preprint arXiv:2408.04591 , 2024. [30] B. Ye, K. Gan, T. Wei, and M.-L. Zhang, “Bridging the gap: Learning pace synchronization for open-world semi-supervised learning,” in Proceedings of the Thirty-Third International Joint Con-ference on Artificial Intelligence , 2024, pp. 5362–5370. [31] J.-X. Shi, T. Wei, Z. Zhou, J.-J. Shao, X.-Y. Han, and Y.-F. Li, “Long-tail learning with foundation model: Heavy fine-tuning hurts,” in 
+
+Proceedings of the 41st International Conference on Machine Learning ,2024. [32] P. Khosla, P. Teterwak, C. Wang, A. Sarna, Y. Tian, P. Isola, A. Maschinot, C. Liu, and D. Krishnan, “Supervised contrastive learning,” Advances in neural information processing systems , vol. 33, pp. 18 661–18 673, 2020. [33] T. Chen, S. Kornblith, M. Norouzi, and G. Hinton, “A simple framework for contrastive learning of visual representations,” in 
+
+International conference on machine learning . PMLR, 2020, pp. 1597– 1607. [34] M. Assran, M. Caron, I. Misra, P. Bojanowski, F. Bordes, P. Vincent, A. Joulin, M. Rabbat, and N. Ballas, “Masked siamese networks for label-efficient learning,” in European Conference on Computer Vision .Springer, 2022, pp. 456–473. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, AUGUST XX 13 
+
+[35] E. Arazo, D. Ortego, P. Albert, N. E. OConnor, and K. McGuinness, “Pseudo-labeling and confirmation bias in deep semi-supervised learning,” in International Joint Conference on Neural Networks , 2020. [36] B. Xu, “Empirical evaluation of rectified activations in convolu-tional network,” arXiv preprint arXiv:1505.00853 , 2015. [37] A. L. Maas, A. Y. Hannun, A. Y. Ng et al. , “Rectifier nonlinearities improve neural network acoustic models,” in Proc. icml , vol. 30, no. 1. Atlanta, GA, 2013, p. 3. [38] K. Konda, R. Memisevic, and D. Krueger, “Zero-bias autoen-coders and the benefits of co-adapting features,” arXiv preprint arXiv:1402.3337 , 2014. [39] D.-A. Clevert, T. Unterthiner, and S. Hochreiter, “Fast and accurate deep network learning by exponential linear units (elus),” arXiv preprint arXiv:1511.07289 , vol. 4, no. 5, p. 11, 2015. [40] S. Maji, E. Rahtu, J. Kannala, M. Blaschko, and A. Vedaldi, “Fine-grained visual classification of aircraft,” arXiv preprint arXiv:1306.5151 , 2013. [41] J. Krause, M. Stark, J. Deng, and L. Fei-Fei, “3d object represen-tations for fine-grained categorization,” in Proceedings of the IEEE international conference on computer vision workshops , 2013, pp. 554– 561. [42] A. Krizhevsky, G. Hinton et al. , “Learning multiple layers of features from tiny images,” 2009. [43] Y. Tian, D. Krishnan, and P. Isola, “Contrastive multiview coding,” in Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part XI 16 . Springer, 2020, pp. 776–794. [44] P. Welinder, S. Branson, T. Mita, C. Wah, F. Schroff, S. Belongie, and P. Perona, “Caltech-ucsd birds 200,” 2010. [45] S. Vaze, K. Han, A. Vedaldi, and A. Zisserman, “Open-set recogni-tion: A good closed-set classifier is all you need?” 2021. [46] K. C. Tan, Y. Liu, B. Ambrose, M. Tulig, and S. Be-longie, “The herbarium challenge 2019 dataset,” arXiv preprint arXiv:1906.05372 , 2019. [47] H. W. Kuhn, “The Hungarian method for the assignment prob-lem,” Naval Research Logistics Quarterly , 1955. [48] D. Arthur and S. Vassilvitskii, “k-means++: The advantages of careful seeding,” Stanford, Tech. Rep., 2006. [49] K. Han, S.-A. Rebuffi, S. Ehrhardt, A. Vedaldi, and A. Zisserman, “Autonovel: Automatically discovering and learning novel visual categories,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 44, no. 10, pp. 6767–6781, 2021. [50] E. Fini, E. Sangineto, S. Lathuili` ere, Z. Zhong, M. Nabi, and E. Ricci, “A unified objective for novel class discovery,” in Proceed-ings of the IEEE/CVF International Conference on Computer Vision ,2021, pp. 9284–9292. [51] N. Pu, Z. Zhong, and N. Sebe, “Dynamic conceptional contrastive learning for generalized category discovery,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2023, pp. 7579–7588. [52] B. Zhao, X. Wen, and K. Han, “Learning semi-supervised gaussian mixture models for generalized category discovery,” in Proceedings of the IEEE/CVF international conference on computer vision , 2023, pp. 16 623–16 633. [53] A. Banerjee, L. S. Kallooriyakath, and S. Biswas, “Amend: Adap-tive margin and expanded neighborhood for efficient generalized category discovery,” in Proceedings of the IEEE/CVF Winter Confer-ence on Applications of Computer Vision , 2024, pp. 2101–2110. [54] S. Ma, F. Zhu, X.-Y. Zhang, and C.-L. Liu, “Protogcd: Unified and unbiased prototype learning for generalized category discovery,” 
+
+IEEE Transactions on Pattern Analysis and Machine Intelligence , 2025. [55] F. Rosenblatt, “The perceptron: a probabilistic model for informa-tion storage and organization in the brain.” Psychological review ,vol. 65, no. 6, p. 386, 1958. [56] Y. LeCun, L. Bottou, G. B. Orr, and K.-R. M ¨ uller, “Efficient back-prop,” in Neural networks: Tricks of the trade . Springer, 2002, pp. 9–50. [57] P. Ramachandran, B. Zoph, and Q. V. Le, “Searching for activation functions,” arXiv preprint arXiv:1710.05941 , 2017. [58] D. Hendrycks and K. Gimpel, “Gaussian error linear units (gelus),” arXiv preprint arXiv:1606.08415 , 2016.

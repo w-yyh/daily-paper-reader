@@ -1,0 +1,492 @@
+Title: SECOS: Semantic Capture for Rigorous Classification in Open-World Semi-Supervised Learning
+
+URL Source: https://arxiv.org/pdf/2604.27596v1
+
+Published Time: Fri, 01 May 2026 00:40:20 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# SECOS: Semantic Capture for Rigorous Classification in Open-World Semi-Supervised Learning *
+
+## Hezhao Liu 1 Jiacheng Yang 1 Junlong Gao 1
+
+## Mengke Li 2 Yiqun Zhang 3 Shreyank N Gowda 4 Yang Lu 1†
+
+> 1
+
+Key Laboratory of Multimedia Trusted Perception and Efficient Computing, Ministry of Education of China, Xiamen University, Xiamen, China 
+
+> 2
+
+College of Computer Science and Software Engineering, Shenzhen University, Shenzhen, China 
+
+> 3
+
+School of Computer Science and Technology, Guangdong University of Technology, Guangzhou, China 
+
+> 4
+
+School of Computer Science, University of Nottingham, Nottingham, UK 
+
+23020231154209@stu.xmu.edu.cn 23020250157840@stu.xmu.edu.cn jlgao@xmu.edu.cn mengkeli@szu.edu.cn yqzhang@gdut.edu.cn shreyank.narayanagowda@nottingham.ac.uk luyang@xmu.edu.cn 
+
+## Abstract 
+
+In open-world semi-supervised learning (OWSSL), a model learns from labeled data and unlabeled data con-taining both known and novel classes. In practical OWSSL applications, models are expected to perform rigorous clas-sification by directly selecting the most semantically rel-evant label from a candidate set for each sample. Ex-isting OWSSL methods fail to achieve this because novel samples are trained without explicit supervision, and these methods lack mechanisms to extract latent semantic infor-mation, resulting in predicted labels that have no seman-tic correspondence to candidate textual labels. To address this, we introduce SEmantic Capture for Open-world Semi-supervised learning (SECOS), which directly predicts tex-tual labels from the candidate set without post-processing, meeting the requirements of practical OWSSL applications. SECOS leverages external knowledge to extract and align semantic representations across modalities for both known and novel classes, providing explicit supervisory signals for training novel classes. Extensive experiments demon-strate that even when existing OWSSL methods are eval-uated under the more lenient post-hoc matching setting, SECOS still surpasses them by up to 5.4% without such assistance, highlighting its superior effectiveness. Code is available at https://github.com/ganchi-huanggua/OSSL-Classification. 
+
+## 1. Introduction 
+
+Open-world semi-supervised learning (OWSSL) [2], also known as generalized class discovery (GCD) [36], extends 
+
+> *
+
+Accepted by CVPR 2026 
+
+> †
+
+Corresponding Author: Yang Lu (luyang@xmu.edu.cn) ⅡⅡⅢ     
+
+> 221
+> ⅡⅢⅠ
+> Predicted labels
+> Novel samples Visual feature alignment
+> 123Ground truth
+> Ⅰ,Ⅱ,Ⅲ:Pseudo label
+> (Random assign)
+> ⅠⅢ
+> Ⅱ
+> Training phase Evaluation phase
+> Wrong
+> pred
+> True Acc: 0%
+> Pred Acc: 100%
+> Dog: 2/ Ⅲ
+> Cat: 1/ Ⅱ
+> Ground truth Hungarian match (Maximum acc)
+> Post-hoc corrected pred Mismatch
+> Cat: Ⅱ
+> Dog: Ⅲ
+> Bird: Ⅰ
+> 221
+> Model
+> Model
+> Test samples Cat: 1 Dog: 2 Bird: 3
+
+Figure 1. Illustration of the limitations of existing OWSSL meth-ods. During training, they overemphasize visual features and ne-glect latent semantic information in novel samples. During eval-uation, they rely on Hungarian matching to align predicted labels with ground truth, highlighting that these methods perform clus-tering rather than RC-OWSSL. 
+
+standard semi-supervised learning (SSL) [4, 15, 17] to set-tings where unlabeled data contain both known and novel classes, requiring algorithms to identify and organize novel samples into semantically coherent groups. However, exist-ing OWSSL algorithms still fail to perform rigorous classi-fication because they cannot directly predict textual labels, and the labels they output lack explicit semantic correspon-dence [40–42, 47]. A rigorous OWSSL classification task, 
+
+> arXiv:2604.27596v1 [cs.CV] 30 Apr 2026
+
+which we term Rigorous Classification in OWSSL (RC-OWSSL), requires the model to directly select the most se-mantically relevant label for each sample from a candidate label set. This goal is consistent with standard classifica-tion tasks [10, 14, 31, 34]. The candidate set includes labels from both known and novel classes, and the predicted la-bel must reflect the true semantic information of the sample rather than being derived from post-hoc processing. Existing OWSSL methods fail to achieve RC-OWSSL because they provide limited explicit semantic supervision for training novel class samples and lack a mechanism to uncover the latent semantic information inherent in novel classes. As shown in Fig. 1, during training, these methods focus excessively on the visual features of samples while completely ignoring the latent semantic information embed-ded in novel samples [16, 40, 42, 47]. During evaluation, nearly all algorithms rely on Hungarian matching to force a post-hoc alignment between predicted pseudo labels and ground truth [7, 20, 40–42, 47], which is highly unstable and can produce artificially high accuracy even when a sub-stantial number of batch samples are misclassified. More-over, in real-world scenarios, such a labeled test set is typ-ically unavailable, making these methods impractical in re-alistic deployment. This underscores their inability to di-rectly predict the textual labels, indicating that existing ap-proaches do not perform RC-OWSSL but instead solve an OWSSL clustering task [20, 47]. To motivate the design of our proposed framework for RC-OWSSL, we pose the following research questions. 1. What is the core ingredient missing in existing OWSSL methods that is essential for achieving RC-OWSSL? 
+
+The core missing ingredient in prior work is semantic grounding, i.e., the ability to associate the visual features of novel classes with their linguistic meaning. With-out capturing latent semantic information from novel classes, models cannot directly predict textual labels and meet the requirements of RC-OWSSL. 2. What is the key challenge in capturing semantic infor-mation from unlabeled novel classes in RC-OWSSL, and how can it be addressed? 
+
+The key challenge lies in the complete absence of ex-plicit supervision for novel classes, forcing the model to utilize external priors to uncover and reconstruct the missing correspondence between visual structures and semantic meanings. To address this, models with visual-textual [28] priors must be leveraged to compute seman-tic similarity between novel samples and candidate la-bels, aligning the two modalities and enabling effective semantic capture. Based on these questions, we propose SEmantic Cap-ture for Open-world SSL (SECOS), a framework specifi-cally designed for RC-OWSSL. SECOS enables direct pre-diction of candidate textual labels for novel class samples without relying on post-hoc alignment, making it appli-cable to real-world scenarios where labeled test sets are unavailable. SECOS leverages external knowledge to ex-tract semantic representations from both known and novel class samples and aligns them with candidate textual la-bels. SECOS performs semantic extraction and alignment through three modules. Novel Class Semantic Compensa-tion builds global semantic representations to compensate for the lack of supervision in novel classes. Batch-Wise Se-mantic Recapture refines sample-level semantics for fine-grained exploitation. Adapter for Semantic Feature Align-ment aligns intermediate features with the generated su-pervisory signals, establishing the correspondence between visual structure and semantic meaning. Extensive exper-iments on generic and fine-grained datasets demonstrate that SECOS significantly outperforms existing OWSSL and GCD methods relying on Hungarian matching during test-ing. Our contributions can be summarized as follows. • We identify key principles for RC-OWSSL, which di-rectly predict textual labels for novel samples without post-processing, revealing an intrinsic deviation between the goal of RC-OWSSL and existing clustering methods. • We propose SECOS, a framework tailored for RC-OWSSL. SECOS leverages external knowledge to extract semantic representations from novel class samples, en-abling direct classification in real-world scenarios. • SECOS effectively achieves the RC-OWSSL challenge, demonstrated by up to 5.4% improvement over state-of-the-art (SOTA) across seven benchmarks, even though ex-isting approaches evaluate using Hungarian matching. 
+
+## 2. Related Work 
+
+2.1. Open-World Semi-Supervised Learning 
+
+OWSSL [2] or GCD [36] aims to learn from labeled data of known classes and unlabeled data that includes both known and novel classes, reflecting more realistic learning scenarios than traditional SSL. Early OWSSL approaches typically follow a train-from-scratch paradigm, employing clustering-based [16, 40, 42] or pseudo-labeling strategies [9, 20, 29, 30] to utilize novel class samples. These methods extract visual representations and encourage feature sep-arability through various unsupervised objectives. More recent works leverage pre-trained models, such as DINO [26, 36, 41, 45] and CLIP [7, 21, 38, 47], to incorporate prior knowledge, thereby enhancing feature representations and facilitating more effective downstream OWSSL. 
+
+2.2. Adapter-Based Fine-Tuning 
+
+Adapter [11] is a lightweight fine-tuning method that inserts small learnable modules into deeper layers of a frozen pre-trained model to adjust intermediate feature flows while pre-serving the general knowledge learned during pre-training. Adapter methods can be broadly categorized into serial and parallel approaches. Serial adapters [22, 25, 33] reshape the output of pre-trained sub-layers, making them suitable for tasks with limited data or requiring high data-fitting capac-ity. Parallel adapters [5, 8, 43], on the contrary, integrate alongside pre-trained layers without altering the original forward pass, providing higher stability and better preser-vation of the generalization ability of the model. 
+
+## 3. SECOS Framework 
+
+This section presents the SECOS framework, designed to address the RC-OWSSL task. We first provide a clear def-inition of RC-OWSSL requirements in Sec. 3.1, and then elaborate on the three core modules of SECOS in Sec. 3.2, Sec. 3.3, and Sec. 3.4: Novel Class Semantic Compensa-tion, Batch-Wise Semantic Recapture, and Adapter for Se-mantic Feature Alignment, respectively. 
+
+3.1. Preliminaries 
+
+Formally, for an RC-OWSSL task, we define the candi-date textual label set C = CK ∪ CN , where CK =
+
+{c1, c 2, . . . , c k} denotes the known class set, CN =
+
+{ck+1 , c k+2 , . . . , c k+n} denotes the novel class set, and 
+
+CK ∩ CN = ∅. The training set is represented as Dtrain =
+
+DL ∪ DU , where DL = {(x1, y 1), (x2, y 2), . . . , (xl, y l) |
+
+y1, y 2, . . . , y l ∈ CK } is the labeled dataset and DU =
+
+{u1, u 2, . . . , u m} is the unlabeled dataset. Although sam-ples in DU have no training labels, each sample inherently corresponds to exactly one class in C, implying the ab-sence of out-of-distribution or multi-label instances in both 
+
+DU and the test set, denoted as Dtest . The goal of RC-OWSSL is to train a model on Dtrain using an OWSSL algorithm that directly predicts labels from C without Hun-garian matching during testing, while optimizing the algo-rithm for maximal classification performance. 
+
+3.2. Novel Class Semantic Compensation 
+
+In RC-OWSSL, explicit supervisory signals are heavily im-balanced between known and novel classes. Specifically, 
+
+DL contains only labeled data for known classes, while all novel class data are contained within DU . Training a model with Dtrain results in a severe logits bias toward known classes and frequent misclassification of novel class sam-ples. To address this, we first perform Novel Class Semantic Compensation to globally capture latent semantic informa-tion from DU , compensating for the lack of supervision in novel classes and balancing it with known classes. In particular, as shown in Fig. 2, we construct aglobal pseudo-labeled novel dataset denoted as DN , which stores samples from DU whose latent semantic informa-tion closely corresponds to classes in CN , supplementing the missing supervisory signals for novel classes. Unlabeled data Global pseudo-labeled novel dataset 
+
+> Teacher Model
+> sample n
+> sample 3
+> sample 2
+> class 0
+> class 9
+> class 5
+
+## ... ... ...       
+
+> Class description text
+> Known Class: 0-4, Novel Class: 5-9
+> Group samples by pseudo labels Assume: For grouped samples, sort by max conf. sample 1 sample 2 Select top-ϕ% samples for novel classes
+> class 9
+> n321sample 1
+> sample 2 sample 1 sample n
+> sample n
+> ...
+
+Figure 2. Novel Class Semantic Compensation. High-confidence pseudo-labeled novel samples are added to DN to compensate for the severe lack of supervision in novel classes. 
+
+Then, a frozen teacher CLIP model T is used to as-sign a hard pseudo label ˆyi to each sample ui in DU .The pseudo-labeled samples are grouped by ˆyi into k +
+
+n subsets, where the subset for class c ∈ C is Pc =
+
+{(uc
+
+> 1
+
+, c ), (uc
+
+> 2
+
+, c ), . . . , (ucmc , c )} with mc samples. Only samples with c ∈ CN are included in DN . Optionally, the same CLIP backbone can function as both teacher and stu-dent through EMA updates, enabling a teacher-free config-uration (see Sec. 4.7). Finally, inspired by [15, 18], for each novel class, the top-ϕ% samples with the highest confidence for class c within Pc are added to DN , yielding DN =
+
+{(u1, ˆy1), (u2, ˆy2), . . . , (ul, ˆyl) | ˆy1, ˆy2, . . . , ˆyl ∈ CN }.This design ensures that |DN | is approximately equal to 
+
+|DL|, achieving globally balanced supervision strength be-tween known and novel classes while maintaining a rela-tively uniform pseudo-label distribution across CN . Train-ing the model with both DN and DL effectively mitigates the strong logits bias toward known classes caused by the absence of supervisory signals for novel classes. To improve pseudo-label accuracy in DN , we enrich the short textual labels in C with enhanced semantic informa-tion. Specifically, a large language model [1, 27, 35] gener-ates descriptive prompts for each class, which are encoded by the text encoder of T and averaged to obtain refined se-mantic representations. These representations are then used to measure similarity with image features. 
+
+3.3. Batch-Wise Semantic Recapture 
+
+Although the Novel Class Semantic Compensation stage effectively compensates substantial semantic information for novel classes, it only performs a coarse-grained ex-traction, focusing primarily on novel classes. Both ne-glected semantic information from known classes and unad-dressed semantic information from novel classes remain un-exploited. To address this, we perform Batch-Wise Seman-tic Recapture, which captures fine-grained semantic infor-Batch-wise unlabeled data 
+
+> Class description text
+
+# ... ... ... ... ... ... ... ... ... 
+
+## u1 
+
+> Class index Confidence  If Σ(class conf) > τ
+> Sample index Confidence ΣIf class conf > θ
+> ...
+
+## c1 c2 c3 ck+n-1 ck+n 
+
+## u2
+
+## u3
+
+## uB-1 
+
+## uB     
+
+> Classes predicted conf matrix
+> Selected Selected
+> Select intra-instance label Select inter-instance label Conf. distribution per instance Conf. distribution per class 112121
+> Teacher model
+> Batch-wise pseudo-labeled data If candidate-label count = 1, sample selected
+> Selected inter-instance label
+> Candidate label selected by both *(* denotes candicate-label count) Selected intra-instance label
+
+Figure 3. Batch-Wise Semantic Recapture. It captures the latent semantic information of each sample at the batch level through both sample-to-class and class-to-sample confidence distributions, further enhancing the supervisory signals in the data. 
+
+mation from DU to further enrich supervision signals and directly facilitate RC-OWSSL. Specifically, as shown in Fig. 3, DU is divided into batches, and pseudo labels will be assigned to each batch of unlabeled samples B = {u1, u 2, . . . , u B }. Following [44], for each ui ∈ B, we define an intra-instance label set 
+
+Cintra i and an inter-instance label set Cinter i . ui is input into T to obtain its predicted confidence score distribution. Inter-instance labels are added to Cintra i in descending or-der of their confidence scores for sample ui, until the cumu-lative confidence just exceeds a threshold τ , where τ is de-fined as the α-quantile of the maximum confidence scores computed over all samples in BU . For each class c ∈ C,the confidence scores of all samples within BU for c are sorted in ascending order, and the value at the β-quantile is selected as the class-specific threshold θc. When the confi-dence score of ui for c exceeds θc, c serves as inter-instance label and added to Cinter i .For samples with both Cintra i and Cinter i , we select ui
+
+where |Cintra i ∩ Cinter i | = 1 and assign the corresponding candidate label ˆyi = Cintra i ∩ Cinter i to get the batch-wise pseudo-labeled data BP = {(u1, ˆy1), (u2, ˆy2), . . . , (ub, ˆyb) |
+
+ˆy1, ˆy2, . . . , ˆyb ∈ C}. This approach recaptures fine-grained semantic information of unlabeled samples from two com-plementary perspectives: instance-to-class and class-to-instance confidence distributions. It thus selects samples with the most salient and reliable semantic information as pseudo-labeled data within each batch, providing richer and more precise supervisory signals for the RC-OWSSL task. 
+
+3.4. Adapter for Semantic Feature Alignment 
+
+In the preceding two stages, we have sufficiently cap-tured the latent semantic information embedded within the dataset, providing abundant supervisory signals for each class, particularly the novel classes. Building upon these supervisory signals, the next step is to align the model’s vi-sual feature space with its semantic feature space on down-stream data, which enables the model to establish explicit correspondences between each sample and its textual label to complete the final RC-OWSSL task. We employ a CLIP [28] model as the backbone. Com-pared with purely visual models [3, 6, 10], CLIP inherently aligns visual and semantic representations during large-scale pre-training, giving them a stronger capability to in-terpret semantic information in downstream data. We uti-lize the adapter to achieve multimodal feature alignment on the training set. Concretely, as shown in Fig. 4, we freeze the parameters of the text encoder and input the textual de-scriptions to obtain the semantic feature representation for class ci ∈ C, denoted as [Ec1 , E c2 , . . . , E ck+n ].For the visual encoder, all original parameters are frozen, and lightweight adapters are inserted after each attention block, in parallel with the subsequent MLP. Each atten-tion block, MLP, and adapter together constitute an adapter residual block, and the visual encoder is composed of S
+
+such blocks stacked in series, each with independent pa-rameters. The visual encoder first encodes an input image 
+
+x to obtain a high-dimensional feature vector, which is then projected through a projector to match the dimensionality of the semantic features. Formally, the process of deriving the high-dimensional visual feature vector Vx of x can be represented as: 
+
+Vx = Projector  f (S)(x), f (0) (x) = x, f (t+1) (x) = h(t) + MLP (h(t)) + Adapter (h(t)),
+
+where h(t) represents the hidden state, denoted as: 
+
+h(t) = f (t)(x) + Attention  f (t)(x).
+
+Specifically, the adapter is defined as: 
+
+Adapter (z) = γparam · P u
+
+
+
+σ Pd(LayerNorm (z)) 
+
+,
+
+where γparam corresponds to the scaling factor in the adapter, and Pu, σ, Pd represent the up-sampling projector, the GeLU activation layer, and the down-sampling projector, respectively. We compute the similarity between the visual and textual feature vectors to obtain the predicted logits of Text features  
+
+> Known
+
+DL 
+
+> Batch-wise
+
+BP
+
+> Class description text
+> Projector
+> Attention
+> MLP
+> Adapter
+> Text encoder
+
++++
+
+> Adapter residual block × N Similarity score (logits)
+> Pseudo label (Ground truth)
+
+## +
+
+> CE Loss
+> Image features
+
+## + 
+
+> CE Loss CE Loss
+> Layer norm
+> Down
+> Up
+> GeLU
+> Scaling param Global
+
+DN  
+
+> Calculate similarity Figure 4. Adapter for Semantic Feature Alignment. The adapter aligns visual features with semantic features of textual descriptions prepared in the previous stages, enabling direct prediction of candidate labels for RC-OWSSL.
+
+the model and calculate the loss of cross-entropy with re-spect to the ground truth or the hard pseudo label, producing the classification loss for the sample (x, y ):
+
+L(x, y ) = −
+
+> k+n
+
+X
+
+> i=1
+
+I[i=y] log 
+
+
+
+exp( ϵ) · Vx, E ci
+
+
+
+,
+
+where ϵ is the logits scaling factor inherent in the model, and ⟨· , ·⟩ represents the inner product of two vectors. y
+
+also denotes the pseudo label ˆy for simplicity, and (x, y ) ∈
+
+BL ∪ BN ∪ BP , where BL, BN denote the mini-batches corresponding to DL, DN . The final loss is computed as the sum over all three types of labeled data. During train-ing, only the adapter and projector parameters are updated. During inference, all parameters are kept fixed, allowing the model to predict the corresponding textual label for the in-put image directly. 
+
+## 4. Experiments 
+
+4.1. Basic Settings 
+
+Dataset. We evaluate SECOS on three generic image clas-sification datasets: CIFAR10 [13], CIFAR100 [13], and ImagenNet100 [14], as well as four fine-grained datasets: CUB [37], Stanford Cars [12], Oxford Flowers [19], and Oxford Pets [23]. For each dataset, we designate the first half of the classes as known classes and the remaining half as novel classes. Among the training samples belonging to the known classes, 50% are selected to form the labeled dataset. The remaining samples from the known classes, to-gether with all samples from the novel classes, are used to construct the unlabeled dataset. For datasets without pre-defined train-test splits, including Flowers, Cars, and Pets, we use the entire dataset for training and randomly sample 20% of unlabeled data as the balanced test set. 
+
+Evaluation Protocol. For all comparison methods [7, 20, 26, 36, 39–42, 45–47], unless otherwise specified, we fol-low their original testing protocol. This protocol uses Hun-garian matching to compute clustering accuracy, formu-lated as ACC cluster = 1
+
+|Dtest |
+
+P|Dtest | 
+
+> i=1
+
+I yi = W (¯ yi),where ¯y is the predicted label and W denotes the opti-mal permutation. In contrast, SECOS computes the clas-sification accuracy by comparing the predicted labels di-rectly with the ground truth, formulated as ACC classif y =1
+
+|Dtest |
+
+P|Dtest | 
+
+> i=1
+
+I(yi = ¯ yi). It is worth noting that for the same algorithm, ACC cluster ≥ ACC classif y , since Hungarian matching reassigns predicted labels to maximize overall accuracy regardless of semantic consistency. 
+
+Implementation Details. We follow prior works [7, 47] and employ the same teacher models and backbones: CLIP-ViT-H-14, released by OpenCLIP, and CLIP-ViT-B-16, re-leased by OpenAI. The training process is conducted for 100 epochs with a batch size of 32, using the AdamW op-timizer with an initial learning rate of 0.0001, weight decay of 1e-5, and a LambdaLR scheduler. Following [44], we set the hyperparameters α = 0 .6 and β = 0 .95 in the Batch-Wise Semantic Capture stage. The global pseudo-labeled novel samples percentage ϕ is set to 50, and the downsam-pling dimension of the adapter is set to 10, which will be discussed in detail in Sec. 4.4 and Sec. 4.5, respectively. During loss computation, each image is augmented into a strong view and a weak view [32]. The classification losses of the two views are calculated and summed to obtain the fi-nal loss for the image. All experiments are conducted using PyTorch [24] with one GeForce RTX 3090 GPU. 
+
+4.2. Main Results 
+
+We compare SECOS with existing OWSSL and GCD SOTA methods. Tab. 1 reports the results on generic datasets, while Tab. 2 presents those on fine-grained datasets. As Table 1. Comparison of SECOS with SOTA OWSSL and GCD methods on generic datasets. Bold and underline indicate the best and second-best results, respectively. K/N/A denotes Known, Novel, and All accuracy, respectively. 
+
+CIFAR10 CIFAR100 ImageNet100 Methods Backbone K N A K N A K N ATIDA [40] ResNet 94.2 93.4 93.8 73.3 56.6 65.3 83.4 71.2 77.6 OwMatch[20] ResNet 96.5 97.1 96.8 80.1 63.9 71.9 91.5 79.6 85.5 TRAILER [42] ResNet 93.4 95.0 94.4 69.7 48.7 55.6 91.4 82.4 85.3 GCD [36] DINO 97.9 88.2 91.5 76.2 66.5 73.0 89.8 66.3 74.1 SimGCD [41] DINO 95.1 98.1 97.1 81.2 77.8 80.1 93.1 77.9 83.0 DCCL [26] DINO 96.5 96.9 96.3 76.8 70.2 75.3 90.5 76.2 80.5 GPC [46] DINO 98.2 89.1 92.2 85.0 63.0 77.9 94.3 71.0 76.9 PromptCAL [45] DINO 96.6 98.5 97.9 84.2 75.3 81.2 92.7 78.3 83.1 SPTNet [39] DINO 95.0 98.6 97.3 84.3 75.6 81.3 93.2 81.4 85.4 SimGCD [41] CLIP 94.7 97.5 96.6 82.6 79.5 81.6 94.5 81.9 86.1 TextGCD [47] CLIP 98.0 98.6 98.2 85.5 71.6 80.8 92.4 85.2 88.0 TP-OWSSL [7] CLIP 92.4 95.4 94.4 71.5 72.9 72.3 84.2 86.8 85.8 SECOS (ours) CLIP 97.9 98.8 98.1 87.1 82.6 84.7 93.4 89.8 91.7 
+
+> Table 2. Comparison of SECOS with SOTA OWSSL and GCD methods on fine-grained datasets.
+
+CUB Stanford Cars Oxford Flowers Oxford Pets Methods Backbone K N A K N A K N A K N AGCD DINO 56.6 48.7 51.3 57.6 29.9 39.0 74.9 74.1 74.4 85.1 77.6 80.2 SimGCD DINO 65.6 57.7 60.3 71.9 45.0 53.8 80.9 66.5 71.3 85.9 88.6 87.7 SimGCD CLIP 76.8 54.6 62.0 81.4 73.1 75.9 87.8 69.0 75.3 75.2 95.7 88.6 TextGCD CLIP 80.6 74.7 76.6 87.4 86.8 86.9 90.7 85.4 87.2 93.9 96.4 95.5 
+
+TP-OWSSL CLIP 83.7 72.6 76.6 95.5 88.6 90.7 90.9 86.9 87.3 94.7 93.5 93.9 SECOS (ours) CLIP 82.0 75.1 78.6 89.8 94.4 92.3 98.4 83.7 90.0 95.3 95.5 95.4 shown, even though previous methods evaluate their cluster-ing accuracy for Novel and All using Hungarian matching. At the same time, SECOS adheres to the standard classifica-tion accuracy, and SECOS still achieves significantly supe-rior performance. In particular, SECOS achieves the highest performance across all three generic datasets in Novel accu-racy and performs best on two datasets and second-best on one in All accuracy. On the fine-grained datasets, SECOS attains two best results in Novel accuracy, as well as three best and one second-best results in All accuracy. Compared with TP-OWSSL [7], a framework tailored for fine-grained OWSSL classification, SECOS still achieves an improve-ment of 1.78% and 1.95% in Novel and All accuracy on fine-grained datasets, and 7.37% and 5.35% improvements on generic datasets, respectively. These results demonstrate that SECOS effectively handles downstream datasets with either large or small inter-class distribution gaps, exhibiting strong robustness and generalization capability. 
+
+4.3. Ablation Study 
+
+To validate the necessity of the two semantic capture stages in SECOS, we conduct ablation studies on the CIFAR100 and CUB datasets. Using the model trained solely on DL as   
+
+> Table 3. Ablation study of the two semantic capture stages in SECOS on CIFAR100 and CUB datasets. “N” and “B” denote the Novel Class Semantic Compensation and Batch-Wise Seman-tic Recapture stages, respectively.
+
+Ablation CIFAR100 CUB N B K N A K N A
+
+✗ ✗ 90.0 14.4 50.7 79.5 22.6 51.2 
+
+✓ ✗ 86.7 80.4 83.9 79.6 74.5 77.5 
+
+✗ ✓ 87.8 76.7 82.3 82.0 69.1 74.6 
+
+✓ ✓ 87.1 82.6 84.7 82.0 75.1 78.6 
+
+the baseline, we progressively incorporate the two semantic capture modules, and the results are presented in Tab. 3. As shown, when trained only with DL, the model exhibits a severe logits bias toward known classes due to the signifi-cant imbalance in supervisory signals between known and novel classes, resulting in extremely low Novel accuracy. After introducing the two semantic capture strategies, Novel accuracy improves substantially. Specifically, the Novel Class Semantic Compensation stage globally supplements the supervisory signals of novel classes. In contrast, the Batch-Wise Semantic Recapture stage further captures fine-10% 25% 50% 75% 90% Top- % p-samples                  
+
+> 80
+> 82
+> 84
+> 86 Accuracy (%)
+> CIFAR100 Performance
+> 10% 25% 50% 75% 90% Top- % p-samples
+> 70
+> 75
+> 80
+> CUB Performance
+> 10% 25% 50% 75% 90% Top- % p-samples
+> 92
+> 94
+> 96
+> 98 P-label Accuracy (%)
+> CIFAR100 (P-labels)
+> 10% 25% 50% 75% 90% Top- % p-samples
+> 87.5
+> 90.0
+> 92.5
+> 95.0
+> CUB (P-labels)
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0 1e4
+> 0
+> 1
+> 2Number of Samples 1e3
+> Known accuracy Novel accuracy All accuracy Correct p-samples Total p-samples P-label accuracy
+
+Figure 5. Analysis of global novel pseudo-label (p-label) density. The left two subfigures show the variation of Known, Novel, and All accuracy with respect to the proportion of top-ϕ% pseudo-labeled samples (p-samples). The right two subfigures present the corresponding pseudo-label accuracy, total number of pseudo-labeled samples, and number of correct pseudo-labeled samples as ϕ increases. 2 4 10 16 32 64 Downsampling dimension 
+
+> 82
+> 84
+> 86
+> 88 Accuracy (%)
+
+CIFAR100 Performance      
+
+> 2410 16 32 64 Downsampling dimension
+> 75.0
+> 77.5
+> 80.0
+> 82.5
+
+CUB Performance   
+
+> Known accuracy Novel accuracy All accuracy
+
+Figure 6. Effect of the adapter’s downsampling dimension on model performance. Increasing the downsampling dimension from 2 to 64 yields less than a 2% improvement in All accuracy. 
+
+grained semantic information available within the dataset. Consequently, incorporating the global stage leads to a pro-nounced improvement in Novel accuracy, and adding the batch-wise stage further enhances All accuracy. 
+
+4.4. Novel Pseudo-Label Density Analysis 
+
+We examine how the number of global pseudo-labeled novel samples influences model performance. Specifically, we set ϕ to 10, 25, 50 (approximately matching the number of labeled samples), 75, and 90 to construct DN for train-ing. The results are shown in Fig. 5. When only a small number of high-confidence samples are used, both Novel and All accuracy are relatively low. This occurs because the supervision for novel classes remains considerably weaker than that for known classes, even though the pseudo la-bels are more accurate, resulting in a pronounced training bias toward known classes. As the proportion of pseudo-labeled samples increases, Known accuracy gradually de-creases while Novel accuracy improves, and All accuracy tends to stabilize. Similarly, as more pseudo-labeled sam-ples are incorporated, noise is inevitably introduced. When the number of pseudo-labeled novel samples surpasses that of labeled known samples, a trade-off between accuracy and noise emerges, resulting in an overall stable performance. 
+
+4.5. Influence of Adapter Downsampling Dimension 
+
+To investigate the impact of the adapter’s downsampling dimension on the performance of SECOS, we conduct ex-
+
+Table 4. Comparison of model performance trained on pseudo-labeled samples (p-samples) obtained from two candidate label selection strategies. 
+
+CIFAR100 CUB Training on K N A K N Aoriginal p-samples 85.2 80.6 82.4 78.5 70.7 75.3 filtered p-samples 87.1 82.6 84.7 82.0 75.1 78.6 
+
+periments on the CIFAR100 and CUB datasets, setting the adapter’s downsampling dimension to 2, 4, 10, 16, 32, and 64. The results are illustrated in Fig. 6. It is shown that as the downsampling dimension increases, the All accu-racy on both datasets gradually improves but quickly con-verges, with a total gain of less than 2% between the small-est and largest dimensions. This indicates that the adapter’s downsampling dimension has a minimal effect on the over-all performance of SECOS, demonstrating its strong stabil-ity. Considering the trade-off between performance and re-source consumption during training, it is generally unnec-essary to set an enormous low-dimensional size (e.g., 64 or higher); a moderate value, such as 10, is sufficient for main-taining high performance while ensuring efficiency. 
+
+4.6. Batch-Wise Pseudo-Labeling Strategy Analysis 
+
+We investigate the impact of batch size and pseudo-label se-lection strategy on the batch-wise pseudo-labeling process. We present experiments with batch sizes of 8, 16, 32, and 64. As shown in Fig. 7 (left), the performance degradation across all three metrics is minimal between the smallest and largest batch sizes, with only a 0.35% drop in overall accu-racy on CIFAR100 and a 1.41% drop on CUB. This demon-strates that SECOS is robust to variations in batch size. We further examine the influence of pseudo-label pre-cision by comparing two candidate label selection strate-gies: one using the raw intersection of intra- and inter-instance label sets, and another retaining only samples with one pseudo label in the candidate label set. As shown in Fig. 7 (right), both strategies show slight improvements as the batch size increases, yet the latter consistently achieves much higher pseudo-label precision. This is because when 8 16 32 64 Batch size            
+
+> 84
+> 86 Accuracy (%)
+> CIFAR100 Performance
+> 816 32 64 Batch size
+> 75.0
+> 77.5
+> 80.0
+> 82.5
+> CUB Performance
+> 816 32 64 Batch size
+> 87.5
+> 90.0
+> 92.5
+> 95.0 P-label accuracy (%)
+> CIFAR100 (P-labels)
+> 816 32 64 Batch size
+> 80.0
+> 82.5
+> 85.0
+> 87.5
+> CUB (P-labels)
+> 0
+> 1
+> 2
+> 31e4
+> 0
+> 2
+> 4Number of Samples 1e3
+> Known accuracy Novel accuracy All accuracy
+> Original total p-samples
+> Original correct p-samples
+> Filtered total p-samples
+> Filtered correct p-samples
+> P-label acc (original)
+> P-label acc (filtered)
+
+Figure 7. Impact of batch size and pseudo-label selection on SECOS. The left two figures show that model performance remains stable across batch sizes. The right two figures show pseudo-label precision and the number of pseudo-labeled samples for two candidate label selection strategies, indicating that retaining samples with exactly one pseudo label consistently yields higher precision. Table 5. Performance comparison between SECOS with and without teacher supervision. The SECOS (w.o. teacher) variant shows only a minor drop in overall accuracy while still outperforming existing OWSSL methods, demonstrating its strong self-learning capability. 
+
+CIFAR100 ImageNet100 Oxford Flowers Oxford Pets Method Teacher model K N A K N A K N A K N ATextGCD ✓ 85.5 71.6 80.8 92.4 85.2 88.0 90.7 85.4 87.2 93.9 96.4 95.5 
+
+TP-OWSSL ✓ 71.5 72.9 72.3 84.2 86.8 85.8 90.9 86.9 87.3 94.7 93.5 93.9 SECOS ✓ 87.1 82.6 84.7 93.4 89.8 91.7 98.4 83.7 90.0 95.3 95.5 95.4 SECOS ✗ 84.3 81.1 82.4 91.9 90.7 91.3 96.8 82.0 88.3 94.5 96.5 95.5 
+
+the candidate label set contains multiple labels, the seman-tic representation of the sample is ambiguous and easily confused with other classes, leading to lower pseudo-label accuracy. In contrast, when the candidate label set con-tains exactly one label, the sample’s semantic information is well-defined and strongly indicative of its true class, re-sulting in significantly improved pseudo-label quality. Subsequently, we use the pseudo-labeled samples ob-tained from these two strategies to train the model. As shown in Tab. 4, the model trained on samples with one pseudo label in the candidate label set achieves better per-formance. Although the number of filtered pseudo-labeled samples is much smaller than that of the original pseudo-labeled samples, as illustrated in Fig. 7 (right), this result confirms that clearer semantic assignments lead to higher-quality pseudo labels and more effective learning. 
+
+4.7. Self-Learning Capability of SECOS 
+
+SECOS exhibits robust self-learning ability and can per-form effectively on some tasks even without relying on a teacher model. We directly use the student CLIP to gen-erate pseudo labels during the Novel Class Semantic Com-pensation stage. At each parameter update, an EMA-based copy of the student CLIP is maintained and used to produce pseudo labels during the Batch-Wise Semantic Recapture stage, while other processes of SECOS remain unchanged. The experimental results, presented in Tab. 5, show that compared with original SECOS, SECOS without a teacher model achieves only a 0.83% average decrease in overall performance across four datasets, while still outperforming existing OWSSL methods that rely on teacher models. This demonstrates that SECOS can effectively adapt to scenarios without teacher supervision, validating the strength of its design in fully exploiting CLIP to capture latent semantic information and enhance training supervision. 
+
+## 5. Conclusion 
+
+This paper introduces the RC-OWSSL task, where ex-isting OWSSL methods fall short due to insufficient semantic grounding between visual and textual modali-ties, emphasizing direct textual label prediction without post-hoc matching. To overcome this limitation, SECOS is proposed, leveraging external knowledge to extract and align semantic representations from both known and novel classes, enabling direct prediction of textual labels. Extensive experiments across multiple benchmarks show that SECOS consistently surpasses previous SOTA methods, even those evaluated with post-hoc alignment, highlighting its effectiveness in achieving practical and rigorous open-world classification. 
+
+Limitations. SECOS depends on large-scale vision-language models such as CLIP, and its performance is inherently tied to the quality and coverage of the un-derlying image-text pretraining. However, given that RC-OWSSL fundamentally requires semantic grounding across modalities, such dependence is natural and shared among recent comparable methods. Acknowledgment 
+
+This study was supported in part by the National Natural Science Foundation of China under Grants 62431004, 62376233, 62502402, 62476063 and 62306181; in part by the Natural Science Foundation of Fujian Province under Grant 2024J09001; in part by the Nat-ural Science Foundation of Guangdong Province un-der Grant 2025A1515011293; in part by the Guang-dong Basic and Applied Basic Research Foundation un-der Grant 2024A1515010163; in part by the Shen-zhen Science and Technology Program under Grant RCBS20231211090659101; in part by the National Key Laboratory of Radar Signal Processing under Grant JKW202403; in part by Xiaomi Young Talents Program; and SNG is supported by the Computational Science Cen-tre for Research Communities (CoSeC) Fellowship pro-gramme. 
+
+## References 
+
+[1] Tom Brown, Benjamin Mann, Nick Ryder, Melanie Sub-biah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakan-tan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. Language models are few-shot learners. In NeurIPS , pages 1877–1901, 2020. 3 [2] Kaidi Cao, Maria Brbic, and Jure Leskovec. Open-world semi-supervised learning. In ICLR , 2022. 1, 2 [3] Mathilde Caron, Hugo Touvron, Ishan Misra, Herv´ e J´ egou, Julien Mairal, Piotr Bojanowski, and Armand Joulin. Emerg-ing properties in self-supervised vision transformers. In 
+
+ICCV , pages 9650–9660, 2021. 4 [4] Bo Cheng, Jueqing Lu, Yuan Tian, Haifeng Zhao, Yi Chang, and Lan Du. Cgmatch: A different perspective of semi-supervised learning. In CVPR , pages 15381–15391, 2025. 1[5] Xinjie Cui, Yuezun Li, Ao Luo, Jiaran Zhou, and Junyu Dong. Forensics adapter: Adapting clip for generalizable face forgery detection. In CVPR , pages 19207–19217, 2025. 3[6] Alexey Dosovitskiy. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929 , 2020. 4 [7] Yuxin Fan, Junbiao Cui, and Jiye Liang. Learning textual prompts for open-world semi-supervised learning. In CVPR ,pages 14756–14765, 2025. 2, 5, 6 [8] Takuma Fukuda, Hiroshi Kera, and Kazuhiko Kawamoto. Adapter merging with centroid prototype mapping for scal-able class-incremental learning. In CVPR , pages 4884–4893, 2025. 3 [9] Lan-Zhe Guo, Yi-Ge Zhang, Zhi-Fan Wu, Jie-Jing Shao, and Yu-Feng Li. Robust semi-supervised learning when not all classes have labels. In NeurIPS , pages 3305–3317, 2022. 2 [10] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In CVPR ,pages 770–778, 2016. 2, 4 [11] Neil Houlsby, Andrei Giurgiu, Stanislaw Jastrzebski, Bruna Morrone, Quentin De Laroussilhe, Andrea Gesmundo, Mona Attariyan, and Sylvain Gelly. Parameter-efficient transfer learning for nlp. In ICML , pages 2790–2799, 2019. 2 [12] Jonathan Krause, Michael Stark, Jia Deng, and Li Fei-Fei. 3d object representations for fine-grained categorization. In 
+
+ICCVW , pages 554–561, 2013. 5 [13] Alex Krizhevsky, Geoffrey Hinton, et al. Learning multiple layers of features from tiny images. 2009. 5 [14] Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. Imagenet classification with deep convolutional neural net-works. In NeurIPS , 2012. 2, 5 [15] Hezhao Liu, Yang Lu, Mengke Li, Yiqun Zhang, Shreyank N Gowda, Chen Gong, and Hanzi Wang. Fate: A prompt-tuning-based semi-supervised learning framework for ex-tremely limited labeled data. In ACM MM , page 3153–3162, 2025. 1, 3 [16] Jiaming Liu, Yangqiming Wang, Tongze Zhang, Yulu Fan, Qinli Yang, and Junming Shao. Open-world semi-supervised novel class discovery. In IJCAI , pages 4002–4010, 2023. 2 [17] Yijie Liu, Xinyi Shang, Yiqun Zhang, Yang Lu, Chen Gong, Jing-Hao Xue, and Hanzi Wang. Mind the gap: Confidence discrepancy can guide federated semi-supervised learning across pseudo-mismatch. In CVPR , pages 10173–10182, 2025. 1 [18] Cristina Menghini, Andrew Delworth, and Stephen Bach. Enhancing clip with clip: Exploring pseudolabeling for limited-label prompt tuning. In NeurIPS , pages 60984– 61007, 2023. 3 [19] Maria-Elena Nilsback and Andrew Zisserman. Automated flower classification over a large number of classes. In 2008 Sixth Indian conference on computer vision, graphics & im-age processing , pages 722–729, 2008. 5 [20] Shengjie Niu, Lifan Lin, Jian Huang, and Chao Wang. Ow-match: Conditional self-labeling with consistency for open-world semi-supervised learning. In NeurIPS , pages 99836– 99866, 2024. 2, 5, 6 [21] Rabah Ouldnoughi, Chia-Wen Kuo, and Zsolt Kira. Clip-gcd: Simple language guided generalized category discov-ery. arXiv preprint arXiv:2305.10420 , 2023. 2 [22] Junting Pan, Ziyi Lin, Xiatian Zhu, Jing Shao, and Hong-sheng Li. St-adapter: Parameter-efficient image-to-video transfer learning. In NeurIPS , pages 26462–26477, 2022. 3[23] Omkar M Parkhi, Andrea Vedaldi, Andrew Zisserman, and CV Jawahar. Cats and dogs. In CVPR , pages 3498–3505, 2012. 5 [24] Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, et al. Pytorch: An imperative style, high-performance deep learning library. In 
+
+NeurIPS , 2019. 5 [25] Jonas Pfeiffer, Aishwarya Kamath, Andreas R¨ uckl´ e, Kyunghyun Cho, and Iryna Gurevych. Adapterfusion: Non-destructive task composition for transfer learning. arXiv preprint arXiv:2005.00247 , 2020. 3 [26] Nan Pu, Zhun Zhong, and Nicu Sebe. Dynamic conceptional contrastive learning for generalized category discovery. In 
+
+CVPR , pages 7579–7588, 2023. 2, 5, 6 [27] Alec Radford, Karthik Narasimhan, Tim Salimans, Ilya Sutskever, et al. Improving language understanding by gen-erative pre-training. 2018. 3 [28] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learn-ing transferable visual models from natural language super-vision. In ICML , pages 8748–8763, 2021. 2, 4 [29] Mamshad Nayeem Rizve, Navid Kardan, Salman Khan, Fa-had Shahbaz Khan, and Mubarak Shah. Openldn: Learn-ing to discover novel classes for open-world semi-supervised learning. In ECCV , pages 382–401, 2022. 2 [30] Mamshad Nayeem Rizve, Navid Kardan, and Mubarak Shah. Towards realistic semi-supervised learning. In ECCV , pages 437–455, 2022. 2 [31] Karen Simonyan and Andrew Zisserman. Very deep convo-lutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556 , 2014. 2 [32] Kihyuk Sohn, David Berthelot, Nicholas Carlini, Zizhao Zhang, Han Zhang, Colin A Raffel, Ekin Dogus Cubuk, Alexey Kurakin, and Chun-Liang Li. Fixmatch: Simplifying semi-supervised learning with consistency and confidence. In NeurIPS , pages 596–608, 2020. 5 [33] Yi-Lin Sung, Jaemin Cho, and Mohit Bansal. Vl-adapter: Parameter-efficient transfer learning for vision-and-language tasks. In CVPR , pages 5227–5237, 2022. 3 [34] Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed, Dragomir Anguelov, Dumitru Erhan, Vincent Vanhoucke, and Andrew Rabinovich. Going deeper with convolutions. In CVPR , pages 1–9, 2015. 2 [35] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszko-reit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In NeurIPS , 2017. 3 [36] Sagar Vaze, Kai Han, Andrea Vedaldi, and Andrew Zisser-man. Generalized category discovery. In CVPR , pages 7492– 7501, 2022. 1, 2, 5, 6 [37] Catherine Wah, Steve Branson, Peter Welinder, Pietro Per-ona, and Serge Belongie. The caltech-ucsd birds-200-2011 dataset. 2011. 5 [38] Enguang Wang, Zhimao Peng, Zhengyuan Xie, Fei Yang, Xialei Liu, and Ming-Ming Cheng. Get: Unlocking the multi-modal potential of clip for generalized category dis-covery. In CVPR , pages 20296–20306, 2025. 2 [39] Hongjun Wang, Sagar Vaze, and Kai Han. Sptnet: An efficient alternative framework for generalized category discovery with spatial prompt tuning. arXiv preprint arXiv:2403.13684 , 2024. 5, 6 [40] Yu Wang, Zhun Zhong, Pengchong Qiao, Xuxin Cheng, Xi-awu Zheng, Chang Liu, Nicu Sebe, Rongrong Ji, and Jie Chen. Discover and align taxonomic context priors for open-world semi-supervised learning. In NeurIPS , pages 19015– 19028, 2023. 1, 2, 6 [41] Xin Wen, Bingchen Zhao, and Xiaojuan Qi. Parametric classification for generalized category discovery: A baseline study. In ICCV , pages 16590–16600, 2023. 2, 6 [42] Ruixuan Xiao, Lei Feng, Kai Tang, Junbo Zhao, Yixuan Li, Gang Chen, and Haobo Wang. Targeted representation align-ment for open-world semi-supervised learning. In CVPR ,pages 23072–23082, 2024. 1, 2, 5, 6 [43] Lingxiao Yang, Ru-Yuan Zhang, Yanchen Wang, and Xiao-hua Xie. Mma: Multi-modal adapter for vision-language models. In CVPR , pages 23826–23837, 2024. 3 [44] Jiahan Zhang, Qi Wei, Feng Liu, and Lei Feng. Candidate pseudolabel learning: Enhancing vision-language models by prompt tuning with unlabeled data. In ICML , pages 60004– 60020, 2024. 4, 5 [45] Sheng Zhang, Salman Khan, Zhiqiang Shen, Muzammal Naseer, Guangyi Chen, and Fahad Shahbaz Khan. Prompt-cal: Contrastive affinity learning via auxiliary prompts for generalized novel category discovery. In CVPR , pages 3479– 3488, 2023. 2, 5, 6 [46] Bingchen Zhao, Xin Wen, and Kai Han. Learning semi-supervised gaussian mixture models for generalized category discovery. In ICCV , pages 16623–16633, 2023. 6 [47] Haiyang Zheng, Nan Pu, Wenjing Li, Nicu Sebe, and Zhun Zhong. Textual knowledge matters: Cross-modality co-teaching for generalized visual class discovery. In ECCV ,pages 41–58, 2024. 1, 2, 5, 6

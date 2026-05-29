@@ -1,0 +1,304 @@
+Title: Relational Retrieval: Leveraging Known-Novel Interactions for Generalized Category Discovery
+
+URL Source: https://arxiv.org/pdf/2605.09420v1
+
+Published Time: Tue, 12 May 2026 01:28:02 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+# Relational Retrieval: Leveraging Known-Novel Interactions for Generalized Category Discovery 
+
+# Yulin Xu ∗
+
+University of California, Irvine Irvine, CA, USA yulinx8@uci.edu 
+
+# Chunqi Guo ∗
+
+Sichuan Agricultural University Ya’an, China guochunqi02@gmail.com 
+
+# Yuanzhen Shuai 
+
+University College London London, UK ucapys0@ucl.ac.uk 
+
+# Jianyuan Ni †
+
+Juniata College Huntingdon, USA jni100@juniata.edu 
+
+## Abstract 
+
+In this study, we tackle Generalized Category Discovery (GCD) via a Relational Retrieval perspective , explicitly coupling labeled and unlabeled data through bidirectional knowledge transfer. While existing methods treat these sources separately, missing valuable in-teraction opportunities, we propose Relational Pattern Consistency (RPC) that enables mutual enhancement. RPC employs One-vs-All classifiers for soft ID/OOD decomposition, then introduces two mechanisms: (i) for known-class preservation, we transfer semantic behavioral alignment; (ii) for category discovery, we leverage the insight that samples from the same category maintain invariant relationships with known-class prototypes, transforming unreli-able pseudo-labeling into well-defined relational pattern matching. This bidirectional design allows labeled data to guide unlabeled learning while discovering novel categories through their collec-tive relational signatures. Extensive experiments demonstrate RPC achieves state-of-the-art performance on both generic and fine-grained benchmarks. 
+
+## CCS Concepts 
+
+• Computing methodologies → Visual content-based indexing and retrieval .
+
+## Keywords 
+
+Generalized category discovery, semi-supervised learning, con-trastive learning. 
+
+ACM Reference Format: 
+
+Yulin Xu, Chunqi Guo, Yuanzhen Shuai, and Jianyuan Ni. 2026. Relational Retrieval: Leveraging Known-Novel Interactions for Generalized Category Discovery. In Proceedings of ACM International Conference on Multimedia Retrieval (ICMR ’26). ACM, New York, NY, USA, 5 pages. https://doi.org/10. 1145/3805622.3810732  
+
+> ∗Both authors contributed equally.
+> †Corresponding author. Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+> ICMR ’26, Amsterdam,Netherlands
+> ©2026 Copyright held by the owner/author(s). Publication rights licensed to ACM. ACM ISBN 979-8-4007-2617-0/26/06 https://doi.org/10.1145/3805622.3810732
+
+Figure 1: Overview of RPC. Soft ID/OOD decomposition via OVA classifiers enables bidirectional knowledge transfer: em-bedding fusion for known-class preservation and relational matching for category discovery. 
+
+## 1 Introduction 
+
+Generalized Category Discovery (GCD) [ 7, 28 ] extends traditional classification to open-world scenarios by jointly recognizing known classes and discovering novel classes in unlabeled data. This prob-lem has been explored across various tasks, including natural im-ages [ 12 , 18 , 24 , 29 , 33 , 37 , 38 ] and specialized applications such as medical imaging and healthcare areas [ 4 , 21 , 39 ], industrial scenar-ios [8], face recognition [15, 22], information retrieval [25], oracle characters[16] etc. Recent advances in GCD [ 3, 13 , 14 , 23 , 32 , 35 , 36 , 40 ] have made significant progress through various strategies, including paramet-ric classifier learning [ 32 ], spatial prompt tuning [ 30 ], textual infor-mation integration [ 29 , 38 ] and soft ID/OOD decomposition [ 13 ], among others. However, these approaches fundamentally treat la-beled and unlabeled data as separate learning streams—labeled data undergoes supervised learning while unlabeled data relies on self-supervised signals. This separation overlooks a critical in-sight: labeled and unlabeled data can mutually enhance each other through structured interactions, where labeled data provides seman-tic guidance while unlabeled data offers distributional knowledge. We identify two key limitations of this separation. First, unlabeled known-class samples rely solely on self-supervision for representa-tion [ 2 ], despite labeled samples of the same classes having already captured highly discriminative features—wasting valuable semantic knowledge. Second, category discovery proceeds without consid-ering relational patterns—samples from the same novel category, while semantically distinct from known classes, maintain consistent relationships with known-class prototypes that serve as powerful grouping signals. In this study, we propose Relational Pattern Consistency (RPC), a novel framework that explicitly couples labeled and unlabeled data  
+
+> arXiv:2605.09420v1 [cs.CV] 10 May 2026 ICMR ’26, 2026, Amsterdam,Netherlands Xu et al.
+
+through bidirectional knowledge transfer as shown in Fig. 1. RPC leverages soft ID/OOD decomposition from One-vs-All classifiers to enable targeted interactions: (i) for known-class preservation, we transfer semantic patterns from labeled to unlabeled data through confidence-weighted embedding fusion and enforce behavioral alignment under augmentation[ 26 ], ensuring unlabeled known-class samples inherit the robust representations from labeled data; (ii) for category discovery, we introduce relational consistency—the principle that samples from the same category maintain invariant relationships with known-class prototype. This transforms discov-ery from ill-posed clustering into well-defined pattern matching within the known-class reference frame. In summary, our contributions are three-fold: (i) We propose RPC, the first GCD framework that couples labeled and unlabeled data through bidirectional knowledge transfer. Unlike existing meth-ods that maintain separate learning streams, RPC employs soft ID/OOD decomposition to enable targeted interactions. (ii) We in-troduce confidence-weighted embedding fusion with behavioral alignment for known-class preservation, and relational consistency learning that discovers novel categories through their invariant re-lationships with known-class prototypes, going beyond unreliable pseudo-labels. (iii) Extensive experiments demonstrate that RPC achieves state-of-the-art performance on both generic and fine-grained benchmarks, with consistent improvements in known and novel class accuracy validating our bidirectional transfer approach. 
+
+## 2 Problem Setting 
+
+Let D denote the dataset, split into a labeled part DL = {( x𝑙 𝑖 , y𝑙 𝑖 )} ⊂ X × Y 𝑙 and an unlabeled part DU = {x𝑢 𝑖 } ⊂ X , where each x𝑢 𝑖 is associated with a hidden ground-truth label ˆy𝑢 𝑖 ∈ Y 𝑢 used only for evaluation. The unlabeled pool may contain categories absent from the labeled subset, i.e., Y𝑙 ⊂ Y 𝑢 . The learning objective is to assign every instance in DU to a semantic category. Following [ 32 ], we assume the total number of categories in the unlabeled set is known a priori, and write 𝐾 = |Y 𝑢 |.
+
+## 3 Method 3.1 Baseline for GCD 
+
+In this study, our model builds on SimGCD [ 32 ] for representa-tion learning and parametric classification, while incorporating De-bGCD’s [ 13 ] One-vs-All (OVA) decomposition to identify whether unlabeled samples belong to known or novel classes. This combina-tion enables effective feature learning through SimGCD while OVA decomposition provides reliable soft weights for our bidirectional knowledge transfer. 
+
+3.1.1 Representation Learning. The objective of representation learning is to obtain discriminative features, which allows the clas-sifier effectively classify all the categories. To do so, a pre-trained feature extractor 𝑓 (·) is fine-tuned with two contrastive losses. Given two random augmentations ˆx𝑖 and ˜x𝑖 of an image x𝑖 in a training mini-batch B that contains both labeled and unlabeled data, the self-supervised contrastive loss is formulated as:                 
+
+> L𝑢
+> rep =1
+> | B | ∑︁ x𝑖 ∈B
+> −log exp (ˆz⊤
+> 𝑖 ˜z𝑖 /𝜏 𝑢 )
+> Íx𝑗 ∈𝐵 exp (ˆz⊤
+> 𝑗 ˜z𝑖 /𝜏 𝑢 ),(1)
+
+where z𝑖 = 𝑔 (𝑓 (x𝑖 )) is the projected feature for contrastive learn-ing, 𝑔 (.) is the projection head, and 𝜏 𝑢 is a temperature value. A supervised contrastive loss is similarly defined by:                    
+
+> L𝑠
+> rep =1
+> | B 𝑙 |∑︁ x𝑖 ∈B 𝑙
+> 1
+> | N 𝑖 |∑︁ 𝑝 ∈N 𝑖
+> −log exp (ˆz⊤
+> 𝑖 ˜z𝑝 /𝜏 𝑠 )
+> Í𝑛 ≠𝑖 exp (ˆz⊤
+> 𝑖 ˜z𝑛 /𝜏 𝑠 ),(2)
+
+where N𝑖 is the indexes of images in the mini-batch that have the same label to x𝑖 , 𝐵 𝑙 is the mini-batch of labeled training data and 𝜏 𝑠 is a temperature value. The two losses are combined to learn the representation: Lrep = (1 − 𝜆 )L 𝑢  
+
+> rep
+
++ 𝜆 L𝑠 
+
+> rep
+
+, where 𝜆 is a hyperparameter. 
+
+3.1.2 Classifier Learning. Following SimGCD [ 32 ], we employ a parametric classifier with learnable prototypes T = {t1, t2, . . . , t𝐾 },where 𝐾 = |Y 𝑢 | is assumed known a priori. During training, the soft label ˆp𝑘 𝑖 for each augmented view x𝑖 is computed via softmax over cosine similarities between features and prototypes:                       
+
+> ˆp𝑘 𝑖 =
+> exp
+> 
+> (ˆh𝑖 /∥ ˆh𝑖 ∥2)⊤(t𝑘 /∥ t𝑘 ∥2)/ 𝜏 𝑠
+> Í𝑗 exp
+> 
+> (ˆh𝑖 /∥ ˆh𝑖 ∥2)⊤(t𝑗 /∥ t𝑗 ∥2)/ 𝜏 𝑠
+> ,(3)
+
+where ˆh𝑖 = 𝑓 ( ˆx𝑖 ). Similarly computing ˜p𝑖 for ˜x𝑖 , the classifier losses become:                     
+
+> L𝑠
+> cls =1
+> | B 𝑙 |∑︁ x𝑖 ∈B 𝑙
+> ℓ𝐶𝐸 (y(𝑥 𝑖 ),ˆp𝑖 ),L𝑢
+> cls =1
+> | B | ∑︁ x𝑖 ∈B
+> ℓ𝐶𝐸 (˜p𝑖 ,ˆp𝑖 ),(4)
+
+where y𝑖 is the ground truth label for the labeled data point x𝑖 , Lce 
+
+is the cross-entropy loss, and 𝐻 (p) = − Í p log p regularizes the mean prediction p = 12|𝐵 |
+
+Íx𝑖 ∈𝐵 ( ˆp𝑖 + ˜p𝑖 ) in a mini-batch. The final classifier loss is given by Lcls = (1 − 𝜆 )L 𝑢  
+
+> cls
+
++ 𝜆 L𝑙  
+
+> cls
+
+− 𝜖𝐻 (p).Combining the losses of the representation learning and the clas-sifier learning, the overall loss of the baseline SimGCD is formulated by: Lbaseline = Lrep + L cls .
+
+3.1.3 One-vs-All Decomposition. Following DebGCD [ 13 ], we em-ploy One-vs-All (OVA) classifiers for soft ID/OOD decomposition. For each known class 𝑐 ∈ Y𝑙 , we pre-train a binary classifier 
+
+ℎ𝑐 : R𝑑 → [ 0, 1] to distinguish class 𝑐 from all others. These clas-sifiers are used to compute ID/OOD scores 𝑠 𝐼 𝐷 (x𝑢 ) for unlabeled samples, yielding soft weights:                   
+
+> 𝑤 old (x𝑢 )=𝑠 𝐼 𝐷 (𝑔 (𝑓 (x𝑢 ) ) ) ,𝑤 new (x𝑢 )=1−𝑠 𝐼 𝐷 (𝑔 (𝑓 (x𝑢 ) ) ) ,(5)
+
+where 𝑤 old indicates the likelihood of belonging to known classes and 𝑤 new to novel classes. These weights guide our bidirectional knowledge transfer: samples with high 𝑤 old participate in semantic pattern transfer from labeled data, while samples with high 𝑤 new 
+
+contribute to relational consistency learning for novel discovery. 
+
+## 3.2 Relational Pattern Consistency (RPC) 
+
+Unlike prior GCD methods that treat labeled and unlabeled data as two disjoint domains, RPC explicitly couples them through bidi-rectional knowledge transfer, as shown in Fig. 1. Our approach rests on two key insights: (i) labeled data contains rich semantic structure that can guide unlabeled known-class learning beyond unreliable pseudo-labels, and (ii) samples from the same category exhibit consistent behavioral signals when interacting with known-class prototypes, and critically, labeled data provides the reference framework to capture and interpret these behavioral patterns for category discovery. Relational Retrieval: Leveraging Known-Novel Interactions for Generalized Category Discovery ICMR ’26, 2026, Amsterdam,Netherlands 
+
+Table 1: Comparison with state-of-the-art methods on generic and fine-grained benchmarks. All values are percentages. 
+
+Methods CUB Stanford Cars FGVC-Aircraft CIFAR10 CIFAR100 ImageNet-100 All Old New All Old New All Old New All Old New All Old New All Old New k-means [19] 34.3 38.9 32.1 12.8 10.6 13.8 16.0 14.4 16.8 83.6 85.7 82.5 52.0 52.2 50.8 72.7 75.5 71.3 RS+ [6] 33.3 51.6 24.2 28.3 61.8 12.1 26.9 36.4 22.2 46.8 19.2 60.5 58.2 77.6 19.3 37.1 61.6 24.8 UNO+ [5] 35.1 49.0 28.1 35.5 70.5 18.6 40.3 56.4 32.2 68.6 98.3 53.8 69.5 80.6 47.2 70.3 95.0 57.9 GCD [28] 51.3 56.6 48.7 39.0 57.6 29.9 45.0 41.1 46.9 91.5 97.9 88.2 73.0 76.2 66.5 74.1 89.8 66.3 PromptCAL [34] 62.9 64.4 62.1 50.2 70.1 40.6 52.2 52.2 52.3 97.9 96.6 98.5 81.2 84.2 75.3 83.1 92.7 78.3 DCCL [23] 63.5 60.8 64.9 43.1 55.7 36.2 - - - 96.3 96.5 96.9 75.3 76.8 70.2 80.5 90.5 76.2 SimGCD [32] 60.3 65.6 57.7 53.8 71.9 45.0 54.2 59.1 51.8 97.1 95.1 98.1 80.1 81.2 77.8 83.0 93.1 77.9 SPTNet [30] 65.8 68.8 65.1 59.0 79.2 49.3 59.3 61.8 58.1 97.3 95.0 98.6 81.3 84.3 75.6 85.4 93.2 81.4 ProtoGCD [17] 63.2 68.5 60.5 53.8 73.7 44.2 56.8 62.5 53.9 97.3 95.3 98.2 81.9 82.9 80.0 84.0 92.2 79.9 DebGCD [13] 66.3 71.8 63.5 65.3 81.6 57.4 61.7 63.9 60.6 97.2 94.8 98.4 83.0 84.6 79.9 85.9 94.3 81.6 RPC (Ours) 67.1 73.2 64.8 65.5 81.0 57.8 62.1 65.5 61.0 97.6 95.2 98.8 83.8 85.1 81.0 86.2 93.8 82.1 
+
+3.2.1 Known-Class Preservation via Semantic Transfer. For known-class preservation, we transfer robust semantic patterns from la-beled to unlabeled data through behavioral consistency under aug-mentation. We construct training batches by selecting ID-likely unlabeled samples based on OVA scores. For each batch of 𝐵 la-beled samples, we first sample 𝜇 unlabeled samples and compute 
+
+𝜇 ID = ⌊𝜇 · 𝜌 ID ⌋, where 𝜌 ID is the estimated proportion of ID-class samples in the unlabeled set. We then select the top-𝜇 ID samples with highest 𝑤 known scores from these 𝜇 samples, resulting in the pattern: [x𝑙 
+
+> 1
+
+, x𝑢 
+
+> 1,1
+
+, ..., x𝑢  
+
+> 1,𝜇 ID
+
+, x𝑙 
+
+> 2
+
+, x𝑢 
+
+> 2,1
+
+, ..., x𝑢  
+
+> 2,𝜇 ID
+
+, ... ], where x𝑢 𝑖,𝑗 denotes the 𝑗 -th ID-class unlabeled sample paired with the 𝑖 -th labeled sample, all sharing identical augmentations. To enable semantic transfer from labeled to unlabeled samples, we apply confidence-weighted embedding[ 9]. Given batch embed-dings Z ∈ R𝑄 ×𝑑 where 𝑄 = 𝐵 (1 + 𝜇 ID ), we compute: 
+
+Z′ = (I + A)Z (6) Following the circular shift design, the fusion matrix is: 
+
+A𝑖 𝑗 =
+
+
+
+𝛼 · 𝑤 old (x𝑖 ) if 𝑗 = (𝑖 − 1) mod 𝑄 
+
+−𝛼 · 𝑤 old (x𝑖 ) if 𝑖 = 𝑗 
+
+0 otherwise (7) This design ensures that each unlabeled sample x𝑢 𝑘,𝑚 (the 𝑚 -th unlabeled sample paired with the 𝑘 -th labeled sample) receives information from its preceding sample in the batch, which is either the paired labeled sample (when 𝑚 = 1) or another unlabeled sample. The weighting by 𝑤 old ensures that only high-confidence ID samples are significantly affected by the fusion. With these fused embeddings Z′, we enforce behavioral con-sistency between each labeled sample and its paired unlabeled samples: 
+
+L𝑎𝑙𝑖𝑔𝑛 = 1
+
+|B 𝑙 | 
+
+> | B 𝑙 |
+
+∑︁ 
+
+> 𝑖 =1
+
+Δ(x𝑙 𝑖 ) − 
+
+Í𝜇 𝑗 =1 𝑤 𝑜𝑙𝑑 (x𝑢 𝑖 𝑗 ) · Δ(x𝑢 𝑖 𝑗 )
+
+Í𝜇 𝑗 =1 𝑤 𝑜𝑙𝑑 (x𝑢 𝑖 𝑗 )
+
+> 22
+
+, (8) where Δ(x) = 𝑔 (𝑓 (T 𝑤 (x))) − 𝑔 (𝑓 (T 𝑠 (x))) captures augmentation-induced behavioral changes, with T𝑤 and T𝑠 denoting weak and strong augmentations respectively. For labeled samples, Δ(x𝑙 ) is computed on original features, while for unlabeled samples, Δ′ (x𝑢 )
+
+is computed on fused features from Z′.
+
+3.2.2 Category Discovery via Relational Matching. For category discovery in this step, we leverage a key insight: while novel classes are semantically distinct from known classes, samples from the same novel category usually share consistent patterns of similarity and dissimilarity with the known-class reference system. Specifi-cally, if two samples belong to the same novel class, they should exhibit similar distances to each known-class prototype—being sim-ilarly far from some known classes and similarly close to others. This shared relational pattern serves as an implicit signature of category membership. To operationalize this, we encode each sample’s relational signa-ture as its similarity pattern with all known-class prototypes: 
+
+r(x) =
+
+ 𝑓 (x) · p1
+
+∥ 𝑓 (x) ∥ 2 ∥p1 ∥2
+
+, ..., 𝑓 (x) · p𝐶 𝐿 
+
+∥ 𝑓 (x) ∥ 2 ∥p𝐶 𝐿 ∥2
+
+
+
+∈ R𝐶 𝐿 , (9) 
+
+where {p𝑐 }𝐶 𝐿  
+
+> 𝑐 =1
+
+are known-class prototypes. This transforms each sample into coordinates within the known-class reference frame. We enforce relational consistency among feature-similar samples: 
+
+Lnew =∑︁  
+
+> 𝑖,𝑗 ∈ B 𝑢
+
+𝑤 new (x𝑢 𝑖 ) · 𝑤 new (x𝑢 𝑗 ) · 𝑠 𝑖 𝑗 · ∥ r(x𝑢 𝑖 ) − r(x𝑢 𝑗 )∥ 22, (10) where 𝑠 𝑖 𝑗 = exp (⟨ 𝑓 (x𝑢 𝑖 ), 𝑓 (x𝑢 𝑗 )⟩/(∥ 𝑓 (x𝑢 𝑖 )∥ 2 ∥𝑓 (x𝑢 𝑗 )∥ 2 · 𝜏 𝑢 )) weights pairs by feature similarity. This transforms novel discovery from ill-posed clustering into well-defined pattern matching—samples from the same novel category share consistent relationships with all known classes. 
+
+## 3.3 Training Objective 
+
+The complete RPC objective integrates baseline learning with our bidirectional consistency mechanisms: 
+
+L𝑡𝑜𝑡𝑎𝑙 = L𝑏𝑎𝑠𝑒𝑙𝑖𝑛𝑒 + 𝜆 1 L𝑎𝑙𝑖𝑔𝑛 + 𝜆 2 L𝑛𝑒𝑤 (11) where 𝜆 1 and 𝜆 2 balance known-class preservation and novel class relational consistency respectively. 
+
+## 4 Experiments 
+
+Datasets . We conduct experiments on six benchmarks covering diverse scenarios. Three fine-grained datasets from the Semantic Shift Benchmark (SSB)— CUB [ 31 ], Stanford Cars [ 10 ], and FGVC-Aircraft [ 20 ]—are used to evaluate performance on specialized do-mains. Two general benchmarks, CIFAR10/100 [ 11 ] and ImageNet-100 [ 27 ], assess broader object recognition capabilities. Consistent with the GCD setting [ 28 ], we split categories into known ( Y𝑙 ) and ICMR ’26, 2026, Amsterdam,Netherlands Xu et al. 
+
+Table 2: Ablation study on CUB and ImageNet-100.                                  
+
+> CUB ImageNet-100 Methods All Old New All Old New w/o Embedding Fusion 64.9 70.1 62.4 84.0 90.6 81.2 w/o Lalign 65.6 71.0 63.6 84.6 91.4 81.5 w/o Ldiscover 65.2 73.0 61.5 84.3 92.6 79.0 RPC (Ours) 67.1 73.2 64.8 86.2 93.8 82.1
+
+Table 3: Computational overhead comparison on CUB.         
+
+> Method Params (M) FLOPs (G) SimGCD 92.25 17.60 RPC (Ours) 93.54 (+1.40%) 17.92 (+1.82%)
+
+novel classes, where 50% of known-class images form the labeled data DL and all other images constitute the unlabeled pool DU .
+
+Implementation details . Following SimGCD [ 32 ], we adopt a ViT-B/16 backbone pre-trained with DINO [ 1], consistent with the set up in [ 28 ]. Image features, 𝑓 (·) , are extracted from the 768-dimensional [CLS] token. We fine-tune only the final block with a batch size of 128 over 200 epochs, starting with a learning rate of 0.1 and applying cosine learning rate decay. Following [ 32 ], the balance factor 𝜆 is 0.35, and the temperature parameters 𝜏 𝑠 and 𝜏 𝑢 
+
+are set to 0.1 and 0.07, respectively. In this study, we empirically set 
+
+𝜆 1 = 0.5, 𝜆 2 = 0.3, and the embedding fusion weight 𝛼 = 0.3 based on hyperparameter analysis. 
+
+Compared methods. The compared methods include three com-peting novel category discovery (NCD) methods RS+ [ 6 ], UNO+ [ 5 ], and k-means [ 19 ] with DINO [ 1 ] features, and several state-of-the-art generalized category discovery (GCD) methods, including GCD [ 28 ], PromptCAL [ 34 ], DCCL [ 23 ], SimGCD [ 32 ], SPTNet [ 30 ], ProtoGCD [ 17 ] and DebGCD [ 13 ]. Importantly, Our method builds on SimGCD’s [ 32 ] framework and DebGCD’s [ 13 ] OVA decompo-sition, adding bidirectional knowledge transfer. 
+
+## 4.1 Results and Discussion 
+
+Results analysis. Tab. 1 shows RPC achieves state-of-the-art per-formance across most benchmarks. Three key findings emerge: (1) Old ACC improves significantly ( 73.2% on CUB compared to De-bGCD’s 71.8% ), validating our semantic transfer mechanism. (2) New ACC gain 1.3% on CUB and 0.5% on ImageNet-100, show-ing relational consistency’s effectiveness. (3) Fine-grained datasets yield larger overall improvements ( 0.8% on CUB, 0.4% on Aircraft) than generic ones ( 0.3% on ImageNet-100), indicating relational patterns better capture subtle distinctions. 
+
+Ablation Study Tab. 2 validates each component’s contribution. Removing embedding fusion or Lalign reduces known-class accu-racy by 3.1% and 3.2% on CUB respectively, confirming their role in semantic transfer. Without Lnew , novel-class accuracy drops 3.3% 
+
+on CUB, demonstrating its effectiveness for category discovery. All components prove essential for optimal performance. 
+
+Hyperparameter Analysis. Fig. 2 shows RPC’s robustness on CUB. Optimal values ( 𝜆 1=0.5, 𝜆 2=0.3, 𝛼 =0.3) balance known-class preservation, category discovery, and feature fusion. Performance degrades gracefully beyond these points—excessive 𝜆 1 over-constrains adaptation, high 𝜆 2 causes unstable classification, and large 𝛼 leads 
+
+Figure 2: Impact of hyperparameters 𝜆 1, 𝜆 2, and 𝛼 on CUB. 
+
+Figure 3: t-SNE visualization of feature embeddings on cub dataset. (a) DebGCD and (b) our RPC. The red boxes highlight specific regions where our method achieves significantly tighter intra-class grouping and clearer inter-class bound-aries. Compared to DebGCD, RPC effectively eliminates the semantic entanglement between neighboring categories. 
+
+to over-fusion. Overall variation remains within 1% , validating our method’s stability. 
+
+Computational Efficiency Analysis. To evaluate the practical applicability of the proposed RPC, we compare its computational overhead with the baseline SimGCD. As summarized in Table 3, RPC introduces a minimal increase in model complexity. Specifically, our method only adds 1.29M parameters (a 1.40% increase) and 0.32G FLOPs (a 1.82% increase) over the baseline. 
+
+Feature Visualization. To qualitatively evaluate the quality of the learned representations, we visualize the feature embeddings using t-SNE. As illustrated in Fig. 3, RPC produces a more structured and discriminative latent space compared to DebGCD. Specifically, within the areas highlighted by red boxes, it is observable that RPC effectively compresses the intra-class variance while expanding the inter-class margins. This superior separability suggests that our Relational Pattern Consistency (RPC) framework better preserves the underlying semantic structure, which is crucial for identifying novel categories in a shared embedding space. 
+
+## 5 Conclusion 
+
+In this study, we introduced bidirectional knowledge transfer for Generalized Category Discovery (GCD) tasks. We proposed Rela-tional Pattern Consistency (RPC), which transfers semantic patterns from labeled to unlabeled data through embedding fusion, while discovering novel categories via relational consistency with known-class prototypes. This transforms GCD from parallel learning into mutual enhancement between labeled and unlabeled data. Extensive experiments on six benchmarks demonstrate the competitiveness of the proposed RPC methods. Relational Retrieval: Leveraging Known-Novel Interactions for Generalized Category Discovery ICMR ’26, 2026, Amsterdam,Netherlands 
+
+## References 
+
+[1] Mathilde Caron, Hugo Touvron, Ishan Misra, Hervé Jégou, Julien Mairal, Piotr Bojanowski, and Armand Joulin. 2021. Emerging Properties in Self-Supervised Vision Transformers. In ICCV (2021-10). [2] Ting Chen, Simon Kornblith, Mohammad Norouzi, and Geoffrey Hinton. 2020. A simple framework for contrastive learning of visual representations. In ICML .[3] Sua Choi, Dahyun Kang, and Minsu Cho. 2024. Contrastive mean-shift learning for generalized category discovery. In CVPR . 23094–23104. [4] Jianan Fan, Dongnan Liu, Hang Chang, Heng Huang, Mei Chen, and Weidong Cai. 2024. Seeing unseen: Discover novel biomedical concepts via geometry-constrained probabilistic modeling. In CVPR . 11524–11534. [5] Enrico Fini, Enver Sangineto, Stéphane Lathuilière, Zhun Zhong, Moin Nabi, and Elisa Ricci. 2021. A Unified Objective for Novel Class Discovery. In ICCV .[6] Kai Han, Sylvestre-Alvise Rebuffi, Sebastien Ehrhardt, Andrea Vedaldi, and An-drew Zisserman. 2021. AutoNovel: Automatically Discovering and Learning Novel Visual Categories. PAMI (2021). doi:10.1109/TPAMI.2021.3091944 [7] Zhenqi He, Yuanpei Liu, and Kai Han. 2025. Category discovery: An open-world perspective. arXiv preprint arXiv:2509.22542 (2025). [8] Ziming Huang, Xurui Li, Haotian Liu, Feng Xue, Yuzhe Wang, and Yu Zhou. 2025. Anomalyncd: Towards novel anomaly class discovery in industrial scenarios. In 
+
+CVPR . 4755–4765. [9] Zhe Huang, Xiaowei Yu, Dajiang Zhu, and Michael C Hughes. 2024. Interlude: Interactions between labeled and unlabeled data to enhance semi-supervised learning. arXiv preprint arXiv:2403.10658 (2024). [10] Jonathan Krause, Michael Stark, Jia Deng, and Li Fei-Fei. 2013. 3d object repre-sentations for fine-grained categorization. In ICCV Workshops .[11] Alex Krizhevsky, Geoffrey Hinton, et al . 2009. Learning multiple layers of features from tiny images. Technical Report (2009). [12] Yu Liu, Yaqi Cai, Qi Jia, Binglin Qiu, Weimin Wang, and Nan Pu. 2024. Novel class discovery for ultra-fine-grained visual categorization. In CVPR . 17679–17688. [13] Yuanpei Liu and Kai Han. 2025. Debgcd: Debiased learning with distribution guidance for generalized category discovery. ICLR (2025). [14] Tingzhang Luo, Mingxuan Du, Jiatao Shi, Xinxiang Chen, Bingchen Zhao, and Shaoguang Huang. 2024. Contextuality helps representation learning for gener-alized category discovery. In ICIP . IEEE, 687–693. [15] Tingzhang Luo, Yichao Liu, Yuanyuan Liu, Andi Zhang, Xin Wang, Yibing Zhan, Chang Tang, Leyuan Liu, and Zhe Chen. 2024. DIG-FACE: De-biased Learning for Generalized Facial Expression Category Discovery. arXiv preprint arXiv:2409.20098 (2024). [16] Tingzhang Luo, Yichao Liu, Yulin Xu, Ruizhong Liu, Xin Wang, Haijin Zeng, Shaoguang Huang, and Hongyan Zhang. 2026. Stroke-Based Perception: Discover Novel Oracle Characters. IEEE Transactions on Multimedia (2026), 1–16. doi:10. 1109/TMM.2026.3685003 [17] Shijie Ma, Fei Zhu, Xu-Yao Zhang, and Cheng-Lin Liu. 2025. Protogcd: Unified and unbiased prototype learning for generalized category discovery. IEEE Transactions on Pattern Analysis and Machine Intelligence (2025). [18] Shijie Ma, Fei Zhu, Zhun Zhong, Xu-Yao Zhang, and Cheng-Lin Liu. 2024. Active generalized category discovery. In CVPR . 16890–16900. [19] James MacQueen et al . 1967. Some methods for classification and analysis of multivariate observations. In Proceedings of the fifth Berkeley symposium on mathematical statistics and probability .[20] Subhransu Maji, Esa Rahtu, Juho Kannala, Matthew Blaschko, and Andrea Vedaldi. 2013. Fine-grained visual classification of aircraft. arXiv preprint arXiv:1306.5151 
+
+(2013). [21] Jianyuan Ni, Hao Tang, Syed Tousiful Haque, Yan Yan, and Anne HH Ngu. 2024. A survey on multimodal wearable sensor-based human action recognition. arXiv preprint arXiv:2404.15349 (2024). [22] Yunseok Oh and Dong-Wan Choi. 2025. FaceGCD: Generalized Face Discovery via Dynamic Prefix Generation. arXiv preprint arXiv:2507.22353 (2025). [23] Nan Pu, Zhun Zhong, and Nicu Sebe. 2023. Dynamic Conceptional Contrastive Learning for Generalized Category Discovery. In CVPR .[24] Sarah Rastegar, Hazel Doughty, and Cees GM Snoek. 2023. Learn to Categorize or Categorize to Learn? Self-Coding for Generalized Category Discovery. arXiv preprint arXiv:2310.19776 (2023). [25] Yunhan Ren, Feng Luo, and Siyu Huang. 2025. Few-Shot Generalized Category Discovery With Retrieval-Guided Decision Boundary Enhancement. In Proceed-ings of the 2025 International Conference on Multimedia Retrieval . 1135–1144. [26] Kihyuk Sohn, David Berthelot, Nicholas Carlini, Zizhao Zhang, Han Zhang, Colin A Raffel, Ekin Dogus Cubuk, Alexey Kurakin, and Chun-Liang Li. 2020. Fixmatch: Simplifying semi-supervised learning with consistency and confidence. In NeurIPS .[27] Yonglong Tian, Dilip Krishnan, and Phillip Isola. 2020. Contrastive multiview coding. In ECCV .[28] Sagar Vaze, Kai Han, Andrea Vedaldi, and Andrew Zisserman. 2022. Generalized Category Discovery. In CVPR (2022-06). [29] Enguang Wang, Zhimao Peng, Zhengyuan Xie, Fei Yang, Xialei Liu, and Ming-Ming Cheng. 2025. Get: Unlocking the multi-modal potential of clip for general-ized category discovery. In CVPR . 20296–20306. [30] Hongjun Wang, Sagar Vaze, and Kai Han. 2024. Sptnet: An efficient alternative framework for generalized category discovery with spatial prompt tuning. ICLR 
+
+(2024). [31] Peter Welinder, Steve Branson, Takeshi Mita, Catherine Wah, Florian Schroff, Serge Belongie, and Pietro Perona. 2010. Caltech-UCSD birds 200. Computation & Neural Systems Technical Report (2010). [32] Xin Wen, Bingchen Zhao, and Xiaojuan Qi. 2023. Parametric Classification for Generalized Category Discovery: A Baseline Study. In ICCV (2023-08-17). [33] Yanan Wu, Zhixiang Chi, Yang Wang, and Songhe Feng. 2023. Metagcd: Learning to continually learn in generalized category discovery. In Proceedings of the IEEE/CVF International Conference on Computer Vision . 1655–1665. [34] Sheng Zhang, Salman Khan, Zhiqiang Shen, Muzammal Naseer, Guangyi Chen, and Fahad Shahbaz Khan. 2023. Promptcal: Contrastive affinity learning via auxiliary prompts for generalized novel category discovery. In CVPR .[35] Bingchen Zhao and Kai Han. 2021. Novel Visual Category Discovery with Dual Ranking Statistics and Mutual Knowledge Distillation. In NeurIPS .[36] Bingchen Zhao, Xin Wen, and Kai Han. 2023. Learning Semi-supervised Gaussian Mixture Models for Generalized Category Discovery. In ICCV .[37] Haiyang Zheng, Nan Pu, Wenjing Li, Nicu Sebe, and Zhun Zhong. 2024. Proto-typical hash encoding for on-the-fly fine-grained category discovery. NeurIPS 37 (2024), 101428–101455. [38] Haiyang Zheng, Nan Pu, Wenjing Li, Nicu Sebe, and Zhun Zhong. 2024. Textual knowledge matters: Cross-modality co-teaching for generalized visual class discovery. In ECCV . Springer, 41–58. [39] Jiaying Zhou, Yang Liu, and Qingchao Chen. 2024. Novel class discovery in chest x-rays via paired images and text. In AAAI , Vol. 38. 7650–7658. [40] Yuanhao Zuo, Yichao Liu, Xiwei Liu, and Tingzhang Luo. 2025. Linking known and unknown: Generalized cross-instance feature helps category discovery. In 
+
+ICASSP 2025-2025 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) . IEEE, 1–5.
