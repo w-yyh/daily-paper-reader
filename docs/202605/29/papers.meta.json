@@ -1,0 +1,54 @@
+{
+  "label": "2026-05-29",
+  "date": "2026-05-29",
+  "generated_at": "2026-05-29T21:06:12",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202605/29/2605.23634v1-dualmem-bypassing-the-objectness-bottleneck-for-calibrated-unknown-stream-filtering-in-open-world-object-detection",
+      "section": "deep",
+      "title_en": "DualMem: Bypassing the Objectness Bottleneck for Calibrated Unknown-Stream Filtering in Open-World Object Detection",
+      "authors": "Yingjun Xiao, Xi Chen, Gang Fang, Siyuan Chen",
+      "date": "2026-05-22",
+      "pdf": "https://arxiv.org/pdf/2605.23634v1",
+      "score": "9.0",
+      "evidence": "解决开放世界目标检测中的未知流过滤问题",
+      "tldr": "开放世界目标检测中，强检测器的未知预测流严重污染，真实未来正样本不足10%，背景误报高达46-71%，根源于objectness头的信息瓶颈。为绕过此瓶颈，提出DualMem，利用冻结SigLIP特征和少量校准数据构建正负记忆，通过非参数似然比检验与涅曼-皮尔逊校准过滤未知提案。在多个检测器上，DualMem将背景误报平均减少56.6%，在PROB上效果超过K均值基线两倍以上，且保持已知类别mAP不变。该方法为开放世界检测提供了可调节的误报-召回权衡，有效净化未知流。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-world object detection (OWOD) requires detectors to localize known classes while identifying unknown objects for future incremental learning. We find that the unknown prediction streams of strong OWOD detectors are heavily polluted: on M-OWODB, across PROB, OW-DETR, and HypOW, future-task positive unknowns make up less than 10% of unknown predictions, whereas background false positives account for 46-71%. We show that this is not a missing-information problem, but an information bottleneck at the objectness head. On PROB Task 1, a linear probe on the 256-D decoder query achieves an AUROC of 0.908 for positive-versus-negative unknown discrimination, but the final one-dimensional objectness scalar drops to 0.642. A frozen SigLIP feature, without access to the detector, independently recovers much of this proposal-level separability at the filtering stage (AUROC = 0.871).   Motivated by this finding, we propose DualMem, a calibrated post-hoc filter that assumes a small image-disjoint annotated calibration split of held-out future-task objects and performs a non-parametric likelihood ratio test in frozen SigLIP feature space. DualMem uses a k-nearest-neighbor positive memory to protect future-task objects and a negative memory to suppress background-like proposals. Its decision threshold is chosen by Neyman-Pearson calibration, giving users an explicit trade-off between false-unknown suppression and novel recall.   Across PROB, OW-DETR, and HypOW on M-OWODB Task 1, DualMem reduces background-type false unknown proposals per image by 44.9%-66.3%, with a mean reduction of 56.6%. On PROB Task 1, it more than doubles the reduction achieved by a natural K-means prototype baseline, while leaving known-class mAP unchanged because known detections bypass the filter.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202605/29/2605.29834v1-open-world-autoencoding-drift-detection-with-novel-class-recognition-in-tabular-non-stationary-data-streams",
+      "section": "deep",
+      "title_en": "Open World Autoencoding Drift Detection with Novel Class Recognition in Tabular Non-stationary Data Streams",
+      "authors": "Joanna Komorniczak",
+      "date": "2026-05-28",
+      "pdf": "https://arxiv.org/pdf/2605.29834v1",
+      "score": "9.0",
+      "evidence": "开放世界数据流中的新类识别",
+      "tldr": "在表格数据流中，概念漂移和新类出现是两大核心挑战。本文提出一种无监督方法，利用镜像自编码器的重构误差来检测已知类分布的变化，同时通过样本代理表示的密度估计来识别未知的新类。两个自编码器能够独立增量式地适应任务分布的变化，从而实现对新颖类别的持续可靠识别。该方法为开放世界环境下的数据流分析提供了一个灵活且高效的框架。",
+      "tags": "query:cgcd",
+      "abstract_en": "Data stream processing has become a landmark in modern machine learning applications, with concept drifts and novel class appearances posing the primary challenges faced by sophisticated recognition methods. This work proposes an unsupervised concept drift detection method that identifies shifts in known class distributions based on the reconstruction errors of an autoencoder, while also enabling the recognition of novel class samples through density estimation of a proxy representation of samples. Using mirrored autoencoders allows for independent incremental adaptation to changing problem distributions for the two considered tasks, resulting in continuous adjustment to evolving concepts and reliable recognition of unknown samples. Conducted experiments used a diverse set of synthetic tabular data streams, where both concept drifts and the emergence of novelties were observed. The results show that the proposed approach is competitive with current state-of-the-art unsupervised drift detectors and novelty classifiers.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202605/29/2605.27116v1-covd-continual-open-vocabulary-object-detection-with-novel-concept-injection",
+      "section": "deep",
+      "title_en": "COVD: Continual Open-Vocabulary Object Detection with Novel Concept Injection",
+      "authors": "Yupeng Zhang, Ruize Han, Yuzhong Feng, Zixin Ren, Yuntong Tian, Liang Wan",
+      "date": "2026-05-26",
+      "pdf": "https://arxiv.org/pdf/2605.27116v1",
+      "score": "8.0",
+      "evidence": "连续开放词汇检测与新颖概念组注入",
+      "tldr": "真实世界中类别空间持续演化，现有开放词汇目标检测模型难以高效学习新概念。为此引入持续注入新概念的任务COVD与基准Novel-114，并提出NoIn-Det框架。该方法冻结视觉编码器，仅用少量文本保持语义对齐并更新文本分支子集注入新概念。实验表明NoIn-Det有效学习新概念且不遗忘旧知识，性能超越现有持续学习方法，为动态开放词汇检测提供轻量方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-vocabulary object detection (OVD) has made significant progress, enabling detectors to generalize from seen to unseen categories. However, real-world category spaces continually evolve, and existing OVD models still struggle with newly emerging concepts, while repeated full retraining is prohibitively expensive. To this end, we introduce a new task setting, termed Continual OVD with Novel Concept Injection (COVD), where models sequentially learn incoming novel concept groups while preserving prior concepts and original open-vocabulary knowledge, along with a new benchmark, Novel-114. Our key observation is that pretrained visual encoders often already perceive and represent many novel concepts, and the main bottleneck lies in the lack of stable semantic alignment between visual representations and textual concepts. Based on this, we propose NoIn-Det, an efficient continual injection framework without additional parameters. NoIn-Det freezes the visual encoder, preserves the text representation space using only texts of common concepts and previously injected concepts, and injects novel concepts by updating only a small subset of text-branch parameters beneficial to novel concept learning. Extensive experiments show that NoIn-Det effectively learns novel concepts, preserves old knowledge, and consistently outperforms existing continual learning methods for VLMs without introducing additional parameters.Novel-114 and the code will be released.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
