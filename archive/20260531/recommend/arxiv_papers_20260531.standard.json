@@ -1,0 +1,102 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-05-31T20:13:27.918263+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2605.24410v1",
+      "source": "arxiv",
+      "title": "Advancing Graph Few-Shot Learning via In-Context Learning",
+      "abstract": "Graph few-shot learning, which aims to classify nodes from novel classes with only a few labeled examples, is a widely studied problem in graph learning. However, existing methods often face two key limitations. First, the predominant graph few-shot learning paradigm relies on supervised tasks, failing to leverage the vast number of unlabeled nodes in the graph. Second, many approaches require complex task adaptation or fine-tuning during inference, limiting their efficiency and applicability. Inspired by the powerful in-context learning capabilities of large language models, we propose a novel model named VISION for adVancIng graph few-Shot learning via In-cOntext LearNing to address these challenges. Our model reframes graph few-shot learning as a fine-tuning-free sequence reasoning problem. At its core is a context-aware network that initializes nodes with role embeddings and employs a dual-context fusion module to synergistically integrate local topological structures and global task-level dependencies. This allows our model to dynamically generate class-aware representations for the query set conditioned on the support set context in a single forward pass. To effectively train our model, we introduce an unsupervised task generator that creates structure-adaptive features and constructs diverse pseudo-tasks from abundant unlabeled data. Our method unifies unsupervised meta-learning with graph in-context learning, achieving efficient inference. Extensive experiments on multiple benchmark datasets demonstrate the superiority of our model. Our public code can be found",
+      "authors": [
+        "Renchu Guan",
+        "Yajun Wang",
+        "Chunli Guo",
+        "Bowen Cao",
+        "Fausto Giunchiglia",
+        "Wei Pang",
+        "Yonghao Liu",
+        "Xiaoyue Feng"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-05-23T05:43:15+00:00",
+      "link": "https://arxiv.org/pdf/2605.24410v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Graph few-shot learning for classifying nodes from novel classes",
+      "llm_evidence_cn": "图少样本学习用于分类新颖类别节点",
+      "llm_evidence": "图少样本学习用于分类新颖类别节点",
+      "canonical_evidence": "图少样本学习用于分类新颖类别节点",
+      "llm_tldr_en": "Graph few-shot learning is advanced by in-context learning to classify novel-class nodes with few labels without fine-tuning. VISION uses unlabeled nodes and avoids complex adaptation, achieving strong node classification.",
+      "llm_tldr_cn": "现有图少样本学习方法通常依赖有监督任务，未能充分利用无标签节点，且推理时需要复杂的任务适配或微调，限制了效率与泛化性。本文提出VISION模型，将图少样本学习重构为无需微调的上下文学习范式，借鉴大语言模型的原位学习能力，直接利用无标签节点提升新类分类性能。实验证明，该方法在节点分类基准上表现优异，有效解决了图数据中新颖类别的识别问题，为开放世界图学习提供了新的思路。",
+      "llm_tldr": "现有图少样本学习方法通常依赖有监督任务，未能充分利用无标签节点，且推理时需要复杂的任务适配或微调，限制了效率与泛化性。本文提出VISION模型，将图少样本学习重构为无需微调的上下文学习范式，借鉴大语言模型的原位学习能力，直接利用无标签节点提升新类分类性能。实验证明，该方法在节点分类基准上表现优异，有效解决了图数据中新颖类别的识别问题，为开放世界图学习提供了新的思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2605.27178v1",
+      "source": "arxiv",
+      "title": "FoundObj: Self-supervised Foundation Models as Rewards for Label-free 3D Object Segmentation",
+      "abstract": "We address the challenging task of 3D object segmentation in complex scene point clouds without relying on any scene-level human annotations during training. Existing methods are typically constrained to identifying simple objects, primarily due to insufficient object priors in the learning process. In this paper, we present FoundObj, a novel framework featuring a superpoint-based object discovery agent that incrementally merges suitable neighboring superpoints, guided by our innovative semantic and geometric reward modules. These modules synergistically leverage semantic and geometric priors from self-supervised 2D/3D foundation models, providing complementary feedback to the object discovery agent and enabling robust identification of multi-class objects through reinforcement learning. Extensive experiments on diverse benchmarks demonstrate that our approach consistently outperforms existing baselines. Notably, our method exhibits strong generalization in zero-shot and long-tail scenarios, underscoring its potential for scalable, label-free 3D object segmentation.",
+      "authors": [
+        "Zihui Zhang",
+        "Zhixuan Sun",
+        "Yafei Yang",
+        "Jinxi Li",
+        "Jiahao Chen",
+        "Bo Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG",
+        "cs.RO"
+      ],
+      "published": "2026-05-26T15:32:32+00:00",
+      "link": "https://arxiv.org/pdf/2605.27178v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Label-free 3D object discovery agent identifies objects without predefined categories, analogous to novel class discovery.",
+      "llm_evidence_cn": "无标签三维物体发现代理无需预定义类别即可识别物体，类似于新类发现。",
+      "llm_evidence": "无标签三维物体发现代理无需预定义类别即可识别物体，类似于新类发现。",
+      "canonical_evidence": "无标签三维物体发现代理无需预定义类别即可识别物体，类似于新类发现。",
+      "llm_tldr_en": "FoundObj proposes a superpoint-based agent for 3D object discovery, using self-supervised 2D/3D foundation models as semantic and geometric rewards to merge superpoints, enabling robust identification of objects without annotations, analogous to novel category discovery in open-world settings.",
+      "llm_tldr_cn": "FoundObj提出一种基于超点的物体发现代理，通过自监督2D/3D基础模型提供的语义和几何奖励引导超点合并，从而在无场景级标注的情况下鲁棒地识别三维物体，实现开放场景下的新类别发现。实验表明该方法能有效发现复杂场景中的物体，为无标签物体分割提供了新思路。",
+      "llm_tldr": "FoundObj提出一种基于超点的物体发现代理，通过自监督2D/3D基础模型提供的语义和几何奖励引导超点合并，从而在无场景级标注的情况下鲁棒地识别三维物体，实现开放场景下的新类别发现。实验表明该方法能有效发现复杂场景中的物体，为无标签物体分割提供了新思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
