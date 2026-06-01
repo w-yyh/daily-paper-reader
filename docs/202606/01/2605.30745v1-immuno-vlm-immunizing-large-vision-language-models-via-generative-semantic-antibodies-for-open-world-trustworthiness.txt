@@ -1,0 +1,788 @@
+Title: Immuno-VLM: Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness
+
+URL Source: https://arxiv.org/pdf/2605.30745v1
+
+Published Time: Mon, 01 Jun 2026 00:44:00 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# Immuno-VLM: Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+Xiang Fang 1 Wanlong Fang 2 Wei Ji 3
+
+Abstract 
+
+Large Vision-Language Models have achieved unprecedented success in zero-shot recognition by aligning visual features with broad seman-tic concepts. However, this semantic abstrac-tion creates a critical vulnerability in open-world deployment: the “Hubris of Semantics”, where models force-fit unknown anomalies into known categories with high confidence due to the lack of explicit negative knowledge. To address this 
+
+Open-World Trustworthiness Paradox , we pro-pose Immuno-VLM , a bio-inspired framework that adapts the biological principle of Immuno-logical Negative Selection to high-dimensional latent spaces. Departing from traditional Open-Set Recognition methods that rely on passive den-sity estimation or inefficient pixel-space outlier generation, Immuno-VLM leverages the gener-ative reasoning of Large Language Models to actively hallucinate “Semantic Antibodies”, tex-tual descriptions of near-distribution outliers (e.g., look-alikes, contextual anomalies) that effectively bound the decision space of known classes. Exten-sive experiments on ImageNet-1K and four chal-lenging OOD benchmarks reveal that Immuno-VLM establishes a new state-of-the-art. 
+
+1. Introduction 
+
+The paradigm of computer vision has been irrevocably al-tered by the emergence of Large Vision-Language Models (LVLMs), such as CLIP (Radford et al., 2021), ALIGN (Jia et al., 2021), and LLaVA (Liu et al., 2023d). By scaling contrastive pre-training to billions of noisy image-text pairs, these foundation models have moved beyond the closed-set 
+
+> 1
+
+School of Software Engineering, Huazhong University of Science and Technology 2Nanyang Technological University, Sin-gapore 3Nanjing University. Correspondence to: Wanlong Fang 
+
+<wanlongfang@gmail.com >.
+
+Proceedings of the 43 rd International Conference on Machine Learning , Seoul, South Korea. PMLR 306, 2026. Copyright 2026 by the author(s). The Open-World Trustworthiness Paradox                 
+
+> 02468Latent Dimension 1 -1 012345678Latent Dimension 2
+> Standard LVLM: The Hubris of Semantics Known Class: "Dog'' OOD Input: "Robotic Dog''
+> 98% Confidence (Match Found) Confidence Field Self (Golden Retriever) Anomaly (Robotic Dog) Erroneous Mapping 02468Latent Dimension 1 -1 012345678Latent Dimension 2
+> Immuno-VLM: Active Semantic Defense REJECTED Self (Protected) OOD Input: "Robotic Dog'' Antibody: ``Toy Dog" Antibody: "Wolf"
+> Safe Zone Semantic Antibodies Self (Golden Retriever) Anomaly (Robotic Dog) Rejection Boundary The Open-World Trustworthiness Paradox
+> 02468Latent Dimension 1 -1 012345678Latent Dimension 2
+> Standard LVLM: The Hubris of Semantics Known Class: "Dog'' OOD Input: "Robotic Dog''
+> 98% Confidence (Match Found) Confidence Field Self (Golden Retriever) Anomaly (Robotic Dog) Erroneous Mapping 02468Latent Dimension 1 -1 012345678Latent Dimension 2
+> Immuno-VLM: Active Semantic Defense REJECTED Self (Protected) OOD Input: "Robotic Dog'' Antibody: ``Toy Dog" Antibody: "Wolf"
+> Safe Zone Semantic Antibodies Self (Golden Retriever) Anomaly (Robotic Dog) Rejection Boundary
+
+Figure 1. The Core Concept. While standard LVLMs suffer from the “Hubris of Semantics”, force-fitting anomalies into known classes, Immuno-VLM uses hallucinated semantic antibodies to actively define the boundary of the unknown. 
+
+limitations of traditional supervised learning, acquiring a remarkable ability to generalize to novel visual concepts via natural language prompts (Bommasani et al., 2021). This “zero-shot” capability suggests a future where AI systems can operate robustly in the unconstrained open world. How-ever, as these models transition from academic benchmarks to safety-critical deployments, ranging from autonomous driving to medical diagnostics, a fundamental epistemic vul-nerability has emerged: the Open-World Trustworthiness Paradox .While LVLMs demonstrate impressive robustness to co-variate shifts (e.g., recognizing a sketch of a dog as easily as a photo) (Radford et al., 2021), they exhibit a perilous fragility when distinguishing “known” concepts from “un-known” anomalies. We term this the “Hubris of Semantics”. Because models like CLIP are trained to maximize the co-sine similarity between visual embeddings and the nearest text concepts in a dense semantic manifold (Wang & Isola, 2020), they develop a retrieval bias that forces virtually any visual input into a known category. When confronted with an out-of-distribution (OOD) anomaly, such as a “robotic dog” or an adversarial texture (Hendrycks et al., 2021), the model does not confess ignorance. Instead, it hallucinates a high-confidence match based on superficial feature over-laps, classifying the robot as a “Golden Retriever” with near-certainty. This behavior represents a regression from the principles of Open Set Recognition (OSR) established by (Scheirer et al., 2012), where the ability to reject the “unknown” is paramount. 1
+
+> arXiv:2605.30745v1 [cs.CV] 29 May 2026
+
+Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness A. Biological Inspiration: Thymic Negative Selection     
+
+> The Thymus (Shape Space)
+> Self
+> Self
+> Self
+> Self
+> Self
+> Mature
+> Stochastic
+> Generation
+> Repertoire
+> Survivor (Non-Self Detector)
+> Apoptosis (Self-Reactive)
+> B. Computational Implementation: Generative Semantic Sampling
+> Latent Space (Z)
+> "Dog"
+> (Self)
+> "Spoon"
+> "Wolf" "Wolf"
+> "Puppy" "Robot Dog"
+> "Spoon"
+> Danger Zone (Synonyms)
+> Active Antibody Zone
+> LLM
+> Prompting
+> Valid Antibody
+> Filtered (Synonym) A. Biological Inspiration: Thymic Negative Selection
+> The Thymus (Shape Space)
+> Self
+> Self
+> Self
+> Self
+> Self
+> Mature
+> Stochastic
+> Generation
+> Repertoire
+> Survivor (Non-Self Detector)
+> Apoptosis (Self-Reactive)
+> B. Computational Implementation: Generative Semantic Sampling
+> Latent Space (Z)
+> "Dog"
+> (Self)
+> "Spoon"
+> "Wolf" "Wolf"
+> "Puppy" "Robot Dog"
+> "Spoon"
+> Danger Zone (Synonyms)
+> Active Antibody Zone
+> LLM
+> Prompting
+> Valid Antibody
+> Filtered (Synonym)
+
+Figure 2. The Isomorphism between Biological Immunity and Immuno-VLM. We map T-cell generation to Antibody Hallucina-tion and Thymic Selection to our Active Density Filter. 
+
+Traditional defenses against Open Space Risk have largely relied on discriminative thresholding. Methods such as Max-imum Softmax Probability (MSP) (Hendrycks & Gimpel, 2017), Energy Scores (Liu et al., 2020), and Activation Shap-ing (Djurisic et al., 2023) attempt to identify anomalies by analyzing the magnitude or distribution of activation vectors. While effective in low-dimensional spaces, these methods struggle in the high-dimensional latent spaces of Foundation Models due to the concentration of measure phenomenon (Wang & Isola, 2020), where the “open space” becomes vast and sparsely populated. More recent approaches like Maximum Concept Matching (MCM) (Ming et al., 2022) at-tempt to leverage the text modality, but they remain reactive ,waiting for an error to manifest as a statistical deviation, rather than proactive . Furthermore, generative approaches that attempt to synthesize pixel-space outliers using GANs (Ge et al., 2017; Neal et al., 2018) face a combinatorial ex-plosion when scaled to the diversity of ImageNet, rendering them computationally intractable. To resolve this paradox, we look to the biological immune system, the only known learning system that successfully solves the open-world recognition problem at a planetary scale (Dasgupta, 1999). The vertebrate immune system protects the organism from a virtually infinite space of pathogens (viruses, bacteria, tumors), including those that have not yet evolved, without requiring prior exposure to them. It achieves this feat not by memorizing the external world, which is impossible, but by rigorously defining the “Self”. Through a process called Negative Selection in the thymus (Forrest et al., 1994), the body generates millions of random T-cell receptors. These candidates are tested against self-antigens; those that bind to “Self” are destroyed (clonal deletion), while the non-reactive survivors are re-leased into the bloodstream. These survivors essentially define a “Repertoire Hole”, a negative image of the Self (Jerne, 1974). Consequently, if a T-cell binds to anything in the periphery, the system can mathematically guarantee that the target is an anomaly (“Non-Self”), even if that specific pathogen has never been encountered before. In this work, we propose Immuno-VLM , a framework that translates this biological principle into a rigorous computa-tional algorithm for large-scale vision models. We address the “Curse of Dimensionality” that plagued early Artifi-cial Immune Systems (Forrest et al., 1994) by shifting the domain of negative selection from the pixel space to the 
+
+Semantic Manifold . Instead of generating random detectors, we leverage the reasoning capabilities of Large Language Models (LLMs) like GPT-4 (Vaswani et al., 2017) to act as a “Computational Thymus”. The LLM actively hallucinates “Semantic Antibodies”, textual descriptions of “Near-OOD” concepts (e.g., “wolf”, “coyote”, “robot dog” for the class “dog”) and “Contextual Anomalies” (e.g., “dog melting”, “dog made of clouds”). These descriptions are projected into the shared embedding space to form a dense, semantically informed boundary around the known classes. Our contributions are threefold. Methodologically , we in-troduced the concept of Generative Semantic Antibodies ,demonstrating that Large Language Models can serve as a “Computational Thymus”, hallucinating a vast, diverse repertoire of near-distribution outliers that pixel-space gen-erators cannot feasibly produce. Theoretically , we derived the Antibody Covering Bound (Theorem 3.3) and the Mani-fold Sample Complexity analysis, providing the first rigorous mathematical proof that targeting the Semantic Manifold 
+
+breaks the Curse of Dimensionality that has historically plagued Artificial Immune Systems. We showed that the safety of a vision system is strictly bounded by the imagina-tion (Wasserstein alignment) of its language generator. Em-pirically , Immuno-VLM achieved state-of-the-art perfor-mance on the demanding multiple challenging benchmarks, improving the detection of adversarial semantic shifts by over 16% compared to standard zero-shot baselines, while preserving the integrity of in-distribution recognition. 
+
+2. Related Work 
+
+As a challenging machine learning task (Liu et al., 2023a; Wang et al., 2025d; Fang et al., 2026b; Kuai et al., 2026; Wang et al., 2025b; Fang et al., 2025c; Zhang et al., 2025b; Fang et al., 2023c; Liu et al., 2024b; Yang et al., 2025; Fang et al., 2022; 2026d; Lei et al., 2025; Fang et al., 2023b; Wang et al., 2025a; Fang et al., 2025e; Yan et al., 2026; Fang et al., 2025a; Wang et al., 2026c; Cai et al., 2025; Fang & Fang, 2026b; Wang et al., 2026a; Fang & Hu, 2020; Wang et al., 2026d; Fang & Fang, 2026a; Wang et al., 2025f; Fang, 2Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+2026; Fang et al., 2026e; Wang et al., 2026b; Liu et al., 2023c; 2026; Fang et al., 2026f; Wang et al., 2025c; Fang et al., 2026g; 2025g; 2024c; Liu et al., 2024c; Fang et al., 2025f;d; 2024b; Liu et al., 2023b; Fang et al., 2024d; Liu et al., 2024a; Fang et al., 2023a; Xiong et al., 2024; Fang et al., 2021b; Wang et al., 2025e; Zhang et al., 2025a; Fang et al., 2026a; Tang et al., 2024; Fang et al., 2025b; Tang et al., 2025; Fang et al., 2021a; Cai et al., 2026; Fang et al., 2020), the out-of-distribution (OOD) detection task aims to detect test samples from distributions that do not overlap with the training distribution. Previous OOD detection meth-ods (Liang et al., 2018; Liu et al., 2020; Sun et al., 2021; Lee et al., 2018b; Mohseni et al., 2020; Vyas et al., 2018; Yu & Aizawa, 2019; Zaeemzadeh et al., 2021; Hsu et al., 2020; Ming et al., 2023; Jiang et al., 2024) can be divided into four types: classification-based methods (Hendrycks & Gimpel, 2016; Liang et al., 2018; Lee et al., 2018c;a), density-based methods (Kirichenko et al., 2020; Serr `a et al., 2019), distance-based methods (Techapanurak et al., 2020; Lee et al., 2018b) and reconstruction-based methods (Zhou, 2022; Yang et al., 2022). 
+
+3. The Proposed Immuno-VLM Framework 
+
+3.1. Problem Formulation 
+
+We consider the problem of open-world visual recognition within a joint vision-language embedding space. Let X ⊆ 
+
+RH×W ×3 denote the input image space and T denote the discrete space of natural language descriptions. We assume the existence of a pre-trained Vision-Language Model (VLM) consisting of dual encoders: a visual encoder 
+
+ϕv : X → Z and a text encoder ϕt : T → Z , mapping both modalities into a shared hyperspherical latent space 
+
+Z ⊂ Rd, where typically || z|| 2 = 1 for all z ∈ Z .
+
+The Open-World Risk Landscape In a standard Closed-Set setting, the training data Dtrain = {(xi, y i)}Ni=1 is drawn from a joint distribution PX Y defined over a known label set Yin = {1, . . . , K }. The goal is to minimize the empirical risk ˆRin (f ).In the Open-World setting, we encounter a test distribution 
+
+Ptest which is a mixture of the known distribution Pin and an unknown distribution Pout defined over a label set Yout ,where Yin ∩ Y out = ∅. The crucial challenge is that the sup-port of Pout in the pixel space X is unbounded. We define the Open Space Risk RO (f ) following the formulation by Scheirer et al., but adapted for the metric space Z:
+
+Definition 3.1 (Metric Open Space Risk ). Given a recog-nition function f : Z → Y in ∪ {⊥} (where ⊥ denotes rejection), the open space risk is defined as the probability of misclassifying an open-world sample as a known class, weighted by its distance from the known distribution:         
+
+> RO(f) =
+> Z
+> O
+> I(f(z)∈ Y in )·ν(z)dz, (1)
+
+where O = Z \ supp (Pin ) is the open space, I(·) is the indicator function, and ν(z) is a probability measure of observing a sample at z.The fundamental difficulty in minimizing RO (f ) is that O is vast. Standard methods try to bound supp (Pin ) tightly (e.g., using hyperspheres). However, without explicit samples from O, these boundaries are often arbitrary and loose. 
+
+The Semantic Manifold Assumption To address the in-tractability of sampling from the entire open pixel space, we leverage the structure of the VLM. We posit that the open space O is not structurally random but follows a semantic manifold .
+
+Assumption 3.2 (Bi-Lipschitz Semantic Alignment ). We assume the text encoder ϕt and visual encoder ϕv share an alignment structure such that for any visual concept x and its true semantic description t, there exists a constant L such that the embedding distance is bounded:       
+
+> ∥ϕv(x)−ϕt(t)∥2≤ϵalign .(2)
+
+Furthermore, the mapping from semantic concepts to vi-sual embeddings is locally Bi-Lipschitz. Let Sconcept be a semantic space metric. For distinct concepts t1, t 2:     
+
+> c1Sconcept (t1, t 2)≤ ∥ ϕt(t1)−ϕt(t2)∥2≤c2Sconcept (t1, t 2).
+
+It implies that if we can identify textual descriptions (Anti-bodies) that are semantically distinct from Yin but seman-tically close to the boundary of Yin , their projections in Z
+
+will structurally bound the visual open space. 
+
+Semantic Antibodies and Covering Bound We define a set of Semantic Antibodies A = {a1, . . . , a M } ⊂ T as a set of generated descriptions such that for all aj ∈ A and 
+
+y ∈ Y in , aj is semantically distinct from y. Let Hk ⊂ Z be the hypothesis space (acceptance region) for known class 
+
+k. The goal of Immuno-VLM is to shape Hk such that it minimizes overlaps with the antibody embeddings ϕt(A).
+
+Theorem 3.3 (The Antibody Covering Bound ). Let Aδ be a δ-cover of the semantic boundary of Yin , meaning for any open-world concept zout within distance γ of a known class prototype μk, there exists an antibody a ∈ A δ such that 
+
+∥zout − ϕt(a)∥ ≤ δ. If the classifier f enforces a margin 
+
+m > δ between known prototypes and all antibodies in Aδ ,then the False Positive Rate (FPR) on open-world samples in the γ-neighborhood is strictly bounded by the alignment error ϵalign .Proof. Let xout be an unknown sample with true semantic description tout . By Assumption 3.2, 3Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness ID training images  
+
+> Class names
+> Frozen VLM
+> Visual
+> encoder
+
+1. Antigen  profiling  2. Semantic  antibody  generation  3. Vaccination  4. Inference     
+
+> Visual mean
+> Text prior
+> Geodesic align
+> Prototype bank
+
+…        
+
+> LLM: Computational thymus
+> Hard negatives
+> wolf
+> robot dog
+> toy dog
+> …
+> Contextual anomalies
+> car underwater
+> flying car
+> …
+> Text encoder ϕₜ
+> Active density filter
+> Antibody bank
+
+…
+
+> ID image x
+
+ϕv   
+
+> Rejection
+> adapter fθ
+> Embedding z
+> Prototype bank
+
+… 
+
+> Antibody bank
+
+…                                                 
+
+> Pull to μy
+> Loss
+> Latent space (Post -vaccination )
+> Self (ID)
+> Prototypes
+> Antibodies
+> Margin m
+> (sterile moat)
+> Vaccinated
+> adapter fθ*
+> Test image
+> Score module
+> s₊= max ⟨z, μ ₖ⟩
+> s₋= max ⟨z, φ ₜ(a) ⟩
+> DIS = s ₊− λᵢ ₙf s ₋
+> EVT threshold
+> τevt
+> Known Class Reject OOD
+> Frozen Prototype / Self Prototype mean μₖAntibody Pull (Attract) Push (Repel) Data flow Auxiliary
+> Dog
+> Cat
+> Chair
+> …
+> Textual
+> encoder kvkt((1 ))kkkNorm a v at
+> =−+cos( ,)safe ab krisk z
+> {}kAa={}kAa={}kP
+> ={}kP
+> =vac pull push LLL
+> =+
+
+ϕv   
+
+> Vaccinated
+> adapter fθ*()evt DIS
+> ()evt DIS
+> 
+
+Figure 3. The Immuno-VLM Framework. The pipeline transforms a pre-trained VLM into a trustworthy open-world recognizer by explicitly defining the “Non-Self” space via generative hallucination. A. Standard AIS: Random Noise 
+
+(The Curse of Dimensionality) 
+
+(Self) 
+
+Random Noise Orthogonal 
+
+No Boundary Information 
+
+B. Immuno-VLM: Semantic Covering 
+
+(Targeted Boundary Definition) 
+
+Semantic 
+
+Antibody 
+
+-Cover of Boundary 
+
+Theorem 1 holds 
+
+Margin m A. Standard AIS: Random Noise 
+
+(The Curse of Dimensionality) 
+
+(Self) 
+
+Random Noise Orthogonal 
+
+No Boundary Information 
+
+B. Immuno-VLM: Semantic Covering 
+
+(Targeted Boundary Definition) 
+
+Semantic 
+
+Antibody 
+
+-Cover of Boundary 
+
+Theorem 1 holds 
+
+Margin m 
+
+Figure 4. Breaking the Curse of Dimensionality. By targeting the semantic manifold, a finite number of antibodies ( M ≈ 100 )can effectively cover the boundary of the Self, whereas random sampling in R512 would require exponentially more points. 
+
+∥ϕv (xout ) − ϕt(tout )∥ ≤ ϵalign . Since Aδ is acover, there exists an antibody a∗ ∈ Aδ such that 
+
+∥ϕt(tout ) − ϕt(a∗)∥ ≤ δ. Using the triangle inequal-ity: ∥ϕv (xout ) − ϕt(a∗)∥ ≤ ∥ϕv (xout ) − ϕt(tout )∥ +
+
+∥ϕt(tout ) − ϕt(a∗)∥ ≤ ϵalign + δ. The classifier f rejects 
+
+x if its similarity to any known prototype μk is lower than a threshold derived from the antibodies. If we enforce the training constraint (Vaccination Loss) such that prototypes are separated from antibodies by margin 
+
+m: ∥μk − ϕt(a∗)∥ ≥ m. For a false positive to occur, xout 
+
+must be close to μk. However, xout is anchored to a∗. If 
+
+m > ϵ align + δ, the triangle inequality ensures xout cannot be arbitrarily close to μk without violating the margin constraint or the metric structure. Thus, the risk is bounded by the density of the cover δ and the alignment quality 
+
+ϵalign .This theorem provides the theoretical foundation for our method: optimizing against a dense set of LLM-generated near-OOD descriptions effectively tightens the decision boundary in a way that random noise injection (standard AIS) cannot. 
+
+3.2. Method Overview 
+
+Our proposed Immuno-VLM framework, illustrated in Fig-ure 3, operationalizes the biological principle of negative se-lection through a three-phase pipeline designed to transform a pre-trained Vision-Language Model into a trustworthy open-world recognizer. 
+
+3.3. Phase 1: Antigen Profiling via Bayesian Hyperspherical Estimation 
+
+In the biological immune system, the definition of “Self” is established via the presence of self-antigens. In our compu-tational framework, the “Self” for class k is not merely a single point but a distribution on the hypersphere Z. Stan-dard approaches often approximate this using the empirical mean of visual features. However, LVLMs suffer from a 
+
+modality gap , where the visual centroid and the text em-bedding of the class name are misaligned. To rigorously define the Antigen Profile pk for each class, we propose a 
+
+Text-Regularized Von Mises-Fisher (vMF) Estimation .
+
+Hyperspherical Distribution Modeling Since the em-beddings are L2-normalized, the feature space is the unit hypersphere Sd−1. We model the distribution of “Self” features for class k using a Von Mises-Fisher distribution 
+
+vM F (μk, κ k), with probability density function: 
+
+f (z|μk , κ k ) = Cd(κk ) exp( κk μ⊤ 
+
+> k
+
+z), (3) 
+
+4Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+where μk ∈ Sd−1 is the mean direction (the Antigen Proto-type), κk ≥ 0 is the concentration parameter (inverse tem-perature), and Cd(κk) is the normalization constant defined as Cd(κ) = κd/ 2−1 
+
+> (2 π)d/ 2Id/ 2−1(κ)
+
+, with Iν being the modified Bessel function of the first kind. 
+
+Text-Prioritized Prototype Estimation We observe a set of visual samples Vk = {vi}Nk 
+
+> i=1
+
+for class k. Additionally, we have the zero-shot text embedding tk = ϕt(name k).A naive Maximum Likelihood Estimation (MLE) would set μk ∝ P vi. However, in open-world settings, visual samples might be noisy, sparse, or biased (e.g., all “dogs” are on grass). The text embedding tk provides a stable, semantic prior. We formulate the prototype estimation as a constrained opti-mization problem on the Riemannian manifold to reconcile the visual evidence with the semantic prior:           
+
+> max
+> μk∈Sd−1
+> X
+> v∈V k
+> κkμ⊤
+> kvs.t. arccos( μ⊤
+> ktk)≤ξ, (4)
+
+where ξ is a tolerance angle allowing for intrinsic modality misalignment. 
+
+Theorem 3.4 (Geodesic Antigen Alignment ). The optimal Antigen Prototype μ∗ 
+
+> k
+
+that solves the constrained maximiza-tion problem lies strictly on the geodesic arc connecting the normalized empirical visual mean ¯vk =   
+
+> Pv
+> ∥Pv∥
+
+and the text embedding tk. Specifically, we have μ∗ 
+
+> k
+
+= (1 −α)¯ vk +αtk  
+
+> ∥(1 −α)¯ vk+αtk∥
+
+for some Lagrange multiplier-derived scalar α ∈ [0 , 1] .Proof. Let the objective function be J(μk) =
+
+κkμ⊤ 
+
+> k
+
+(Nk ¯vk). We introduce a Lagrange multiplier 
+
+λ for the constraint μ⊤ 
+
+> k
+
+tk ≥ cos( ξ) (relaxing equality for the Lagrangian formulation). The Lagrangian is: 
+
+L(μk, λ ) = κkNkμ⊤ 
+
+> k
+
+¯vk+λ(μ⊤ 
+
+> k
+
+tk−cos( ξ)) −γ(μ⊤ 
+
+> k
+
+μk−1) .
+
+(5) Taking the derivative with respect to μk and setting to zero: 
+
+∇μk L = κkNk ¯vk + λtk − 2γμk = 0 . (6) This implies μk ∝ κkNk ¯vk + λtk. Since μk is a linear combination of ¯vk and tk, and must lie on the unit hyper-sphere, it geometrically resides on the great circle (geodesic) connecting them. The parameter α is strictly determined by the binding constraint ξ. This proves that the optimal Self-definition is a semantic interpolation, correcting visual noise with linguistic stability. 
+
+3.4. Phase 2: Generating Semantic Antibodies via Manifold Sampling 
+
+Traditional Artificial Immune Systems (AIS) generate nega-tive detectors via random bit-string generation or isotropic Gaussian sampling in the feature space. While effective in low-dimensional settings, we argue that this approach fundamentally fails in the high-dimensional latent spaces of modern LVLMs ( d ≥ 512 ). We formalize this failure mode and propose Generative Semantic Sampling as the necessary solution. 
+
+The Inefficiency of Random Negative Selection Let 
+
+U(Sd−1) be the uniform distribution on the unit hypersphere, representing isotropic random negative generation. A nega-tive detector zneg ∼ U is useful if and only if it falls into the “Near-OOD” region, sufficiently close to a class prototype 
+
+μk to shape the decision boundary, but not so close as to be a false positive. We define the informative margin for class k as the spherical cap defined by angular distance θ ∈ [θself , θ boundary ].
+
+Theorem 3.5 (Asymptotic Orthogonality of Isotropic Negatives ). For any fixed angular margin ϵ > 0, the probability that a uniformly sampled negative detector 
+
+zneg ∼ U (Sd−1) has a non-trivial cosine similarity with a fixed prototype μk decays exponentially with the dimension 
+
+d. Specifically,           
+
+> lim
+> d→∞ P(|⟨ zneg ,μk⟩| ≥ ϵ)≤2 exp
+> 
+> −dϵ 2
+> 2
+> 
+> .(7)
+
+Proof. This result follows from the concentration of mea-sure phenomenon on the high-dimensional sphere. The area of a spherical cap defined by angle β (where cos β = ϵ)relative to the total area of the sphere Ad−1 is given by the regularized incomplete beta function, which can be bounded as: Area (Cap ϵ)
+
+Area (Sd−1) ≤ exp 
+
+
+
+− dϵ 2
+
+2
+
+
+
+. (8) This implies that as d increases, almost all the probability mass of the uniform distribution concentrates on the equator, i.e., ⟨zneg , μk⟩ ≈ 0. In standard CLIP models where d =512 or d = 768 , random vectors are effectively orthogonal to all class prototypes. Consequently, they provide zero gradients for boundary tightening and fail to immunize the model against near-distribution outliers. This theorem proves that classic AIS is computationally infeasible for LVLMs. We must sample from the semantic manifold , not the geometric hypersphere. 
+
+Generative Adversarial Prompting To overcome the curse of dimensionality, we exploit the fact that the open space O is structured by language. We employ a Large Language Model (LLM) as a conditional generator G :
+
+Y → 2T . For each known class y ∈ Y in , we prompt the LLM to generate a set of Semantic Antibodies Ay .We distinguish between two types of antibodies to ensure coverage: 1) Hard Semantic Negatives (Near-OOD): Con-5Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+cepts that share visual attributes with y but belong to disjoint categories, i.e., Ahard (y) = {t ∈ T | VisualSim (t, y ) >τhigh ∧ Category (t)̸ = y}. Example: For y = Wolf ,
+
+Ahard = {Alaskan Malamute , Husky , Wolf-dog hybrid }.2) Contextual Anomalies (Covariate Shift): Concepts where the object y appears in impossible or anomalous contexts. i.e., Acontext (y) = {t ∈ T | t = y ⊕
+
+context anomaly }. Example: For y = Car , Acontext =
+
+{Car underwater , Car melting in lava , Flying car }.
+
+The Antibody Filtration Mechanism Generating text is necessary but not sufficient; we must ensure the generated antibodies projected into Z are effective. We define the Antibody Projection as zab = ϕt(G(y)) . To prevent Auto-Immune Toxicity (where an antibody is actually a synonym for the self-class), we apply a Semantic Filtration Filter :
+
+Proposition 3.6 (Active Antibody Density ). An antibody 
+
+a generated for class k is retained in the vaccination set 
+
+Ωvac if and only if it satisfies the Safety-Utility Condition :
+
+δsaf e < ⟨ϕt(a), μk ⟩ < δ risk , (9) 
+
+where δsaf e ensures the antibody is not the class itself (avoiding label confusion), and δrisk ensures the antibody is close enough to the prototype to be a hard negative (avoid-ing the orthogonality issue proved in Theorem 3.5). 
+
+By enforcing this band-pass filter on cosine similarity, we curate a dataset of “active” negative samples that popu-late the decision boundary ∂Zself , enabling efficient metric learning in the subsequent vaccination phase. 
+
+3.5. Phase 3: Vaccination via Contrastive Optimization 
+
+The final phase of Immuno-VLM is the “Vaccination” pro-cess, where the visual embedding space is refined to ex-plicitly reject the generated semantic antibodies. Direct fine-tuning of the large-scale backbone ϕv is undesirable due to the risk of catastrophic forgetting (degrading closed-set performance) and high computational cost. Instead, we introduce a lightweight Rejection Adapter and a novel 
+
+Push-Pull Vaccination Loss .
+
+The Rejection Adapter We freeze the pre-trained en-coders ϕv and ϕt. We introduce a trainable residual adapter 
+
+fθ : Z → Z , parameterized by θ: fθ (z) = Norm (z +
+
+MLP (z)) , where Norm (·) ensures the output remains on the unit hypersphere Sd−1. This adapter acts as a “metric correc-tion” lens, warping the local geometry to create separation between visual samples and antibody regions. 
+
+The Push-Pull Vaccination Loss We formulate a multi-objective loss function that balances the compactness of known classes with the rejection of hallucinated antibodies. 
+
+1) Attraction (Pull) Term: To maintain In-Distribution (ID) accuracy, visual samples x from class y must remain tightly A. Initial State  
+
+> (HighEntro py/O
+
+ver lap)   
+
+> B.Post-Vacc ination
+> (Structure d/Margin)
+
+Margin m Lpull      
+
+> pue
+> MixedDistrib utio
+> ·Self
+> ◆AntibonCleanDec isionBou nda
+
+ryA. Initial State     
+
+> (HighEntro py/Over lap)
+> B.Post-Vacc ination
+> (Structure d/Margin)
+
+Margin m Lpull      
+
+> pue
+> MixedDistrib utio
+> ·Self
+> ◆AntibodynCleanDec isionBou nda
+
+ry
+
+Figure 5. The Push-Pull Optimization. The loss function reshapes the Riemannian manifold, compacting the “Self” while creating a sterile moat against the “Non-Self”. 
+
+clustered around their semantic prototype μy (derived in Theorem 3.4). We maximize the log-likelihood of the Von Mises-Fisher distribution: 
+
+Lpull = −E(x,y )∼D in 
+
+"
+
+log exp( κμ⊤ 
+
+> y
+
+fθ (ϕv (x))) 
+
+P 
+
+> k∈Y in
+
+exp( κμ⊤ 
+
+> k
+
+fθ (ϕv (x))) 
+
+#
+
+.
+
+2) Repulsion (Push) Term: This is the core immunological objective. For a visual sample x ∈ Class k, we treat the generated antibody set Ak as explicit negative classes. We use a Margin-based Hinge Loss to enforce a “sterile zone” of width m between the visual sample and any antibody. 
+
+Lpush = E(x,y )∼D in [ X
+
+> a∈A y
+
+max(0 , cos( fθ (ϕv (x)) , ϕ t(a)) −m)2],
+
+where m is the angular margin threshold (e.g., 0.2). This forces the adapter to warp the visual embedding fθ (x) away from the directions of near-OOD concepts. Therefore, we have the following total objective loss: 
+
+Lvac = Lpull + λLpush + η∥θ∥22. (10) 
+
+Theoretical Guarantee: The Open-World Generalization Bound A critical question in Open-World Learning is: 
+
+Does minimizing error on synthetic antibodies guarantee low error on real, unseen open-world data? We answer this affirmatively by deriving a generalization bound based on the covering number of the antibody set. Let RO (f ) be the true Open Space Risk (error rate on real unknown data) and 
+
+ˆRA(f ) be the empirical risk on the generated antibodies. 
+
+Theorem 3.7 (Open Space Generalization via Synthetic Covering ). Let H be the hypothesis space of the adapter fθ .Assume the set of generated antibodies A forms a δ-cover of the boundary manifold ∂O with respect to the semantic metric. Then, for any δ > 0, with probability at least 1 − ν
+
+over the draw of training data and antibody generation: 
+
+RO (f ) ≤ ˆRA(f ) + RN (H) + O
+
+ L · δ
+
+√M
+
+
+
++
+
+r log(1 /ν )2N ,
+
+where RN (H) is the Rademacher Complexity of the adapter class, M is the number of antibodies, and L is the Lipschitz constant of the VLM backbone (Assumption 3.2). 
+
+6Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+Proof. We sketch the proof using a transductive Rademacher analysis. The true open space risk can be decomposed into the risk on the boundary ∂O and the far-field risk. Since deep features tend to collapse far-field samples to the origin or uniformly on the sphere (Theorem 3.5), the risk is dominated by the boundary. 
+
+|RO (f ) − ˆRA(f )| ≤ sup 
+
+> h∈H
+
+|Ez∼Pout [h(z)] − Ea∼A [h(a)] |
+
+(11) Since A is a δ-cover, for any z ∼ Pout near the boundary, there exists a ∈ A such that ∥z−a∥ ≤ δ. By the L-Lipschitz property of the network fθ :
+
+|h(z) − h(a)| ≤ L∥z − a∥ ≤ Lδ (12) The deviation between the empirical antibody risk and the true boundary risk is thus bounded by the covering density 
+
+δ and the standard Rademacher complexity term RN (H)
+
+which accounts for the capacity of the adapter. The term 
+
+O( 1√M ) arises from the Monte-Carlo approximation of the antibody integral. This theorem provides the rigorous justification for Immuno-VLM. It states that increasing the density of antibodies (decreasing δ) and the number of antibodies ( M ), while keeping the adapter simple (low RN (H)), strictly bounds 
+
+the error on real-world unknown objects, even those never seen during training. 
+
+3.6. Inference: The Trustworthiness Score 
+
+Once the Rejection Adapter fθ is vaccinated, we require a robust scoring mechanism S(x) to determine whether a test sample x belongs to the set of known classes Yin or the open world O. Standard approaches like Maximum Softmax Probability (MSP) or Energy Scores rely solely on the distance to the nearest known prototype. However, these metrics ignore the explicit information learned about the “Non-Self” regions. We propose the Differential Immunity Score (DIS) and a thresholding strategy based on Extreme Value Theory (EVT) .
+
+The Differential Immunity Score (DIS) The core intu-ition of Immuno-VLM is that trustworthiness is a competi-tion between “Self-Affinity” and “Non-Self-Reactivity”. A sample should be accepted only if it is significantly closer to a known prototype than to any hallucinated antibody. For a test image x, we compute the adapted embedding 
+
+z = fθ (ϕv (x)) . We define: 1) Proximity to Self ( s+): 
+
+The cosine similarity to the nearest known class proto-type: s+(z) = max k∈Y in ⟨z, μk⟩. 2) Reactivity to Non-Self ( s−): The cosine similarity to the nearest semantic antibody (the “most dangerous” hallucination): s−(z) = max a∈A all ⟨z, ϕ t(a)⟩. The Differential Immunity Score is defined as: SDIS (x) = s+(z) − λinf · s−(z), where λinf 
+
+controls the sensitivity to antibody reactivity. Unlike stan-dard open-set scores that satisfy lim ∥x∥→∞ S(x) = const ,
+
+SDIS explicitly penalizes samples that drift towards the semantic boundary defined by the antibodies. 
+
+Theorem 3.8 (The Differential Margin Guarantee ). As-sume the vaccination loss Lvac has converged such that for all training pairs, the margin constraints are satisfied with tolerance ϵ. Let xout be an open-world sample that aligns with an antibody a∗ (i.e., ⟨fθ (xout ), ϕ t(a∗)⟩ ≥ 1 − ξ). If the nearest prototype μk is separated from a∗ by angular distance Ω, the score SDIS (xout ) is strictly bounded by:             
+
+> SDIS (xout )≤cos(Ω −ξ)−λinf (1 −ξ) + O(ϵ).(13)
+
+Proof. By the triangle inequality on the Riemannian manifold Sd−1, the angular distance d∠(z, μk) ≥
+
+d∠(μk, ϕ t(a∗)) − d∠(z, ϕ t(a∗)) . Given the conditions, 
+
+d∠(μk, ϕ t(a∗)) = Ω and d∠(z, ϕ t(a∗)) ≤ arccos(1 −ξ) ≈√2ξ. Thus, s+(z) = cos( d∠(z, μk)) ≤ cos(Ω − √2ξ). Si-multaneously, s−(z) ≥ 1 − ξ. Substituting these into the score definition yields the upper bound. This theorem guar-antees that as long as the antibodies are semantically distant from prototypes ( Ω is large) and the test sample resembles an antibody ( ξ is small), the score will be suppressed, ensur-ing rejection. 
+
+EVT-Based Adaptive Thresholding Setting a global threshold τ for SDIS (x) > τ is suboptimal because dif-ferent classes have different levels of semantic density (e.g., “Dog” has many look-alikes; “Aircraft Carrier” has few). We model the tail distribution of the immunity scores using Extreme Value Theory to determine per-class thresholds. According to the Fisher-Tippett-Gnedenko Theorem , the distribution of the maximum of i.i.d. variables converges to a Generalized Extreme Value (GEV) distribution. We focus on the “Non-Match” scores. For each class k, we collect the set of immunity scores from the validation set where class 
+
+k was the ground truth: Sk = {SDIS (x) | y = k}.We model the tail of Sk using a Weibull distribution 
+
+W(ηk, β k), where ηk is the scale and βk is the shape param-eter. The probability of a test sample x belonging to class k
+
+is given by the Cumulative Distribution Function (CDF) of the fitted Weibull model:             
+
+> P(x∈k) = 1 −exp
+> 
+> −
+> ∥SDIS (x)−ηk∥
+> βk
+> αk
+> .(14)
+
+We reject sample x if the probability P (x ∈ ˆk) < τ evt for the predicted class ˆk. This adaptive thresholding ensures that the rejection logic scales with the inherent “tightness” of each class’s semantic cluster. 
+
+4. Experiments 
+
+Our experimental design focuses on three key questions: 1) 
+
+Trustworthiness (OOD Detection): Does the vaccination 7Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+process significantly reduce false positives on unseen open-world concepts, particularly those that are semantically ad-versarial (Near-OOD)? 2) Safety (ID Preservation): Does the projection adapter preserve the original zero-shot accu-racy on known classes, or does it suffer from catastrophic forgetting? 3) Scalability: Is the method effective when scaling to thousands of classes (ImageNet-1K) and modern architectures (ViT-L/14)? 
+
+4.1. Main Results and Analysis Comparison with State-of-the-Art Table 1 summarizes the performance on the ImageNet-1K (ID) and three OOD benchmarks (ImageNet-O, iNaturalist, Texture). We com-pare against post-hoc methods (MSP, Energy, ReAct) ap-plied to the frozen CLIP backbone, and recent VLM-specific methods (MCM, GL-MCM). 1) Analysis of Near-OOD Performance: The most striking result is observed on 
+
+ImageNet-O , which contains adversarial examples specif-ically designed to fool visual classifiers (e.g., a localized texture of a spider that looks like a spider web to a CNN but is not an object). 1) Standard methods like Energy Score achieve only 70 .1% AUROC, suggesting that in the raw embedding space, these anomalies are dangerously close to valid class prototypes. 2) Immuno-VLM jumps to 83 .4% AUROC. This validates Theorem 3.3: by ex-plicitly training against hallucinated look-alikes (Semantic Antibodies), we generated a δ-cover of the boundary that successfully intercepted these adversarial examples. The 28.5% FPR95 is a massive safety improvement over the 61.3% of MSP, effectively halving the risk of deployment failure. 2) Preservation of In-Distribution Capabilities: 
+
+A common failure mode in OOD detection (seen in CSI, which dropped to 76.5% acc) is that optimizing for rejec-tion distorts the feature space for recognition. Immuno-VLM, however, achieves a slight improvement in ID-ACC (78 .2% → 78 .5% ). 
+
+Theoretical Interpretation: This aligns with the Pull term in our vaccination loss Lpull . By refining the prototypes via Geodesic Alignment (Theorem 3.4) and forcing visual samples to cluster tighter, we inadvertently improved the fine-grained separability of known classes. 
+
+Visualizing the Immune Response Figure 6 presents t-SNE visualizations of the embedding space before and after vaccination. We observe the formation of sterile moats. The Known classes are compressed into dense, spherical clusters. The hallucinated antibodies (green) form a visible perimeter ring around the known classes. Crucially, the real Open-World data (red), which the model never saw during training , falls into the empty space carved out by the antibodies, enabling easy linear separation. 
+
+Figure 6. Visual Confirmation of Rejection Capability. The vac-cination process creates physical separation in the latent space between Self (ID) and Non-Self (OOD), enabling linear separa-tion. 10 25 50 100 200 500 Antibodies per Class (M) 70 75 80 85 90 95 AUROC (%) 0246810 12 14 16 Training Time (Hours)      
+
+> A. Antibody Population Size (M)
+> Optimal Operating Point Near-OOD (ImageNet-O) Far-OOD (Texture) Compute Cost 00.1 0.2 0.3 0.4 0.5 Margin Hyperparameter (m) 70 75 80 85 OOD Detection AUROC (%) 72 73 74 75 76 77 78 79 80 In-Distribution Accuracy (%)
+> B. Vaccination Margin (m)
+> Under-Vaccinated
+> Stability Zone
+> Manifold Collapse OOD Detection (Safety) ID Accuracy (Utility)
+
+Figure 7. Hyperparameter Robustness. The method is stable across a wide range of configurations, with a clear optimal operating point at 100 antibodies per class. 
+
+4.2. Ablation Studies and Sensitivity Analysis 
+
+While the main results demonstrate the superiority of the Immuno-VLM framework, it is critical to understand the behavior of the system under varying hyperparameter con-figurations and to empirically validate the theoretical claims regarding sample complexity and antibody density. 
+
+Robustness to Hyperparameter λ In Figure 7, we ana-lyze the sensitivity of the system to the balance weight λ
+
+between Lpull and Lpush .
+
+The Necessity of Semantics To prove that our gains stem from the semantic quality of the antibodies and not merely from regularization or architecture, we perform a rigorous ablation study (Table 2). 
+
+Sensitivity to Antibody Population Size The manifold sample-complexity analysis posits that the number of anti-bodies M required to cover the boundary scales polynomi-ally with the intrinsic semantic dimension. To verify this, we trained separate adapters with varying antibody counts per class M ∈ { 10 , 25 , 50 , 100 , 200 , 500 } on ImageNet-1K. 
+
+Impact of the Vaccination Margin ( m) The margin m
+
+in the push-loss Lpush defines the width of the “sterile zone”. We evaluated m ∈ {0.0, 0.1, 0.2, 0.3, 0.5}. 1) 
+
+Under-Vaccination ( m = 0 .0): Results in poor separa-8Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+Table 1. Open-World Recognition Performance. All methods use the same pre-trained CLIP-ViT-B/16 backbone. Immuno-VLM achieves a substantial gain in OOD detection (AUROC) while maintaining or improving In-Distribution Accuracy. 
+
+Method ID-ACC ImageNet-O (Near-OOD) iNaturalist (Fine-Grained) Texture (Far-OOD) Avg H-Score 
+
+(↑) AUROC ( ↑) FPR95 ( ↓) AUROC ( ↑) FPR95 ( ↓) AUROC ( ↑) FPR95 ( ↓) (↑)
+
+Zero-Shot Baselines 
+
+MSP 78.2 66.8 61.3 72.4 55.1 76.5 48.2 73.1 Energy Score 78.2 70.1 55.4 76.8 49.3 81.2 38.5 75.8 MCM 78.2 74.5 46.2 79.1 42.1 83.4 33.1 77.9 
+
+Post-Hoc Adaptation 
+
+ReAct 77.9 72.3 49.5 77.4 45.8 82.1 35.6 76.5 ASH-B 78.0 73.1 47.1 78.0 44.2 82.9 34.2 77.0 
+
+Generative / Training-based 
+
+CSI 76.5 71.5 50.2 74.3 51.0 79.8 40.1 74.2 Neg-Label (Standard AIS) 77.5 71.8 49.8 75.1 48.5 80.2 39.5 75.8 
+
+Immuno-VLM (Ours) 78.5 83.4 28.5 84.2 31.1 89.5 18.4 81.3 
+
+- with ViT-L/14 82.1 88.7 19.2 89.1 22.4 94.3 10.5 85.6 
+
+Table 2. Ablation Study. Deconstructing the contribution of each component. We replace the LLM-generated antibodies with various noise sources to test the Manifold Assumption.                   
+
+> Configuration ID-ACC AUROC
+> ImageNet-O Avg OOD
+> (A) Frozen CLIP (Baseline) 78.2 66.8 71.9 (B) Adapter + Gaussian Noise (Classic AIS) 78.0 68.2 (+1.4) 73.1 (C) Adapter + Random Words (Dictionary) 77.8 72.5 (+5.7) 76.0 (D) Adapter + LLM Antibodies (No Filter) 77.6 79.8 (+13.0) 80.2
+> (E) Immuno-VLM (LLM + Filter + EVT) 78.5 83.4 (+16.6) 85.7
+
+Table 3. Computational Efficiency Analysis. Comparing Immuno-VLM against leading baselines. Training time is mea-sured on 4 ×A100 GPUs for ImageNet-1K. Inference latency is measured on a single A100.                                
+
+> Method Add. Params Training Time Latency Memory
+> (Millions) (GPU-Hours) (ms/image) (VRAM)
+> MSP (Zero-Shot) 0012.50 0 MB
+> ReAct (Post-Hoc) 0012.55 +2 MB
+> CSI (Training) 11.2 48.0 12.50 +450 MB
+> ARPL (Training) 2.5 24.5 13.10 +120 MB
+> Immuno-VLM 0.5 3.5 12.54 +15 MB
+
+tion (AUROC 76.2%). The adapter barely moves the vi-sual features away from antibodies. 2) Optimal Range (m ∈ [0 .1, 0.3] ): Performance is stable, peaking at m = 0 .2.This corresponds to an angular separation of roughly 37 ◦,which balances rejection with the natural intra-class vari-ance of visual features. 3) Over-Vaccination ( m ≥ 0.5): 
+
+We observed Manifold Collapse . The strong repulsion forces squeezed the known classes into such small volumes that the ID-ACC dropped significantly (-4.2%). The adapter distorted the semantic meanings of valid images to satisfy the margin constraint. 
+
+Efficacy of Semantic Filtration We proposed a band-pass filter δsaf e < ⟨a, μ ⟩ < δ risk to curate antibodies. We per-formed an ablation by removing these bounds: 1) No Upper Bound ( δrisk → 1.0): The LLM occasionally generated synonyms (e.g., for “Projectile”, it generated “Missile”). Treating these as negative samples caused Label Confu-sion , dropping ID-ACC by 12%. 2) No Lower Bound (δsaf e → − 1.0): Including semantically irrelevant con-cepts (e.g., “Toaster” as a negative for “Dog”) diluted the gradient. The vaccination loss converged instantly because the margin was already satisfied, resulting in an AUROC of only 72.1% (similar to random words). 3) Active Band (0.3 < sim < 0.7): This configuration forced the model to learn the hardest distinctions, validating the “Near-OOD” focus of our method. 
+
+4.3. Computational Cost and Latency 
+
+For practical adoption, overhead must be minimal. Table 3 presents a detailed comparison of training and inference costs. 1) Training Cost: Vaccination takes ≈ 3.5 hours on a single A100 GPU for ImageNet-1K (10 epochs). This is < 1% of the cost of fine-tuning the full backbone. 2) 
+
+Inference Latency: The Rejection Adapter is a lightweight MLP ( d → d/ 4 → d). (i) ViT-B/16 Backbone Inference: 12.5 ms/image. (ii) Adapter Inference: 0.04 ms/image. The latency overhead is negligible ( < 0.5% ), making Immuno-VLM suitable for real-time applications. 
+
+5. Conclusion 
+
+In this paper, we identified the Open-World Trustworthi-ness Paradox , arguing that the very mechanisms which grant LVLMs their zero-shot robustness, massive seman-tic abstraction and dense retrieval biases, simultaneously blind them to novel anomalies, rendering them fundamen-tally unsafe for high-stakes deployment. To resolve this paradox, we proposed Immuno-VLM , a framework that bridges the epistemic gap between biological systems the-ory and modern representation learning. By operationaliz-ing the mechanism of Immunological Negative Selection 
+
+within the latent space of foundation models, we shifted the paradigm of OOD detection from reactive discrimination 
+
+to proactive immunization . Extensive experiments show that Immuno-VLM achieved state-of-the-art performance on the demanding ImageNet-O and OpenOOD benchmarks, improving the detection of adversarial semantic shifts by over 16% compared to standard zero-shot baselines, while preserving the integrity of in-distribution recognition. 9Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+Impact Statement 
+
+This paper presents work whose goal is to advance the field of Machine Learning. There are many potential societal consequences of our work, none which we feel must be specifically highlighted here. 
+
+References 
+
+Bommasani, R., Hudson, D. A., Adeli, E., Altman, R., Arora, S., von Arx, S., Bernstein, M. S., Bohg, J., Bosse-lut, A., Brunskill, E., et al. On the opportunities and risks of foundation models. arXiv preprint arXiv:2108.07258 ,2021. Cai, F., Liu, D., Fang, X., Yu, J., Tang, K., and Zhou, P. Imperceptible beam-sensitive adversarial attacks for lidar-based object detection in autonomous driving. In 2025 IEEE International Conference on Multimedia and Expo (ICME) , pp. 1–6. IEEE, 2025. Cai, X., Liu, D., Qu, X., Fang, X., Dong, J., Tang, K., Zhou, P., Sun, L., and Hu, W. Towards building model/prompt-transferable attackers against large vision-language mod-els. Advances in Neural Information Processing Systems ,38:174022–174058, 2026. Dasgupta, D. (ed.). Artificial Immune Systems and Their Applications . Springer Berlin Heidelberg, 1999. ISBN 978-3-642-59901-9. doi: 10.1007/978-3-642-59901-9. Djurisic, A., Bozanic, N., Ashok, A., and Liu, R. Extremely simple activation shaping for out-of-distribution detection. In The Eleventh International Conference on Learning Representations , 2023. Fang, W., Zhang, T., and Chan, A. To align or not to align: Strategic multimodal representation alignment for opti-mal performance. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 40, pp. 21056–21064, 2026a. Fang, W., Zhang, T., Tao, W., and Chan, A. Towards un-derstanding modality interaction in multimodal language models via partial information decomposition. In Inter-national Conference on Machine Learning , 2026b. Fang, X. Advancing out-of-distribution detection across diverse scenarios. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 40, pp. 41042–41043, 2026. Fang, X. and Fang, W. Disentangling adversarial prompts: A semantic-graph defense for robust llm security. In 
+
+Proceedings of the AAAI Conference on Artificial Intelli-gence , 2026a. Fang, X. and Fang, W. Slap: The semantic least action principle for variational video-language modeling. In 
+
+International Conference on Machine Learning , 2026b. Fang, X. and Hu, Y. Double self-weighted multi-view clustering via adaptive view fusion. arXiv preprint arXiv:2011.10396 , 2020. Fang, X., Hu, Y., Zhou, P., and Wu, D. O. V3h: View variation and view heredity for incomplete multiview clustering. IEEE Transactions on Artificial Intelligence ,1(3):233–247, 2020. Fang, X., Hu, Y., Zhou, P., and Wu, D. Animc: A soft ap-proach for autoweighted noisy and incomplete multiview clustering. IEEE Transactions on Artificial Intelligence ,3(2):192–206, 2021a. Fang, X., Hu, Y., Zhou, P., and Wu, D. O. Unbalanced incomplete multi-view clustering via the scheme of view evolution: Weak views are meat; strong views do eat. 
+
+IEEE Transactions on Emerging Topics in Computational Intelligence , 6(4):913–927, 2021b. Fang, X., Liu, D., Zhou, P., and Hu, Y. Multi-modal cross-domain alignment network for video moment retrieval. 
+
+IEEE Transactions on Multimedia , 25:7517–7532, 2022. Fang, X., Liu, D., Fang, W., Zhou, P., Cheng, Y., Tang, K., and Zou, K. Annotations are not all you need: A cross-modal knowledge transfer network for unsupervised tem-poral sentence grounding. In Findings of the Association for Computational Linguistics: EMNLP 2023 , pp. 8721– 8733, 2023a. Fang, X., Liu, D., Zhou, P., and Nan, G. You can ground earlier than see: An effective and efficient pipeline for temporal sentence grounding in compressed videos. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 2448–2460, 2023b. Fang, X., Liu, D., Zhou, P., Xu, Z., and Li, R. Hierarchical local-global transformer for temporal sentence grounding. 
+
+IEEE Transactions on Multimedia , 2023c. Fang, X., Easwaran, A., and Genest, B. Uncertainty-guided appearance-motion association network for out-of-distribution action detection. In IEEE International Conference on Multimedia Information Processing and Retrieval , 2024a. Fang, X., Fang, W., Liu, D., Qu, X., Dong, J., Zhou, P., Li, R., Xu, Z., Chen, L., Zheng, P., et al. Not all inputs are valid: Towards open-set video moment retrieval using language. In Proceedings of the 32nd ACM International Conference on Multimedia , pp. 28–37, 2024b. 10 Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+Fang, X., Liu, D., Fang, W., Zhou, P., Xu, Z., Xu, W., Chen, J., and Li, R. Fewer steps, better performance: Efficient cross-modal clip trimming for video moment retrieval using language. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 38, pp. 1735–1743, 2024c. Fang, X., Xiong, Z., Fang, W., Qu, X., Chen, C., Dong, J., Tang, K., Zhou, P., Cheng, Y., and Liu, D. Rethink-ing weakly-supervised video temporal grounding from a game perspective. In European Conference on Computer Vision . Springer, 2024d. Fang, X., Easwaran, A., and Genest, B. Adaptive multi-prompt contrastive network for few-shot out-of-distribution detection. In International Conference on Machine Learning , 2025a. Fang, X., Easwaran, A., Genest, B., and Suganthan, P. N. Adaptive hierarchical graph cut for multi-granularity out-of-distribution detection. IEEE Transactions on Artificial Intelligence , 2025b. Fang, X., Easwaran, A., Genest, B., and Suganthan, P. N. Your data is not perfect: Towards cross-domain out-of-distribution detection in class-imbalanced data. Expert Systems with Applications , 2025c. Fang, X., Fang, W., Ji, W., and Chua, T.-S. Turing patterns for multimedia: Reaction-diffusion multi-modal fusion for language-guided video moment retrieval. In ACM International Conference on Multimedia , 2025d. Fang, X., Fang, W., and Wang, C. Hierarchical semantic-augmented navigation: Optimal transport and graph-driven reasoning for vision-language navigation. In Ad-vances in Neural Information Processing Systems , 2025e. Fang, X., Fang, W., Wang, C., Liu, D., Tang, K., Dong, J., Zhou, P., and Li, B. Multi-pair temporal sentence grounding via multi-thread knowledge transfer network. In Proceedings of the AAAI Conference on Artificial In-telligence , 2025f. Fang, X., Fang, W., Wang, C., Liu, D., Tang, K., Dong, J., Zhou, P., and Li, B. Multi-pair temporal sentence grounding via multi-thread knowledge transfer network. In Proceedings of the AAAI Conference on Artificial In-telligence , volume 39, pp. 2915–2923, 2025g. Fang, X., Fang, W., and Ji, W. Immuno-vlm: Immunizing large vision-language models via generative semantic an-tibodies for open-world trustworthiness. In International Conference on Machine Learning , 2026c. Fang, X., Fang, W., and Wang, C. Cogniverse: Revolution-izing multi-modal retrieval-augmented generation with cognitive reflection and geometric reasoning. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2026d. Fang, X., Fang, W., and Wang, C. Unveiling the fragility of vision-language models: Multi-modal adversarial synergy via texture-constrained perturbations and cross-modal optimization. In Proceedings of the AAAI Conference on Artificial Intelligence , 2026e. Fang, X., Fang, W., Wang, C., Qu, X., and Liu, D. Re-thinking video-language model from the language input perspective. In Proceedings of the AAAI Conference on Artificial Intelligence , 2026f. Fang, X., Fang, W., Wang, C., Tang, K., Liu, D., Wang, S., and Ji, W. Towards unified vision-language models with incomplete multi-modal inputs. In Proceedings of the AAAI Conference on Artificial Intelligence , 2026g. Forrest, S., Perelson, A. S., Allen, L., and Cherukuri, R. Self-nonself discrimination in a computer. In Proceedings of 1994 IEEE computer society symposium on research in security and privacy , pp. 202–212. Ieee, 1994. Ge, Z., Demyanov, S., and Garnavi, R. Generative openmax for multi-class open set classification. In Procedings of the British Machine Vision Conference 2017 . British Machine Vision Association, 2017. Hendrycks, D. and Gimpel, K. A baseline for detecting misclassified and out-of-distribution examples in neural networks. In International Conference on Learning Rep-resentations , 2016. Hendrycks, D. and Gimpel, K. A baseline for detecting misclassified and out-of-distribution examples in neural networks. In International Conference on Learning Rep-resentations , 2017. Hendrycks, D., Zhao, K., Basart, S., Steinhardt, J., and Song, D. Natural adversarial examples. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 15262–15271, 2021. Hsu, Y.-C., Shen, Y., Jin, H., and Kira, Z. Generalized odin: Detecting out-of-distribution image without learn-ing from out-of-distribution data. In CVPR , pp. 10951– 10960, 2020. Jerne, N. K. Towards a network theory of the immune system. Annales d’Immunologie , 125C:373–389, 1974. Jia, C., Yang, Y., Xia, Y., Chen, Y.-T., Parekh, Z., Pham, H., Le, Q., Sung, Y.-H., Li, Z., and Duerig, T. Scaling up visual and vision-language representation learning with noisy text supervision. In International conference on machine learning , pp. 4904–4916. PMLR, 2021. 11 Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+Jiang, X., Liu, F., Fang, Z., Chen, H., Liu, T., Zheng, F., and Han, B. Negative label guided ood detection with pretrained vision-language models. In The Twelfth Inter-national Conference on Learning Representations , 2024. Kirichenko, P., Izmailov, P., and Wilson, A. G. Why normal-izing flows fail to detect out-of-distribution data. Ad-vances in neural information processing systems , 33: 20578–20589, 2020. Kuai, M., Qin, Y., Fang, X., Ji, W., and Zimmermann, R. Dynamic graph-enhanced event refinement for temporal sentence grounding of micro-moments. IEEE Transac-tions on Multimedia , 2026. Lee, K., Lee, H., Lee, K., and Shin, J. Training confidence-calibrated classifiers for detecting out-of-distribution sam-ples. In International Conference on Learning Represen-tations , 2018a. Lee, K., Lee, K., Lee, H., and Shin, J. A simple unified framework for detecting out-of-distribution samples and adversarial attacks. Advances in neural information pro-cessing systems , 31, 2018b. Lee, K., Lee, K., Min, K., Zhang, Y., Shin, J., and Lee, H. Hierarchical novelty detection for visual object recogni-tion. In CVPR , pp. 1034–1042, 2018c. Lei, H., Cai, X., Liu, D., Fang, X., Qu, X., Dong, J., Yu, J., and Jin, K. Exploring disentangled appearance-motion contexts for temporal activity localization. In 2025 Inter-national Joint Conference on Neural Networks (IJCNN) ,pp. 1–8. IEEE, 2025. Liang, S., Li, Y., and Srikant, R. Enhancing the reliability of out-of-distribution image detection in neural networks. In 
+
+International Conference on Learning Representations ,2018. Liu, D., Fang, X., Hu, W., and Zhou, P. Exploring optical-flow-guided motion and detection-based appearance for temporal sentence grounding. IEEE Transactions on Multimedia , 25:8539–8553, 2023a. Liu, D., Fang, X., Zhou, P., Di, X., Lu, W., and Cheng, Y. Hypotheses tree building for one-shot temporal sentence localization. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 37, pp. 1640–1648, 2023b. Liu, D., Zhu, J., Fang, X., Xiong, Z., Wang, H., Li, R., and Zhou, P. Conditional video diffusion network for fine-grained temporal sentence grounding. IEEE Transactions on Multimedia , 26:5461–5476, 2023c. Liu, D., Fang, X., Qu, X., Dong, J., Yan, H., Yang, Y., Zhou, P., and Cheng, Y. Unsupervised domain adaptative temporal sentence localization with mutual information maximization. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 38, pp. 3567–3575, 2024a. Liu, D., Qu, X., Fang, X., Dong, J., Zhou, P., Nan, G., Tang, K., Fang, W., and Cheng, Y. Towards robust tem-poral activity localization learning with noisy labels. In 
+
+Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024) , pp. 16630–16642, 2024b. Liu, D., Yang, M., Qu, X., Zhou, P., Fang, X., Tang, K., Wan, Y., and Sun, L. Pandora’s box: Towards building universal attackers against real-world large vision-language models. 
+
+Advances in Neural Information Processing Systems , 37: 52127–52158, 2024c. Liu, D., Cai, X., Dong, J., Guo, Z., Qu, X., Guan, R., Fang, X., and Ye, D. Attacking gray-box large vision-language models with adaptive svd-structured adversarial align-ment. In International Conference on Machine Learning ,2026. Liu, H., Li, C., Wu, Q., and Lee, Y. J. Visual instruction tun-ing. Advances in neural information processing systems ,36:34892–34916, 2023d. Liu, W., Wang, X., Owens, J., and Li, Y. Energy-based out-of-distribution detection. volume 33, pp. 21464–21475, 2020. Ming, Y., Cai, Z., Gu, J., Sun, Y., Li, W., and Li, Y. Delving into out-of-distribution detection with vision-language representations. Advances in neural information process-ing systems , 35:35087–35102, 2022. Ming, Y., Sun, Y., Dia, O., and Li, Y. How to exploit hyper-spherical embeddings for out-of-distribution detection? In The Eleventh International Conference on Learning Representations , 2023. Mohseni, S., Pitale, M., Yadawa, J., and Wang, Z. Self-supervised learning for generalizable out-of-distribution detection. In AAAI , volume 34, pp. 5216–5223, 2020. Neal, L., Olson, M., Fern, X., Wong, W.-K., and Li, F. Open set learning with counterfactual images. In Proceedings of the European conference on computer vision (ECCV) ,pp. 613–628, 2018. Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., et al. Learning transferable visual models from natural language supervision. In International conference on machine learning , pp. 8748–8763. PmLR, 2021. 12 Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+Scheirer, W. J., de Rezende Rocha, A., Sapkota, A., and Boult, T. E. Toward open set recognition. IEEE transac-tions on pattern analysis and machine intelligence , 35(7): 1757–1772, 2012. Serr `a, J., ´Alvarez, D., G ´omez, V., Slizovskaia, O., N ´u ˜nez, J. F., and Luque, J. Input complexity and out-of-distribution detection with likelihood-based generative models. In International Conference on Learning Repre-sentations , 2019. Sun, Y., Guo, C., and Li, Y. React: Out-of-distribution detection with rectified activations. Advances in neural information processing systems , 34:144–157, 2021. Tang, K., Zhao, W., Peng, W., Fang, X., Cui, X., Zhu, P., and Tian, Z. Reparameterization head for efficient multi-input networks. In ICASSP 2024-2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 6190–6194. IEEE, 2024. Tang, K., Hou, C., Peng, W., Fang, X., Wu, Z., Nie, Y., Wang, W., and Tian, Z. Simplification is all you need against out-of-distribution overconfidence. In Proceed-ings of the Computer Vision and Pattern Recognition Conference , pp. 5030–5040, 2025. Techapanurak, E., Suganuma, M., and Okatani, T. Hyperparameter-free out-of-distribution detection using cosine similarity. In ACCV , 2020. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., and Polosukhin, I. At-tention is all you need. Advances in neural information processing systems , 30, 2017. Vyas, A., Jammalamadaka, N., Zhu, X., Das, D., Kaul, B., and Willke, T. L. Out-of-distribution detection using an ensemble of self supervised leave-out classifiers. In 
+
+ECCV , pp. 550–564, 2018. Wang, C., Fang, X., and Tiwari, P. Dypolyseg: Taylor series-inspired dynamic polynomial fitting network for few-shot point cloud semantic segmentation. In Forty-second International Conference on Machine Learning ,2025a. Wang, C., He, S., Fang, X., Han, J., Liu, Z., Ning, X., Li, W., and Tiwari, P. Point clouds meets physics: Dynamic acoustic field fitting network for point cloud understand-ing. In Proceedings of the Computer Vision and Pattern Recognition Conference , pp. 22182–22192, 2025b. Wang, C., He, S., Fang, X., Nan, F., and Tiwari, P. See-ing the overlooked: Bio-visual inspired weak saliency feedback transformer for person re-identification. In Pro-ceedings of the 33rd ACM International Conference on Multimedia , pp. 3192–3201, 2025c. Wang, C., He, S., Fang, X., Wu, M., Lam, S.-K., and Tiwari, P. Taylor series-inspired local structure fitting network for few-shot point cloud semantic segmentation. In Proceed-ings of the AAAI Conference on Artificial Intelligence ,volume 39, pp. 7527–7535, 2025d. Wang, C., He, S., Fang, X., Hu, Z., Huang, J.-H., Shen, Y., and Tiwari, P. Reasoning beyond points: A visual introspective approach for few-shot 3d segmentation. Ad-vances in Neural Information Processing Systems , 38: 117394–117414, 2026a. Wang, C., He, S., Fang, X., Li, W., Gao, X., Liu, Z., Ti-wari, P., and Kanoulas, D. From coarse to fine: Deep prototype refinement network for few-shot point cloud semantic segmentation. International Conference on Ma-chine Learning , 2026b. Wang, C., He, S., Fang, X., Li, W., Shen, Y., Xu, M., Sun, Z., and Tiwari, P. Topadapter: Topology-aware prompt tun-ing for efficient point cloud understanding. International Conference on Machine Learning , 2026c. Wang, C., Hu, Z., Fang, X., Yu, Z. Y., Wu, Y., Xu, M., Wang, Y., Gao, X., and Tiwari, P. Biologically-inspired evolutionary domain symbiosis for few-shot and zero-shot point cloud semantic segmentation. In Proceedings of the AAAI Conference on Artificial Intelligence , vol-ume 40, pp. 9666–9674, 2026d. Wang, J., Li, J., Fan, G., Ju, Y., Fang, X., and Kot, A. C. Prototype-driven structure synergy network for remote sensing images segmentation. IEEE Transactions on Geoscience and Remote Sensing , 2025e. Wang, S., Dutta, S., Lee, W. J. B., Feng, J., Fang, X., and Chattopadhyay, A. Reducing t-depth and t-count in quan-tum multiplication using compressor primitives. In Pro-ceedings of the Great Lakes Symposium on VLSI 2025 ,pp. 35–40, 2025f. Wang, T. and Isola, P. Understanding contrastive represen-tation learning through alignment and uniformity on the hypersphere. In International conference on machine learning , pp. 9929–9939. PMLR, 2020. Xiong, Z., Liu, D., Fang, X., Qu, X., Dong, J., Zhu, J., Tang, K., and Zhou, P. Rethinking video sentence grounding from a tracking perspective with memory network and masked attention. IEEE Transactions on Multimedia , 26: 11204–11218, 2024. Yan, H., Ma, H., Cai, X., Liu, D., Yuan, Z., Qu, X., Dong, J., Guan, R., Fang, X., He, H., et al. Fit the distribution: Cross-image/prompt adversarial attacks on multimodal large language models. Advances in Neural Information Processing Systems , 38:75204–75247, 2026. 13 Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness 
+
+Yang, G., Hou, C., Peng, W., Fang, X., Nie, Y., Zhu, P., and Tang, K. Eood: Entropy-based out-of-distribution detection. In 2025 International Joint Conference on Neural Networks (IJCNN) , pp. 1–8. IEEE, 2025. Yang, Y., Gao, R., and Xu, Q. Out-of-distribution detection with semantic mismatch under masking. In ECCV , pp. 373–390. Springer, 2022. Yu, Q. and Aizawa, K. Unsupervised out-of-distribution detection by maximum classifier discrepancy. In ICCV ,pp. 9518–9526, 2019. Zaeemzadeh, A., Bisagno, N., Sambugaro, Z., Conci, N., Rahnavard, N., and Shah, M. Out-of-distribution detec-tion using union of 1-dimensional subspaces. In CVPR ,pp. 9452–9461, 2021. Zhang, X., Lei, H., Liu, D., Qu, X., Fang, X., Guan, R., and Jin, K. Manipulating the bounding box: Multimodal controlled backdoor attacks on 3d visual grounding mod-els. In 2025 International Joint Conference on Neural Networks (IJCNN) , pp. 1–8. IEEE, 2025a. Zhang, X., Lei, H., Liu, D., Qu, X., Fang, X., Guan, R., and Jin, K. Monoattack: A strong attack framework with depth-migration and attribute-tampering for monocular 3d object detection. In 2025 International Joint Confer-ence on Neural Networks (IJCNN) , pp. 1–8. IEEE, 2025b. Zhou, Y. Rethinking reconstruction autoencoder-based out-of-distribution detection. In CVPR , 2022. 14

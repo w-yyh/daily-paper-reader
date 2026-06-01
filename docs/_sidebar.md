@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-01 <!--dpr-date:20260601-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/01/2605.30745v1-immuno-vlm-immunizing-large-vision-language-models-via-generative-semantic-antibodies-for-open-world-trustworthiness" data-sidebar-item="{&quot;title&quot;: &quot;Immuno-VLM: Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2605.30745v1-immuno-vlm-immunizing-large-vision-language-models-via-generative-semantic-antibodies-for-open-world-trustworthiness&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;通过语义抗体检测未知异常，处理开放世界中的未知类别问题&quot;}">Immuno-VLM: Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness</a>
   * 2026-05-31 <!--dpr-date:20260531-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202605/31/2605.24410v1-advancing-graph-few-shot-learning-via-in-context-learning" data-sidebar-item="{&quot;title&quot;: &quot;Advancing Graph Few-Shot Learning via In-Context Learning&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2605.24410v1-advancing-graph-few-shot-learning-via-in-context-learning&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;图少样本学习用于分类新颖类别节点&quot;}">Advancing Graph Few-Shot Learning via In-Context Learning</a>

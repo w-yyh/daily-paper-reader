@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-01",
+  "date": "2026-06-01",
+  "generated_at": "2026-06-01T22:57:17",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/01/2605.30745v1-immuno-vlm-immunizing-large-vision-language-models-via-generative-semantic-antibodies-for-open-world-trustworthiness",
+      "section": "deep",
+      "title_en": "Immuno-VLM: Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness",
+      "authors": "Xiang Fang, Wanlong Fang, Wei Ji",
+      "date": "2026-05-29",
+      "pdf": "https://arxiv.org/pdf/2605.30745v1",
+      "score": "8.0",
+      "evidence": "通过语义抗体检测未知异常，处理开放世界中的未知类别问题",
+      "tldr": "当前大规模视觉语言模型通过语义对齐实现零样本识别，但由于缺乏负向知识，在开放世界中常以高置信度将未见异常误判为已知类别，引发“语义傲慢”的信任危机。为应对这一开放世界可信性悖论，本文借鉴生物免疫的负向选择机制，提出Immuno-VLM框架，利用大语言模型的生成能力主动构建“语义抗体”，即对近分布异常样本的文本描述，有效约束模型的已知类别决策空间。在ImageNet-1K及多项OOD评测中，该方法显著超越现有方法，为开放环境下的可信视觉识别提供了新范式。",
+      "tags": "query:cgcd",
+      "abstract_en": "Large Vision-Language Models have achieved unprecedented success in zero-shot recognition by aligning visual features with broad semantic concepts. However, this semantic abstraction creates a critical vulnerability in open-world deployment: the ``Hubris of Semantics'', where models force-fit unknown anomalies into known categories with high confidence due to the lack of explicit negative knowledge. To address this \\textit{Open-World Trustworthiness Paradox}, we propose \\textbf{Immuno-VLM}, a bio-inspired framework that adapts the biological principle of \\textbf{Immunological Negative Selection} to high-dimensional latent spaces. Departing from traditional Open-Set Recognition methods that rely on passive density estimation or inefficient pixel-space outlier generation, Immuno-VLM leverages the generative reasoning of Large Language Models to actively hallucinate ``Semantic Antibodies'', textual descriptions of near-distribution outliers (e.g., look-alikes, contextual anomalies) that effectively bound the decision space of known classes.Extensive experiments on ImageNet-1K and four challenging OOD benchmarks reveal that Immuno-VLM establishes a new state-of-the-art.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

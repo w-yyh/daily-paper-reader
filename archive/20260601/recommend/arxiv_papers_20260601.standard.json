@@ -1,0 +1,53 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-01T22:54:42.014426+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2605.30745v1",
+      "source": "arxiv",
+      "title": "Immuno-VLM: Immunizing Large Vision-Language Models via Generative Semantic Antibodies for Open-World Trustworthiness",
+      "abstract": "Large Vision-Language Models have achieved unprecedented success in zero-shot recognition by aligning visual features with broad semantic concepts. However, this semantic abstraction creates a critical vulnerability in open-world deployment: the ``Hubris of Semantics'', where models force-fit unknown anomalies into known categories with high confidence due to the lack of explicit negative knowledge. To address this \\textit{Open-World Trustworthiness Paradox}, we propose \\textbf{Immuno-VLM}, a bio-inspired framework that adapts the biological principle of \\textbf{Immunological Negative Selection} to high-dimensional latent spaces. Departing from traditional Open-Set Recognition methods that rely on passive density estimation or inefficient pixel-space outlier generation, Immuno-VLM leverages the generative reasoning of Large Language Models to actively hallucinate ``Semantic Antibodies'', textual descriptions of near-distribution outliers (e.g., look-alikes, contextual anomalies) that effectively bound the decision space of known classes.Extensive experiments on ImageNet-1K and four challenging OOD benchmarks reveal that Immuno-VLM establishes a new state-of-the-art.",
+      "authors": [
+        "Xiang Fang",
+        "Wanlong Fang",
+        "Wei Ji"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-05-29T02:22:01+00:00",
+      "link": "https://arxiv.org/pdf/2605.30745v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "handles open-world scenarios with unknown classes by detecting anomalies via semantic antibodies",
+      "llm_evidence_cn": "通过语义抗体检测未知异常，处理开放世界中的未知类别问题",
+      "llm_evidence": "通过语义抗体检测未知异常，处理开放世界中的未知类别问题",
+      "canonical_evidence": "通过语义抗体检测未知异常，处理开放世界中的未知类别问题",
+      "llm_tldr_en": "Proposes Immuno-VLM, a bio-inspired framework adapting immunological negative selection to latent spaces, which generates semantic antibodies to detect unknown anomalies and prevent misclassification, enhancing open-world trustworthiness of vision-language models.",
+      "llm_tldr_cn": "大型视觉语言模型在零样本识别中表现出色，但在开放世界部署时因缺乏显式负知识常将未知异常高置信度地强制归入已知类别，引发可信性悖论。本文提出Immuno-VLM框架，受生物免疫负选择启发，在高维潜在空间学习生成语义抗体用于检测和拒绝未知异常，从而提升开放世界中的可信性。实验表明该方法在多个开放世界场景下能有效减少误分类，为开放世界学习提供了一种生物启发的安全机制。",
+      "llm_tldr": "大型视觉语言模型在零样本识别中表现出色，但在开放世界部署时因缺乏显式负知识常将未知异常高置信度地强制归入已知类别，引发可信性悖论。本文提出Immuno-VLM框架，受生物免疫负选择启发，在高维潜在空间学习生成语义抗体用于检测和拒绝未知异常，从而提升开放世界中的可信性。实验表明该方法在多个开放世界场景下能有效减少误分类，为开放世界学习提供了一种生物启发的安全机制。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}
