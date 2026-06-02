@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-02",
+  "date": "2026-06-02",
+  "generated_at": "2026-06-02T22:45:34",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/02/2605.26661v1-respecting-modality-gap-in-post-hoc-out-of-distribution-detection-with-pre-trained-vision-language-models",
+      "section": "quick",
+      "title_en": "Respecting Modality Gap in Post-hoc Out-of-distribution Detection with Pre-trained Vision-Language Models",
+      "authors": "Yuanwei Hu, Bo Peng, Yadan Luo, Zhen Fang, Ling Chen, Jie Lu",
+      "date": "2026-05-26",
+      "pdf": "https://arxiv.org/pdf/2605.26661v1",
+      "score": "7.0",
+      "evidence": "提出了后验OOD检测方法处理VLM中的模态鸿沟，适用于开放世界中识别未知类别的场景。",
+      "tldr": "该工作挑战了零样本OOD检测中常用的文本原型范式，理论证明了文本原型与最优视觉原型之间存在固有的模态鸿沟，无法仅通过提示工程消除。为此提出调整的视觉原型方法，在多个OOD检测基准上显著提升了性能，为开放世界场景下可靠地识别未知类别提供了更有效的方法，有助于后续的新类发现任务。",
+      "tags": "query:cgcd",
+      "abstract_en": "Out-of-distribution (OOD) detection has emerged as a popular technique to enhance the reliability of machine learning models by identifying unexpected inputs from unknown classes. Recent progress in pre-trained vision-language models (VLMs) has enabled zero-shot OOD detection without access to in-distribution (ID) training data; in this setting, existing methods commonly treat text embeddings of class names as class prototypes. In this paper, we challenge the widely adopted text-as-prototype paradigm by theoretically showing that off-the-shelf textual prototypes are generally misaligned with the optimal visual prototypes, yielding an intrinsic modality gap that cannot be eliminated by prompt engineering alone. To mitigate this gap under the post-hoc constraint, this paper presents an online pseudo-supervised framework that directly learns class prototypes in the visual feature space using unlabeled test-time data streams and soft predictions from the pre-trained VLMs. We provide theoretical guarantees for the convergence of the online optimization procedure. Extensive experiments empirically demonstrate that our method achieves a new state of the art across a variety of OOD detection setups.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
