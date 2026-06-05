@@ -1,0 +1,96 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-05T20:41:18.424517+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.05916v1",
+      "source": "arxiv",
+      "title": "Unveiling the Unknown: Open Vocabulary Object Detection with Scene Graphs",
+      "abstract": "Open-vocabulary object detection seeks to identify novel object categories that were not part of the training data. Many knowledge distillation-based approaches have shown promising performance by transferring knowledge from pre-trained vision-language models to object detection. However, these methods often overlook structured, image-specific relationships between objects, such as interactions and spatial arrangements. This oversight can significantly restrict the effectiveness of detecting novel categories. To address this issue, we propose a Scene-guided Relational Modeling detection framework. This framework utilizes scene graphs to capture structured semantic and spatial relationships between candidate regions and their contextual objects. It explicitly models interactions among neighboring regions and incorporates a Relation Attention Module to implicitly amplify the key relational cues extracted from the scene graph. Furthermore, we present a scene-based textual alignment branch that distills category knowledge from captions to guide relational alignment. This approach facilitates a seamless integration of visual relations with semantic information for enhanced detection performance. Comprehensive experiments show that our model achieves superior performance compared to other OVOD methods, improving the AP for novel categories on COCO and LVIS datasets.",
+      "authors": [
+        "Yi Chen",
+        "Yinghao Lu",
+        "Zhehao Li",
+        "Chenchen Yan",
+        "Jiafei Wu",
+        "Chong Wang",
+        "Jiangbo Qian"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-04T09:23:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.05916v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Open-vocabulary object detection identifies novel categories not in training data",
+      "llm_evidence_cn": "开放词汇目标检测识别训练数据中未出现的新类别",
+      "llm_evidence": "开放词汇目标检测识别训练数据中未出现的新类别",
+      "canonical_evidence": "开放词汇目标检测识别训练数据中未出现的新类别",
+      "llm_tldr_en": "Proposes Scene-guided Relational Modeling for open-vocabulary object detection, using scene graphs to capture spatial and semantic relationships, improving novel category detection.",
+      "llm_tldr_cn": "本文针对开放词汇目标检测中忽视目标间结构化关系的问题，提出场景引导的关系建模检测框架，利用场景图捕获候选区域与上下文目标间的语义和空间关系。该方法在检测训练中未见过的新类别时显著提升了效果，为开放世界环境下的新类发现提供了有效途径。",
+      "llm_tldr": "本文针对开放词汇目标检测中忽视目标间结构化关系的问题，提出场景引导的关系建模检测框架，利用场景图捕获候选区域与上下文目标间的语义和空间关系。该方法在检测训练中未见过的新类别时显著提升了效果，为开放世界环境下的新类发现提供了有效途径。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2605.29933v1",
+      "source": "arxiv",
+      "title": "CLUBench: A Clustering Benchmark",
+      "abstract": "Clustering is a fundamental problem in data science with a long-standing research history, yielding numerous insightful algorithms. Despite this progress, a systematic and large-scale empirical evaluation that jointly considers conventional algorithms, deep learning-based methods, and recent foundation model-based clustering remains largely absent, leading to limited guidance on algorithm selection and deployment. To address this gap, we introduce CLUBench, a comprehensive clustering benchmark comprising 24 algorithms of diverse principles evaluated on 131 datasets across tabular, text, and image data, involving 178,815 experiments. Importantly, our analyses of (i) the impact of hyperparameter tuning,(ii) the impact of data types and characteristics,(iii) the impact of pretrained embeddings,(iv) large language model-based clustering,(v) the similarity of algorithms, and (vi) the low-rank structures of performance matrices, yield meaningful insights and promising pathways for clustering research. For instance, our study reveals that: 1) All evaluated deep clustering methods do not exhibit a significant advantage compared with the top-performing conventional clustering algorithms (e.g., KMeans, SpeClu) in terms of average performance; 2) For image and text clustering tasks, combining pretrained embeddings with conventional clustering algorithms (e.g., KMeans, SpeClu) offers effective and efficient clustering; 3) Clustering remains a challenging and nontrivial problem, even in the era of increasingly dominant foundation models. Moreover, we propose to use the low-rank structure in cross-model performance matrices to efficiently approximate the overall performance evaluation in practical applications. We further demonstrate the feasibility of model selection based on the performance matrices across all hyperparameter configurations.",
+      "authors": [
+        "Feng Xiao",
+        "Dazhi Fu",
+        "Chris Ding",
+        "Jicong Fan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-05-28T13:45:37+00:00",
+      "link": "https://arxiv.org/pdf/2605.29933v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Comprehensive clustering benchmark supporting evaluation of novel category discovery methods",
+      "llm_evidence_cn": "全面聚类基准，支持新类发现方法评估",
+      "llm_evidence": "全面聚类基准，支持新类发现方法评估",
+      "canonical_evidence": "全面聚类基准，支持新类发现方法评估",
+      "llm_tldr_en": "Introduces CLUBench, a large-scale clustering benchmark with 24 algorithms on 131 datasets, enabling systematic evaluation of clustering methods including those for generalized category discovery.",
+      "llm_tldr_cn": "现有聚类研究缺乏大规模系统评估，导致算法选择困难。CLUBench是一项大规模聚类基准，包含24种不同原理的算法和131个表格、文本、图像数据集，共进行178,815次实验。它不仅对比了算法性能，还深入分析了超参数调优、数据特性和预训练嵌入的影响，为广义类别发现等开放世界新类聚类任务提供了宝贵的实验平台和选型依据。该基准覆盖从传统k-means到基础模型方法，分析表明预训练嵌入对性能影响显著，推动了新类聚类算法的发展。",
+      "llm_tldr": "现有聚类研究缺乏大规模系统评估，导致算法选择困难。CLUBench是一项大规模聚类基准，包含24种不同原理的算法和131个表格、文本、图像数据集，共进行178,815次实验。它不仅对比了算法性能，还深入分析了超参数调优、数据特性和预训练嵌入的影响，为广义类别发现等开放世界新类聚类任务提供了宝贵的实验平台和选型依据。该基准覆盖从传统k-means到基础模型方法，分析表明预训练嵌入对性能影响显著，推动了新类聚类算法的发展。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
