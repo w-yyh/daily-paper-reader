@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-06",
+  "date": "2026-06-06",
+  "generated_at": "2026-06-06T20:49:34",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/06/2606.00782v1-flowovd-learning-generative-latent-flows-for-zero-shot-open-vocabulary-detection",
+      "section": "deep",
+      "title_en": "FlowOVD: Learning Generative Latent Flows for Zero-shot Open-vocabulary Detection",
+      "authors": "Yao Wei, Andrea Cavallaro, Changjae Oh",
+      "date": "2026-05-30",
+      "pdf": "https://arxiv.org/pdf/2606.00782v1",
+      "score": "10.0",
+      "evidence": "提出生成式框架用于开放词汇检测，直接促进新类别发现。",
+      "tldr": "现有开放词汇检测多为判别式且查询生成缺乏多样性，本文提出FlowOVD，将查询生成建模为潜在空间中的连续传输过程，利用整流流逐步将类别无关查询转为类别相关查询。实验表明该方法提升了新类别检测的多样性与准确性，为开放世界目标检测提供了生成式视角，促进了新颖类别的发现。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-vocabulary object detection (OVD) has achieved remarkable progress through large-scale vision-language pre-training. Existing methods, however, typically formulate OVD as a discriminative prediction problem, where decoder queries are either static or initialized from encoder features, thus limiting their diversity and flexibility. In this paper, we introduce a generative perspective by modeling decoder query generation as a continuous transport process in latent space. We propose FlowOVD, a text-conditioned query generation framework based on rectified flow that progressively transforms text-agnostic queries into text-guided queries. By introducing continuous latent query dynamics into a vision-language model (VLM) based detector, our method avoids heuristic discrete query construction and enables more expressive semantic alignment for open-vocabulary detection. Without requiring additional training data, FlowOVD achieves 49.5 AP on COCO and 31.5 AP on LVIS, outperforming GroundingDINO by +1.2 AP (+2.5 %) and +4.1 AP (+15.0 %), respectively. The larger gain on the challenging long-tailed LVIS benchmark further highlights the effectiveness of continuous query generation for open-vocabulary generalization.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

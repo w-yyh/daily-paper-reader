@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-06 <!--dpr-date:20260606-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/06/2606.00782v1-flowovd-learning-generative-latent-flows-for-zero-shot-open-vocabulary-detection" data-sidebar-item="{&quot;title&quot;: &quot;FlowOVD: Learning Generative Latent Flows for Zero-shot Open-vocabulary Detection&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.00782v1-flowovd-learning-generative-latent-flows-for-zero-shot-open-vocabulary-detection&quot;, &quot;score&quot;: &quot;10.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;提出生成式框架用于开放词汇检测，直接促进新类别发现。&quot;}">FlowOVD: Learning Generative Latent Flows for Zero-shot Open-vocabulary Detection</a>
   * 2026-06-05 <!--dpr-date:20260605-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/05/2606.05916v1-unveiling-the-unknown-open-vocabulary-object-detection-with-scene-graphs" data-sidebar-item="{&quot;title&quot;: &quot;Unveiling the Unknown: Open Vocabulary Object Detection with Scene Graphs&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.05916v1-unveiling-the-unknown-open-vocabulary-object-detection-with-scene-graphs&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;开放词汇目标检测识别训练数据中未出现的新类别&quot;}">Unveiling the Unknown: Open Vocabulary Object Detection with Scene Graphs</a>
