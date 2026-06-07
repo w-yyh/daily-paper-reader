@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-07",
+  "date": "2026-06-07",
+  "generated_at": "2026-06-07T20:37:32",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/07/2606.00436v1-weighted-conformal-clustering",
+      "section": "quick",
+      "title_en": "Weighted Conformal Clustering",
+      "authors": "Anirban Nath, YoonHaeng Hur, Genevera I. Allen",
+      "date": "2026-05-29",
+      "pdf": "https://arxiv.org/pdf/2606.00436v1",
+      "score": "7.0",
+      "evidence": "提供一种共形推理聚类方法，为无标记数据的簇分配生成有效置信集。",
+      "tldr": "现代聚类分析通常只提供硬分配结果，缺乏对聚类标签不确定性的严格衡量。本文提出加权保形聚类方法，为聚类标签构建具有有限样本覆盖保证的置信集。其核心挑战在于校准数据中的标签并非真实标签，而是由聚类算法生成的合成标签。方法将这一不匹配问题形式化为条件标签分布转移问题，并通过设计权重来纠正偏差。首先导出一个能达到有限样本边际覆盖的oracle程序，随后利用估计的条件标签概率和新型增强校准技术，开发出计算可行的估计版本，并理论推导了相对于名义覆盖水平的损失界。实验结果显示，该方法在非线性和高维聚类应用中，所构建的置信集大小较之分裂保形聚类更小，显著提升了不确定性量化的信息含量。",
+      "tags": "query:cgcd",
+      "abstract_en": "Clustering is a central tool for discovering latent structure in unlabeled data; yet modern clustering pipelines often end with a hard assignment of each observation to a cluster without rigorous measures of assignment uncertainty. We propose a novel weighted conformal approach for constructing valid confidence sets for cluster labels. The key difficulty is that the labels available for calibration are not observed ground-truth labels, but synthetic labels produced by a data-dependent clustering algorithm. Our method develops a conformal inference algorithm that corrects the resulting mismatch with the latent target labels through weights by formulating conformal clustering as a conditional label-distribution shift problem. We first derive an oracle procedure that attains finite-sample marginal coverage and then develop a computationally tractable and implementable version using estimated conditional label probabilities and novel augmented calibration. We show that the coverage of the estimated-weight procedure depends on the estimator, giving an explicit bound on the loss relative to the nominal level. Empirical studies demonstrate that the proposed weighted approach offers improvements over the recently proposed split conformal clustering procedure in terms of informative confidence set size, especially in nonlinear and high-dimensional clustering applications.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/07/2606.04733v1-contrastive-learning-and-correlation-clustering-for-sequences-of-network-telescope-data",
+      "section": "quick",
+      "title_en": "Contrastive Learning and Correlation Clustering for Sequences of Network Telescope Data",
+      "authors": "Jannik Presberger, Alexander Männel, Maynard Koch, Thomas C. Schmidt, Matthias Wählisch, Bjoern Andres",
+      "date": "2026-06-03",
+      "pdf": "https://arxiv.org/pdf/2606.04733v1",
+      "score": "7.0",
+      "evidence": "使用对比学习嵌入网络序列并进行关联聚类，无需标签即可分组，类似于通过对比聚类发现新类别。",
+      "tldr": "本文探索利用对比学习估计网络流量序列之间的成对关系，随后通过关联聚类在无标签数据中发现有意义的群组。实验表明学习的相似度能够有效捕捉同类序列的共性，验证了对比学习与聚类结合在无监督类别发现中的潜力，为开放世界中的新类发现提供了一种无需预训练和标注的方法。",
+      "tags": "query:cgcd",
+      "abstract_en": "Understanding activities of Internet scanners is challenging; it often requires identifying relationships between sources, a task for which semantic annotations are scarce. This work investigates whether semantically meaningful pairwise relationships between sequences of network flow records can be estimated by contrastive learning, without pretraining and without annotations. To this end, we propose a transformer model that embeds minimally preprocessed sequences of network flow records and train it using contrastive learning. With the similarities obtained from this model, we state a correlation clustering problem and solve it locally. Experimentally, we show: Learned similarities are higher on average for sequences originating from the same source than for sequences originating from different sources, and this property generalizes to unseen sequences of unseen sources. Moreover, correlation clustering yields clusters consistent with scanner labels. The complete source code of the algorithms and for reproducing the experiments is publicly available.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

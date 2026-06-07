@@ -1,0 +1,331 @@
+Title: Contrastive Learning and Correlation Clustering for Sequences of Network Telescope Data
+
+URL Source: https://arxiv.org/pdf/2606.04733v1
+
+Published Time: Thu, 04 Jun 2026 01:12:59 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# Contrastive Learning and Correlation Clustering for Sequences of Network Telescope Data ∗
+
+Jannik Presberger 1, B · Alexander M¨ annel 1, B · Maynard Koch 1, B
+
+Thomas C. Schmidt 2, B · Matthias W¨ ahlisch 1, B · Bjoern Andres 1,3, B
+
+> 1
+
+TU Dresden · 2HAW Hamburg ·
+
+> 3
+
+Center for Scalable Data Analytics and AI Dresden/Leipzig 
+
+Abstract 
+
+Understanding activities of Internet scanners is challenging; it often requires identi-fying relationships between sources, a task for which semantic annotations are scarce. This work investigates whether semantically meaningful pairwise relationships between sequences of network flow records can be estimated by contrastive learning, without pretraining and without annotations. To this end, we propose a transformer model that embeds minimally preprocessed sequences of network flow records and train it using contrastive learning. With the similarities obtained from this model, we state a correlation clustering problem and solve it locally. Experimentally, we show: Learned similarities are higher on average for sequences originating from the same source than for sequences originating from different sources, and this property generalizes to unseen sequences of unseen sources. Moreover, correlation clustering yields clusters consistent with scanner labels. The complete source code of the algorithms and for reproducing the experiments is publicly available [1]. 
+
+1 Introduction 
+
+Network traffic analysis plays a central role in cybersecurity research and operations. In particular, the identification and analysis of large-scale scanning activities is important for understanding attack infrastructure, detecting malicious behavior, and monitoring emerging threats [ 4, 15 , 27 ]. Network telescopes are an established instrument for measuring such phenomena [ 5 , 6 , 16 , 23 ,25 , 36 , 38 , 40 , 41 , 44 ]. They were first introduced by Moore et al. [ 37 ], whose work gave rise to large-scale network telescope deployments. Based on large sets of unused IP addresses, called 
+
+darkspace , they collect unsolicited Internet traffic, called Internet background radiation , originating from scanners or misconfigured hosts that send packets directly to the telescope darkspace, or from backscatter traffic, i.e., responses to packets from (randomly) spoofed source addresses mainly used for distributed denial of service attacks or other attack traffic. However, modern network environments generate vast amounts of heterogeneous traffic data, making manual analysis increasingly infeasible. A major challenge in this domain is the limited availability of high-quality annotations [ 19 ]. While some scanner infrastructures may be partially identified through external knowledge or manual analysis, the majority of network traffic remains unlabeled. In addition, scanning behavior is dynamic [ 24 ] and may vary substantially even within the same organizational or infrastructural context. These characteristics make purely supervised approaches difficult to scale and limit their ability to generalize to previously unseen sources and behaviors. This raises the question of whether meaningful embeddings can be learned directly from raw network flow sequences in an unsupervised manner. In this paper, we investigate whether contrastive learning can extract semantically meaningful structure from sequences of minimally preprocessed flow records such that related network behavior 
+
+> ∗This work was funded by the German Federal Ministry of Research, Technology and Space under grant number 16KIS2332K.
+
+1
+
+> arXiv:2606.04733v1 [cs.LG] 3 Jun 2026
+
+becomes recoverable in the learned embedding space. Representation learning utilizing transformer-based models has proven successful for network traffic analysis [ 32 , 34 ], including approaches combining sequence models with contrastive learning objectives for downstream traffic classification tasks [ 29 ]. In these settings, positive pairs are commonly generated through data augmentation techniques and the learned representations are primarily evaluated with respect to supervised classification performance. In contrast, our work focuses on whether semantically meaningful structure can be learned in an unsupervised setting directly from minimally processed network flow sequences. Rather than targeting binary traffic classification, we investigate the structure of the learned embedding space itself and evaluate whether it supports exploratory analysis and clustering of scanner-related activity. Furthermore, we define positive pairs as different subsequences originating from the same source, allowing the model to leverage naturally occurring consistency instead of synthetic augmentations. Our experiments show that the learned similarities are higher on average for sequences originating from the same source than for sequences originating from different sources, and that this property generalizes to unseen sequences of unseen sources. Furthermore, the embedding space encodes semantic information associated with scanner network annotations, despite the absence of explicit supervision during training. The use of correlation clustering as a downstream task further demonstrates that the learned representations can be used to recover semantically meaningful clusters, even in the presence of substantial amounts of unlabeled background traffic. 
+
+2 Related Work 
+
+Classical approaches to network scan detection commonly rely on manually designed statistical models and heuristics. A well-known example is the Threshold Random Walk (TRW) algorithm [26 ] that formulates scan detection as a sequential hypothesis testing problem based on the ratio of successful and failed connection attempts. Such approaches are highly effective for specific detection tasks but typically depend on explicitly designed assumptions about scanner behavior and are primarily optimized for binary detection scenarios. Subsequent work extended these ideas through improved statistical modeling [ 33 ], graph-based analysis [ 12 ], and evasion-resistant scan detection techniques [ 22 , 33 ]. However, many traditional approaches remain strongly reliant on manually engineered features and predefined behavioral assumptions. IP2Vec, Dante, and DarkVec build on Word2Vec [ 35 ] to learn representations for estimating behavioural similarities between network traffic. IP2Vec [ 42 ] models a network flow as a sentence composed of source and destination IP addresses, ports, and protocol fields, and trains the model to predict one element from the others. Dante [ 13 ] constructs sequences of target ports contacted by a source IP address for a given destination IP address. Using a sliding window over these sequences, the model predicts a target port from neighbouring ports. DarkVec [ 20 ] directly embeds source IP addresses. Services are defined by sets of ports, and sequences are formed from source IPs accessing the same service within a time window. The model is trained to predict a source IP address from the other IPs in the sequence. As the embedding space is tied to the data seen during training Gioacchini et al. introduce with i-DarkVec [ 21 ] an extensions to DarkVec that allows to expand the corpus and continually incorporate new data by iteratively retraining the model. The applicability to the task of exploring and tracking network activity over time is explored by Huang et al. [ 24 ] by combining i-DarkVec with HDBSCAN [ 8] clustering to identify and track evolving behavioral groups across temporal windows. Koukoulis et al. [ 29 ] propose a self supervised learning method for network intrusion detection. The method is based on a transformer architecture that embeds sequences of packet headers, followed by a classification head to distinguish sequences into benign and malicious traffic. In the context of network intrusion detection systems, Manocchio et al. [ 32 ] propose a transformer-based model that operates on sequences of aggregated network flow records to classify malicious traffic. Training is performed in a supervised manner on a dataset of annotated network flows, and the model is evaluated on its ability to accurately classify network traffic as benign or malicious. One of the main challenges in network traffic analysis is the scarcity of annotated data, which 2is crucial for training supervised machine learning models. To address this issue, methods have been proposed to generate synthetic data sets. Noblet et al. [ 39 ] introduce NetGlyph which utilizes a combination of vector-quantized variational autoencoders (VQ-VAE) and a transformer model to generate synthetic network traffic data. The VQ-VAE is used to learn a discrete latent representation of the network traffic, which is then used by the transformer to generate new synthetic samples that resemble real network traffic patterns. Along with synthetic data generation, GPT-style pretrained transformer models have been proposed for network traffic analysis [ 17 , 30 , 34 ]. One crucial design choice is the tokenization strategy. Proposed approaches include conversion of hexadecimal byte streams by applying a WordPiece-style vocabulary construction mechanism inspired by NLP models such as BERT [ 18 ], as well as approaches utilizing domain-specific knowledge about the network traffic [30]. 
+
+3 Data 3.1 Network Telescope Records 
+
+The data used in this study consists of network flow records collected from the network telescope UCSD-NT located at the UCSD and operated by CAIDA [ 7 ]. It is the largest and longest standing network telescope infrastructure of today [ 31 ]. Data collection at the UCSD-NT has been running continuously for over 15 years. Currently, 10.5 million IP addresses are monitored, accounting for roughly 0.28% of the entire public IPv4 address space. These addresses combined received on average 1 million packets every second. One hour of the data set averaged 3.6 billion packets and 174 gigabytes of storage after compression in 2024. From this data, we examine one hour, from 13:00 until 14:00 on July 3rd, 2024. This data is not public due to the non-anonymous client source IP addresses contained in the packet captures [ 2 ]. Access can, however, be requested from CAIDA [3]. A network flow record is a tuple consisting of a source IP address, a destination IP address, a destination port, a protocol, and a timestamp. We construct sequences of network flow records in three steps: Firstly, we group the records with respect to source IP address. Secondly, for each source IP address, we sort the flow chronologically to obtain a sequence. Thirdly, and again for each source IP address, we cut the sequence into sub-sequences of the fixed length 128. 
+
+3.2 Annotations 
+
+We derive semantic annotations of a subset of the source IP addresses by referring to IP address ranges [ 14 ] associated with known scan campaigns and operators such as Censys [ 9] and Shodan [ 43 ]. While annotations with a non-zero label indicate confirmed membership of the source IP address in an acknowledged scanner network, annotations with the label zero do not necessarily imply the absence of such a membership. While the majority of sources labeled zero are likely not associated with any known scanner network, some sources may belong to unrecognized or emerging scanner infrastructure. For training and testing, we algorithmically construct subsets of the raw data as follows: Firstly, the set of source IP addresses is partitioned into disjoint train and test subsets such that approximately 80% of all records originate from training sources and 20% originate from test sources. Secondly, only the records associated with the training-source subset are sorted chronologically and partitioned using an 80/20 temporal split. The earlier portion is used for training, while the latter portion is used to examine generalization to unseen sequences from seen sources. This procedure results in the following data sets: 
+
+• Train , a data set containing about 2.4 billion records from 1.49 million unique source IP addresses, which we use to train the model. 
+
+• Test-Unseen-Seq , a data set containing about 0.6 billion records from the same 1.49 million unique source IP addresses as in Train, which we use to examine generalization of the model to unseen sequences from seen sources. 
+
+• Test-Unseen-Src , a data set containing about 0.7 billion records from 0.2 million unique source IP addresses, which we use to examine generalization of the model to unseen sequences from unseen sources. 3192 168 1 10 443          
+
+> Port
+> TCP
+> Protocol
+> ∆t
+> Time Diff.
+> R8R8R8R8R16 R4
+> log(∆ t+ 1)
+> R16
+> Concatenate Linear Layer R128 Record Embedding
+> Destination IP
+
+Figure 1: Each element of a network record is embedded separately: IP octets are embedded independently into R8, while destination port, protocol, and log-scaled time differences are embedded into R16 , R4, and 
+
+R16 , respectively. These embeddings are concatenated and mapped to a single vector in R128 representing the entire record. xi, 1
+
+> xi, 2
+> ...
+> xi,n
+
+
+
+
+
+> Input Embed-ding
+> ˆxi, 1
+> ˆxi, 2
+> ...
+> ˆxi,n
+
+
+
+
+
+> Trans-former Encoder
+> yi, 1
+> yi, 2
+> ...
+> yi,n
+
+
+
+ 
+
+> Mean Pooling ˆyi
+
+[ ] Projection Head si
+
+[ ]
+
+Figure 2: Each network flow record xi,k of the input sequence xi is mapped to a representation ˆxi,k .The sequence of these embeddings is processed by a transformer encoder to produce contextualized token representations yi,k , which are then mean-pooled to obtain a fixed-size representation ˆyi of the entire sequence. Finally, a projection head maps the pooled representations to an embedding si of the sequence. 
+
+4 Methods 4.1 Transformer Encoder Model 
+
+In order to embed any given sequence of network flow records in a 128-dimensional real vector space, we define a specific transformer encoder model. This model consists of two parts, a feed-forward network for embedding individual records, and a transformer for representing sequences of such embeddings. 
+
+Embedding an individual record. Each record in the input sequence is a tuple consisting of a destination IP address, a destination port, a protocol and a timestamp. These elements are embedded separately by learned embedding layers, as shown in Figure 1: The destination IP address is not embedded as a whole but rather each octet is embedded into R8 to allow the model to capture some structure within the IP address space. Destination port and protocol are embedded separately into R16 and R4, respectively. Instead of absolute timestamps, we embed into 
+
+R16 the difference in time to the previous record. In order to account for the large range of time differences, a log scale is applied to the time differences before the learned embedding layer. These embeddings are then concatenated and passed through a fully-connected linear layer to obtain an embedding into R128 for the record as a whole. 
+
+Embedding a sequence of records. In order to obtain an embedding not of a single record but of a sequence of records, we use a standard transformer encoder model consisting of multiple layers of multi-head self-attention and feed forward networks, enabling the capture of dependencies within the sequence. Specifically, we use a transformer consisting of 4 layers, with 4 attention heads, a model dimension of 128 and hidden dimension of 256. To arrive at a fixed size representation of the input sequence, we apply mean pooling to the output of the transformer encoder across the sequence. The resulting representation of the sequence is then passed through a two-layer perceptron with a ReLU activation between the two layers. 
+
+4.2 Learning Objective and Algorithm 
+
+In order to learn the model defined in Section 4.1 in an unsupervised fashion, we adopt a contrastive learning objective inspired by SimCLR [ 10 ]. The key idea is to learn representations so as to bring 4semantically similar sequences closer in the embedding space while pushing dissimilar ones apart. A central component of contrastive learning is the definition of positive and negative pairs. In contrast to established prior work [ 29 ] where data augmentations are commonly used to generate positive pairs, we obtain positive pairs by sampling different sequences originating from the same source IP address. These sequences are assumed to share underlying properties, making them suitable positive examples. Negative pairs are formed by sampling sequences from different source IP addresses. The output of the projection head is ℓ2-normalized, and cosine similarity is used to measure similarity between representations. Given a batch of such pairs, the model is trained to maximize cosine similarity between representations of positive pairs while minimizing cosine similarity with negative samples. More specifically, the objective is the normalized temperature-scaled cross-entropy loss (NT-Xent) [ 10 ], which encourages high similarity for positive pairs relative to all other samples in the batch. For a temperature τ ∈ R+ and any positive pair i, j :
+
+l(i, j ) = − log exp( ⟨si, s j ⟩/τ )
+
+∑  
+
+> l̸=i
+
+exp( ⟨si, s l⟩/τ ) . (1) During training, a subset of sequences of a subset of source IP addresses is materialized in memory. Sequences from this subset are sampled uniformly at random to construct training batches. After a set number of training batches has been constructed, a new subset of source IP addresses is selected and the corresponding sequences are materialized in memory. Which source IP addresses are selected at each step is determined by a sampling strategy: As the data set exhibits a large number of source IP addresses with a low number of records, assigning equal weight to all source IP addresses would cause these to dominate, whereas the few source IP addresses with a large number of records could be artificially suppressed. Therefore, the sampling strategy is defined so as to assign weights based on the number of records associated with each source IP address. Specifically, the weight ωs of a source IP address s with ks many records is defined as ωs = kαs where α ∈ R is a parameter that can be chosen to bias either toward source IP addresses with a low number of records or toward source IP addresses with a larger number of records. For the purpose of this study, we set α = 0 .5 which results in a bias toward source IP addresses with a larger number of records while still allowing source IP addresses with a smaller number of records to be selected with non-negligible probability. For comparability, we record the IP addresses sampled in each step and ensure that across different runs of the training procedure, the same subsets of source IP addresses are selected. The model is trained for 150.000 steps using the Adam optimizer with a learning rate of 10 −4, a temperature τ = 0 .07 and a batch size of 512. Training is performed on a single NVIDIA RTX 4080 GPU with 16GB of memory. The total training time amounts to approximately 10 hours. 
+
+4.3 Correlation Clustering Problem and Algorithm 
+
+In order to group sequences based on their learned similarities, we employ correlation clustering. In contrast to metric-based clustering such as k-means, correlation clustering does not require prior assumptions about the number or size of clusters. This is suitable for the considered setting, where the underlying structure of the data is unknown and may vary significantly across different sources. More specifically, in order to cluster a set J of sequences, we consider for any distinct sequences 
+
+j, k ∈ J a cost q{j,k } ∈ R that is positive for sequences that are similar and negative for sequences that are dissimilar. The objective is to find a partition (clustering) of the set J that minimizes the sum of costs of those pairs of sequences that are in distinct clusters. Any partition Π of J is encoded by the vector y : (J
+
+> 2
+
+) → { 0, 1} such that for any pair {j, k } ∈ (J
+
+> 2
+
+)
+
+of distinct sequences, we have y{j,k } = 1 if and only if j and k are in distinct clusters, i.e., if 
+
+∀U ∈ Π : {j, k }̸ ⊆ U . The set YJ of the encoding vectors of all partitions is written below, with transitivity expressed in the form of linear inequalities [11]: 
+
+YJ =
+
+{
+
+y : (J
+
+> 2
+
+) → { 0, 1}
+
+∣∣∣∣ ∀j ∈ J ∀k ∈ J \{ j} ∀ l ∈ J \{ j, k } : y{j,l } ≤ y{j,k } + y{k,l }
+
+}
+
+5For any pair of distinct sequences j, k ∈ J, we define below a cost q{j,k } ∈ R associated with j
+
+and k being in distinct clusters. For any y ∈ YJ , we define its total cost ξq (y) ∈ R as 
+
+ξq (y) = ∑
+
+> {j,k }∈
+
+(J
+
+> 2
+
+) q{j,k } y{j,k } . (2) Hence, the task of finding an optimal partition of the set of sequences J assumes the form of the correlation clustering problem min {ξq (y) | y ∈ YJ } . (3) To define the cost q{j,k } associated with a pair of distinct sequences j, k ∈ J being in distinct clusters, we leverage the cosine similarity between their learned embeddings si, s j . Raw cosine similarities alone are predominantly positive and would therefore be insufficient to induce meaningful partitions. Therefore, to allow for control over the clustering and to exclude trivial solutions, we introduce a similarity offset δ. Specifically, the cosine similarity between two representations is shifted by a constant value, effectively adjusting the threshold that separates similar from dissimilar pairs. 
+
+q{j,k } := ⟨si, s j ⟩ − δ (4) In our experiments, we solve these instances of the correlation clustering problem locally by means of greedy additive edge contraction [28]. 
+
+5 Experiments 5.1 Distinction of Sources 
+
+As an initial validation step, we analyze whether the model assigns similar representations to unseen sequences originating from the same source IP address. This would indicate that the model captures source-specific information and that representations generalize beyond the training data. More specifically, we compare cosine similarities of sequence representations for pairs of sequences from the same source IP address with cosine similarities of pairs of sequences originating from different sources. The analysis is performed on 50.000 sequences drawn from Test-Unseen-Seq and on 50.000 sequences drawn from Test-Unseen-Src .It can be seen in Figure 3 that sequences from the same source IP address consistently exhibit substantially higher cosine similarity than unrelated sequences: For unseen sequences originating from seen sources, the intra-source similarity is distributed with a mean of 0.932. In contrast, the inter-source similarity distribution is centered around 0.032. For sequences from unseen sources, the intra-source similarity distribution has a mean of 0.893. The corresponding inter-source similarity distribution is centered around 0.019. This indicates that the model captures source-specific information despite being trained in an unsupervised manner. While this evaluation does not demonstrate semantic understanding, it provides evidence that contrastive learning results in a model that captures properties associated with individual sources. 
+
+5.2 Consistency with Annotations 
+
+Beyond identifying individual source IP addresses, we further investigate whether the learned representations relate to the sparse scanner network annotations introduced in Section 3. For this experiment, we draw 50.000 sequences labeled as belonging to a scanner network from 
+
+Test-Unseen-Seq and another 50.000 sequences labeled as belonging to a scanner network from 
+
+Test-Unseen-Src . For a quantitative analysis, we compare the cosine similarity of the learned representations of pairs of sequences from the same scanner network with that of pairs of sequences from distinct scanner networks. Within the same scanner network, we exclude pairs of sequences originating from the same source IP address. This is in order to focus on similarities different from the source identity already examined in Section 5.1. It can be seen in Figure 4 that sequences associated with the same scanner network (intra) exhibit higher cosine similarity than sequences from distinct scanner networks (inter). For unseen 6sequences originating from seen sources, the intra-class similarity distribution has a mean of 0.527. The corresponding inter-class similarity distribution is centered around -0.044. For sequences from unseen sources, the intra-class similarity distribution has a mean of 0.529. The corresponding inter-class similarity distribution is centered around -0.043. While the separation is less pronounced than for relating sources (Section 5.1), a shift in the similarity distributions can still clearly be observed. Of note is the bimodal structure of the intra-class cosine similarity distribution. One mode is concentrated around high similarity values close to 1, while a second mode appears at substantially lower similarity values and overlaps with the inter-class distribution. One possible explanation for this behavior is that scanner network annotations do not necessarily correspond to fully homogeneous groups. While IP addresses associated with the same scanner infrastructure may share certain properties, they may still exhibit different scanning strategies, target selections, or temporal behavior. In addition, the lower-similarity mode of the intra-class distribution overlaps with the inter-class similarity distribution. This observation suggests that the provided scanner network annotations do not form perfectly separable subsets. This could be due to sources belonging to different scanner networks performing similar scanning activities. E.g., distinct scanner infrastructures may employ similar scanning strategies, target selection schemes, or tooling, resulting in comparable sequential patterns. In total, these findings indicate that contrastive learning induces semantically meaningful structure beyond simple memorization of individual source identities. It is possible (but not established here) that the learned representations capture finer-grained distinctions even within the same scanner networks as well as similarities across different scanner networks that are not encoded in the annotation. 
+
+5.3 Correlation Clustering 
+
+In order to examine whether the learned representations can be used to algorithmically extract meaningful clusters of semantically similar sequences, we apply correlation clustering as described in Section 4.3. For this experiment, we consider three subsets, each containing 10.000 sequences drawn uniformly at random, without replacement, from Train , Test-Unseen-Seq , and Test-Unseen-Src , respectively. To better reflect realistic conditions in which scanner-related traffic is intermixed with unrelated traffic, the subsets are not restricted to sequences with scanner annotations. Instead, 50% of the sequences are un-annotated, meaning that no scanner attribution is available for these. The un-annotated sequences are clustered together with the annotated sequences and can therefore influence the result. In order to quantify the accuracy of this result, the clustering, we observe for every pair of sequences whether these are in the same or distinct clusters, and calculate the precision, recall, accuracy and weighted F1-score of these binary decisions, only for those pairs in which both sequences are annotated. Ideally, any two sequences with the same annotations would end up in the same cluster, and any two sequences with distinct annotations would end up in distinct clusters. Unlabeled sequences are included in the clustering problem and can affect the result but are not considered in the calculation of metrics. For correlation clustering, it is essential to learn the offset δ in (4). We do so by clustering the subset of sequences from Train for every δ ∈ [0 , 1] with increments of 0 .01. We fix δ′ = 0 .26, which maximizes the weighted F1-score on Train to 0.938. With that δ′, correlation clustering of the Test-Unseen-Seq and Test-Unseen-Src subsets have weighted F1-scores of 0.913 and 0.917, respectively. Precision, recall, F1-scores for both cuts and joins, overall accuracy and weighted F1-score are reported in Table 1. The computation time for greedy additive edge contraction is about 90 seconds on a single core of a i9-12900KF CPU. These results indicate that the learned representations can be used to extract meaningful clusters of semantically similar sequences, and that the clustering generalizes to unseen data, especially to unseen sequences from sources. Additionally, for exploratory analysis, we show two-dimensional t-SNE projections [ 45 ] of the learned embedding representations, in Figure 6. 7−1 0 1
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+Cos Similarity 
+
+> Relative Frequency
+
+Unseen Sequences 
+
+−1 0 1
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+Cos Similarity 
+
+Unseen Sources 
+
+intra 
+
+inter Figure 3: Shown above are distributions of cosine similarities of learned representations, for pairs of sequences from the same source IP (intra) and different source IP addresses (inter). The analysis is performed separately for unseen sequences of seen sources (left), and for unseen sequences of unseen sources (right). In both cases, a clear separation between the intra-source and inter-source similarity distributions can be observed, indicating that the learned model captures source-specific information. −1 0 1
+
+0
+
+0.05 
+
+0.1
+
+Cosine Similarity 
+
+> Relative Frequency
+
+Unseen Sequences 
+
+−1 0 1
+
+0
+
+0.05 
+
+0.1
+
+Cosine Similarity 
+
+Unseen Sources 
+
+intra 
+
+inter 
+
+Figure 4: Shown above are distributions of cosine similarities of learned representations, for pairs of sequences annotated as belonging to the same scanner network (intra) and distinct scanner networks (inter). The analysis is performed separately for unseen sequences of seen sources (left), and for unseen sequences of unseen sources (right). In both cases, a clear separation can be observed. The overlap of the distributions might be caused by annotations not corresponding to homogeneous categories. 0 0.5 1
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+Offset parameter δ
+
+> F1 score
+
+Unseen Sequences 
+
+0 0.5 1
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+Offset parameter δ
+
+Unseen Sources 
+
+join 
+
+cut 
+
+weighted 
+
+Figure 5: Shown above are the F1-scores of correlation clustering decisions for different values of the offset parameter δ. These are shown for unseen sequences of network flow records from seen sources (left) and unseen sources (right). The vertical dashed lines indicate δ′ = 0 .26, which is optimal on the training set and used for evaluation. 
+
+8Cuts Joins Data Precision Recall F1 Precision Recall F1 Accuracy Weighted F1                                   
+
+> Test-Unseen-Seq 0.925 0.965 0.947 0.880 0.768 0.820 0.915 0.913
+> Test-Unseen-Src 0.949 0.948 0.948 0.799 0.802 0.800 0.918 0.917
+> Table 1: Reported above are precision, recall, F1-score for both cuts and joins, as well as overall accuracy and weighted F1-score, for correlation clustering results on the Test-Unseen-Seq and Test-Unseen-Src
+> subsets. −100 −50 050 100
+> −100
+> −50
+> 0
+> 50
+> 100
+> t-SNE 1
+> t-SNE 2
+> Scanner Labels Test-Unseen-Seq
+> −100 −50 050 100
+> −100
+> −50
+> 0
+> 50
+> 100
+> t-SNE 1
+> Scanner Labels Test-Unseen-Src
+> Figure 6: Two-dimensional t-SNE projections of the embedded representations for 10,000 sequences sampled from Test-Unseen-Seq , shown in the left panel, and 10,000 sequences sampled from Test-Unseen-Src ,shown in the right panel, as used in Section 5.3. Colors indicate scanner network labels, with label 0 depicted in gray.
+
+6 Conclusion 
+
+We explore whether semantically meaningful pairwise relationships between sequences of network flow records can be estimated by contrastive learning, without pretraining and without annotations. The results suggest that embeddings can be obtained which encode meaningful source-specific information. Despite the absence of semantic supervision, the learned embeddings exhibit scanner-related structure. The observed overlap between intra-class and inter-class cosine similarity distributions suggests that the embedding space reflects additional structure not fully represented by the scanner annotations considered in this study. Correlation clustering with respect to these similarities and a global threshold optimized on training data can be used to recover meaningful semantic groups under realistic conditions where scanner-related traffic is intermixed with unlabeled background traffic. Overall, these results suggest that contrastive learning on minimally processed sequences of network flow records is capable of capturing semantically meaningful structure with potential applicability for exploratory traffic analysis and the investigation of previously unknown or weakly labeled network behavior. At the same time, the presented results remain exploratory in nature. The scanner annotations used in this study are sparse and coarse-grained, and further work is required to better understand the semantic structure represented within the embedding space. Future research will focus on more extensive quantitative evaluation, analysis of alternative representation learning objectives, and means which can further improve the learned representations. 9References 
+
+[1] URL: https://github.com/JannikPresberger/Contrastive Learning and Correlation Clustering for Sequences of Network Telescope Data. [2] URL: https://www.caida.org/about/legal/aua/. [3] URL: https://www.caida.org/catalog/datasets/request user info forms/telescope dataset request/. [4] M. Antonakakis, T. April, M. Bailey, M. Bernhard, E. Bursztein, J. Cochran, Z. Durumeric, J. A. Halderman, L. Invernizzi, M. Kallitsis, D. Kumar, C. Lever, Z. Ma, J. Mason, D. Menscher, C. Seaman, N. Sullivan, K. Thomas, and Y. Zhou. Understanding the Mirai Botnet. In 26th USENIX Security Symposium (USENIX) , 2017. doi:10.5555/3241189.3241275. [5] E. Balkanli, J. Alves, and A. N. Zincir-Heywood. Supervised Learning to detect DDoS Attacks. In Symposium on Computational Intelligence in Cyber Security (CICS) , 2014. doi:10.1109/CICYBS.2014.7013367. [6] E. Balkanli, N. Zincir-Heywood, and M. I. Heywood. Feature Selection for Robust Backscatter DDoS Detection. In 40th Local Computer Networks Conference Workshops (LCNW) , 2015. doi:10.1109/LCNW.2015.7365905. [7] CAIDA. Sustainable Tools for Analysis and Research on Darknet Unsolicited Traffic, 2021. URL: https://www.caida.org/projects/stardust/. [8] R. J. G. B. Campello, D. Moulavi, A. Zimek, and J. Sander. Hierarchical density estimates for data clustering, visualization, and outlier detection. ACM Trans. Knowl. Discov. Data ,10(1), 2015. doi:10.1145/2733381. [9] Censys. Censys Plattform. Website, 2017. URL: https://platform.censys.io/. [10] T. Chen, S. Kornblith, M. Norouzi, and G. Hinton. A simple framework for contrastive learning of visual representations. In ICML , 2020. URL: https://proceedings.mlr.press/v119/ chen20j/chen20j.pdf. [11] S. Chopra and M. R. Rao. The partition problem. Mathematical Programming , 59(1):87–115, 1993. doi:10.1007/BF01581239. [12] S. Chowdhury, F. Zhang, S. Zhang, H. Medal, M. Marufuzzaman, and L. Bian. Botnet detection using graph-based feature clustering. Journal of Big Data , 4:14, 2017. doi:10.1186/ s40537-017-0074-7. [13] D. Cohen, Y. Mirsky, M. Kamp, T. Martin, Y. Elovici, R. Puzis, and A. Shabtai. Dante: A framework for mining and monitoring darknet traffic. In 25th European Symposium on Research in Computer Security (ESORICS) , 2020. doi:10.1007/978-3-030-58951-6 5. [14] M. Collins. Acknowledged Scanners, 2021. URL: https://gitlab.com/mcollins at isi/ acknowledged scanners.git. [15] A. Dainotti, A. King, K. Claffy, F. Papale, and A. Pescape. Analysis of a “/0” Stealth Scan From a Botnet. IEEE/ACM Transactions on Networking , 23(2):341–354, 2015. doi: 10.1109/tnet.2013.2297678. [16] A. Dainotti, C. Squarcella, E. Aben, K. C. Claffy, M. Chiesa, M. Russo, and A. Pescap´ e. Analysis of Country-Wide Internet Outages Caused by Censorship. IEEE/ACM Transactions on Networking , 22(6):1964–1977, 2014. doi:10.1109/TNET.2013.2291244. [17] J. A. Delgado-Soto, J. E. L´ opez de Vergara, I. Gonz´ alez, D. Perdices, and L. de Pedro. GPT on the wire: Towards realistic network traffic conversations generated with large language models. Comput. Netw. , 265(C), 2025. doi:10.1016/j.comnet.2025.111308. 10 [18] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova. BERT: Pre-training of deep bidirectional transformers for language understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) . Association for Computational Linguistics, 2019. doi:10.18653/v1/N19-1423. [19] L. Gioacchini, M. Mellia, L. Vassio, I. Drago, G. Milan, Z. B. Houidi, and D. Rossi. Cross-network embeddings transfer for traffic analysis. IEEE Transactions on Network and Service Management , 21(3):2686–2699, 2024. doi:10.1109/TNSM.2023.3329442. [20] L. Gioacchini, L. Vassio, M. Mellia, I. Drago, Z. B. Houidi, and D. Rossi. Darkvec: automatic analysis of darknet traffic with word embeddings. In International Conference on Emerging Networking EXperiments and Technologies (CoNEXT) , 2021. doi:10.1145/3485983.3494863. [21] L. Gioacchini, L. Vassio, M. Mellia, I. Drago, Z. B. Houidi, and D. Rossi. i-DarkVec: Incremental Embeddings for Darknet Traffic Analysis. ACM Trans. Internet Technol. , 23(3), 2023. doi:10.1145/3595378. [22] R. Harang and P. Mell. Evasion-resistant network scan detection. Security Informatics ,4(4):1–10, 2015. doi:10.1186/s13388-015-0019-7. [23] R. Hiesgen, M. Nawrocki, M. Barcellos, D. Kopp, O. Hohlfeld, E. Chan, R. Dobbins, C. Doerr, C. Rossow, D. R. Thomas, M. Jonker, R. Mok, X. Luo, J. Kristoff, T. C. Schmidt, M. W¨ ahlisch, and K. Claffy. The Age of DDoScovery: An Empirical Comparison of Industry and Academic DDoS Assessments. In Internet Measurement Conference (IMC) , 2024. doi:10.1145/3646547. 3688451. [24] K. Huang, L. Gioacchini, M. Mellia, and L. Vassio. Dynamic cluster analysis to detect and track novelty in network telescopes. In European Symposium on Security and Privacy Workshops (EuroS & PW) , 2024. doi:10.1109/EuroSPW61312.2024.00037. [25] M. Jonker, A. King, J. Krupp, C. Rossow, A. Sperotto, and A. Dainotti. Millions of Targets under Attack: A Macroscopic Characterization of the DoS Ecosystem. In Internet Measurement Conference (IMC) , 2017. doi:10.1145/3131365.3131383. [26] J. Jung, V. Paxson, A. Berger, and H. Balakrishnan. Fast portscan detection using sequential hypothesis testing. In IEEE Symposium on Security and Privacy , 2004. doi:10.1109/SECPRI. 2004.1301325. [27] M. Kallitsis, R. Prajapati, V. Honavar, D. Wu, and J. Yen. Detecting and Interpreting Changes in Scanning Behavior in Large Network Telescopes. IEEE Transactions on Information Forensics and Security , 17:3611–3625, 2022. doi:10.1109/tifs.2022.3211644. [28] M. Keuper, E. Levinkov, N. Bonneel, G. Lavou´ e, T. Brox, and B. Andres. Efficient decomposi-tion of image and mesh graphs by lifted multicuts. In ICCV , 2015. doi:10.1109/ICCV.2015.204. [29] I. Koukoulis, I. Syrigos, and T. Korakis. Self-supervised transformer-based contrastive learning for intrusion detection systems. In Proceedings of the IFIP Networking 2025 Conference ,Limassol, Cyprus, 2025. IFIP. URL: https://networking.ifip.org/2025/images/Net25 papers/ 1571127827.pdf. [30] Z. Li, S. Li, D. Fang, X. Chen, Z. Song, Z. Li, S. Lv, and L. Sun. PNetGPT: Proprietary Protocol Network Traffic Generation with Pre-trained Transformer. In International Conference on Acoustics, Speech and Signal Processing (ICASSP) , 2025. doi:10.1109/ICASSP49660.2025. 10890383. 11 [31] A. M¨ annel, J. M¨ ucke, kc Claffy, M. Gao, R. K. P. Mok, M. Nawrocki, T. C. Schmidt, and M. W¨ ahlisch. Lessons Learned from Operating a Large Network Telescope. In Proc. of ACM Special Interest Group on Data Communication (SIGCOMM) , pages 826–841, New York, NY, USA, 2025. ACM. doi:10.1145/3718958.3754347. [32] L. D. Manocchio, S. Layeghy, W. W. Lo, G. K. Kulatilleke, M. Sarhan, and M. Portmann. FlowTransformer: A transformer framework for flow-based network intrusion detection systems. 
+
+Expert Syst. Appl. , 241(C), 2024. doi:10.1016/j.eswa.2023.122564. [33] P. Mell and R. Harang. Limitations to threshold random walk scan detection and mitigating enhancements. In Conference on Communications and Network Security (CNS) , 2013. doi: 10.1109/CNS.2013.6682723. [34] X. Meng, C. Lin, Y. Wang, and Y. Zhang. NetGPT: Generative Pretrained Transformer for Network Traffic, 2025. URL: https://arxiv.org/abs/2304.09513, arXiv:2304.09513. [35] T. Mikolov, I. Sutskever, K. Chen, G. S. Corrado, and J. Dean. Distributed representations of words and phrases and their compositionality. In NeurIPS , 2013. URL: https://proceedings. neurips.cc/paper files/paper/2013/file/9aa42b31882ec039965f3c4923ce901b-Paper.pdf. [36] D. Moore, V. Paxson, S. Savage, C. Shannon, S. Staniford-Chen, and N. Weaver. Inside the Slammer Worm. IEEE Security & Privacy , 1(4):33–39, 2003. doi:10.1109/msecp.2003.1219056. [37] D. Moore, G. M. Voelker, and S. Savage. Inferring Internet Denial-of-Service Activity. In 
+
+USENIX Security Symposium , 2001. [38] J. M¨ ucke, M. Nawrocki, R. Hiesgen, P. Sattler, J. Zirngibl, G. Carle, J. Luxemburk, T. C. Schmidt, and M. W¨ ahlisch. Waiting for QUIC: Passive Measurements to Understand QUIC Deployments. Proceedings of the ACM on Networking (PACMNET) , 3(CoNEXT4):41:1–41:26, 2025. URL: https://doi.org/10.1145/3768988. [39] G. Noblet, C. Lefebvre, P. Owezarski, and W. Ritchie. NetGlyph: Representation Learning to generate Network Traffic with Transformers. In International Conference on Network and Service Management (CNSM) , 2024. doi:10.23919/CNSM62983.2024.10814626. [40] R. Padmanabhan, A. Filast` o, M. Xynou, R. S. Raman, K. Middleton, M. Zhang, D. Madory, M. Roberts, and A. Dainotti. A Multi-Perspective View of Internet Censorship in Myanmar. In ACM SIGCOMM Workshop on Free and Open Communications on the Internet (FOCI) ,2021. doi:10.1145/3473604.3474562. [41] M. S. Pour, J. Khoury, and E. Bou-Harb. HoneyComb: A Darknet-Centric Proactive Deception Technique For Curating IoT Malware Forensic Artifacts. In IEEE/IFIP Network Operations and Management Symposium (NOMS) , 2022. doi:10.1109/noms54207.2022.9789827. [42] M. Ring, A. Dallmann, D. Landes, and A. Hotho. IP2Vec: Learning Similarities Between IP Addresses. In International Conference on Data Mining Workshops (ICDMW) , 2017. doi:10.1109/ICDMW.2017.93. [43] Shodan. Shodan - the world’s first search engine for Internet-connected devices. Website. URL: https://www.shodan.io/. [44] R. Sommese, K. Claffy, R. van Rijswijk-Deij, A. Chattopadhyay, A. Dainotti, A. Sperotto, and M. Jonker. Investigating the Impact of DDoS Attacks on DNS Infrastructure. In Internet Measurement Conference (IMC) , 2022. doi:10.1145/3517745.3561458. [45] L. van der Maaten and G. Hinton. Visualizing data using t-sne. Journal of Machine Learning Research , 9(86):2579–2605, 2008. URL: http://jmlr.org/papers/v9/vandermaaten08a.html. 12

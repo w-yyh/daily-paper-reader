@@ -1,0 +1,97 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-07T20:35:35.881081+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.00436v1",
+      "source": "arxiv",
+      "title": "Weighted Conformal Clustering",
+      "abstract": "Clustering is a central tool for discovering latent structure in unlabeled data; yet modern clustering pipelines often end with a hard assignment of each observation to a cluster without rigorous measures of assignment uncertainty. We propose a novel weighted conformal approach for constructing valid confidence sets for cluster labels. The key difficulty is that the labels available for calibration are not observed ground-truth labels, but synthetic labels produced by a data-dependent clustering algorithm. Our method develops a conformal inference algorithm that corrects the resulting mismatch with the latent target labels through weights by formulating conformal clustering as a conditional label-distribution shift problem. We first derive an oracle procedure that attains finite-sample marginal coverage and then develop a computationally tractable and implementable version using estimated conditional label probabilities and novel augmented calibration. We show that the coverage of the estimated-weight procedure depends on the estimator, giving an explicit bound on the loss relative to the nominal level. Empirical studies demonstrate that the proposed weighted approach offers improvements over the recently proposed split conformal clustering procedure in terms of informative confidence set size, especially in nonlinear and high-dimensional clustering applications.",
+      "authors": [
+        "Anirban Nath",
+        "YoonHaeng Hur",
+        "Genevera I. Allen"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "math.ST",
+        "stat.ML"
+      ],
+      "published": "2026-05-29T23:58:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.00436v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Provides a conformal inference method for clustering that yields valid confidence sets for cluster assignments in unlabeled data.",
+      "llm_evidence_cn": "提供一种共形推理聚类方法，为无标记数据的簇分配生成有效置信集。",
+      "llm_evidence": "提供一种共形推理聚类方法，为无标记数据的簇分配生成有效置信集。",
+      "canonical_evidence": "提供一种共形推理聚类方法，为无标记数据的簇分配生成有效置信集。",
+      "llm_tldr_en": "Presents weighted conformal clustering to provide finite-sample valid confidence sets for cluster assignments, treating calibration as conditional label-distribution shift. It yields coverage guarantees and aids novel category discovery via uncertainty quantification.",
+      "llm_tldr_cn": "现有聚类方法大多仅给出硬标签，缺乏对分配结果的不确定性量化，限制了在开放世界新类发现等高安全需求任务中的应用。为此，本文提出加权共形聚类框架，将聚类校准问题形式化为条件标签分布偏移，通过加权共形推理校正由聚类算法产生的合成标签与真实潜在类别之间的不匹配，为每个测试样本构造了有限样本有效的置信集。理论分析提供了oracle过程的覆盖保证，并在合成和真实数据集上验证了方法的有效性。该方法为无监督类别发现提供了实用的置信度评估工具，可辅助风险控制和主动学习。",
+      "llm_tldr": "现有聚类方法大多仅给出硬标签，缺乏对分配结果的不确定性量化，限制了在开放世界新类发现等高安全需求任务中的应用。为此，本文提出加权共形聚类框架，将聚类校准问题形式化为条件标签分布偏移，通过加权共形推理校正由聚类算法产生的合成标签与真实潜在类别之间的不匹配，为每个测试样本构造了有限样本有效的置信集。理论分析提供了oracle过程的覆盖保证，并在合成和真实数据集上验证了方法的有效性。该方法为无监督类别发现提供了实用的置信度评估工具，可辅助风险控制和主动学习。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.04733v1",
+      "source": "arxiv",
+      "title": "Contrastive Learning and Correlation Clustering for Sequences of Network Telescope Data",
+      "abstract": "Understanding activities of Internet scanners is challenging; it often requires identifying relationships between sources, a task for which semantic annotations are scarce. This work investigates whether semantically meaningful pairwise relationships between sequences of network flow records can be estimated by contrastive learning, without pretraining and without annotations. To this end, we propose a transformer model that embeds minimally preprocessed sequences of network flow records and train it using contrastive learning. With the similarities obtained from this model, we state a correlation clustering problem and solve it locally. Experimentally, we show: Learned similarities are higher on average for sequences originating from the same source than for sequences originating from different sources, and this property generalizes to unseen sequences of unseen sources. Moreover, correlation clustering yields clusters consistent with scanner labels. The complete source code of the algorithms and for reproducing the experiments is publicly available.",
+      "authors": [
+        "Jannik Presberger",
+        "Alexander Männel",
+        "Maynard Koch",
+        "Thomas C. Schmidt",
+        "Matthias Wählisch",
+        "Bjoern Andres"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.NI"
+      ],
+      "published": "2026-06-03T11:15:37+00:00",
+      "link": "https://arxiv.org/pdf/2606.04733v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Uses contrastive learning to embed network sequences and correlation clustering to group them without labels, akin to novel category discovery via contrastive clustering.",
+      "llm_evidence_cn": "使用对比学习嵌入网络序列并进行关联聚类，无需标签即可分组，类似于通过对比聚类发现新类别。",
+      "llm_evidence": "使用对比学习嵌入网络序列并进行关联聚类，无需标签即可分组，类似于通过对比聚类发现新类别。",
+      "canonical_evidence": "使用对比学习嵌入网络序列并进行关联聚类，无需标签即可分组，类似于通过对比聚类发现新类别。",
+      "llm_tldr_en": "This paper investigates using contrastive learning to estimate pairwise relationships between network flow sequences and then applies correlation clustering to discover meaningful groups from unlabeled data, demonstrating a contrastive clustering approach for unsupervised category discovery.",
+      "llm_tldr_cn": "本文探索利用对比学习估计网络流量序列之间的成对关系，随后通过关联聚类在无标签数据中发现有意义的群组。实验表明学习的相似度能够有效捕捉同类序列的共性，验证了对比学习与聚类结合在无监督类别发现中的潜力，为开放世界中的新类发现提供了一种无需预训练和标注的方法。",
+      "llm_tldr": "本文探索利用对比学习估计网络流量序列之间的成对关系，随后通过关联聚类在无标签数据中发现有意义的群组。实验表明学习的相似度能够有效捕捉同类序列的共性，验证了对比学习与聚类结合在无监督类别发现中的潜力，为开放世界中的新类发现提供了一种无需预训练和标注的方法。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "novel category discovery in open world setting using contrastive clustering",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
