@@ -6,29 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-07
-- 运行时间：2026-06-07 20:37:24 UTC
+- 最新运行日期：2026-06-08
+- 运行时间：2026-06-08 21:32:25 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：0
-- 速读区：2
+- 本次总论文数：1
+- 精读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读两篇聚类新作，加权共形聚类与网络异常序列的对比相关聚类各得7分。  
-最值得关注的是共形预测赋予聚类的加权不确定度控制，以及对比学习在无监督网络流量分析中的落地尝试。  
-建议读者从这两篇出发，跟进共形聚类与自监督网络防御的交叉进展。
-- 详情：[/202606/07/README](/202606/07/README)
+今日精读：用几何感知超图推理，让点云3D分割在无标注新类别上也能准确发现。  
+最值关注：将超图结构与点云几何特性融合，显著提升新类发现召回率，为自动驾驶场景中未知物体识别提供新思路。  
+下步可试：在自己数据上用该框架迁移学习，优先关注局部几何特征的构建方式。
+- 详情：[/202606/08/README](/202606/08/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Geometric-Aware Hypergraph Reasoning for Novel Class Discovery in Point Cloud Segmentation](/202606/08/2606.07280v1-geometric-aware-hypergraph-reasoning-for-novel-class-discovery-in-point-cloud-segmentation)  
+   标签：评分：10.0/10、query:cgcd
+   evidence：点云分割中基于超图推理的新类发现
 
 ### 速读区论文标签
-1. [Weighted Conformal Clustering](/202606/07/2606.00436v1-weighted-conformal-clustering)  
-   标签：评分：7.0/10、query:cgcd
-   evidence：提供一种共形推理聚类方法，为无标记数据的簇分配生成有效置信集。
-2. [Contrastive Learning and Correlation Clustering for Sequences of Network Telescope Data](/202606/07/2606.04733v1-contrastive-learning-and-correlation-clustering-for-sequences-of-network-telescope-data)  
-   标签：评分：7.0/10、query:cgcd
-   evidence：使用对比学习嵌入网络序列并进行关联聚类，无需标签即可分组，类似于通过对比聚类发现新类别。
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">

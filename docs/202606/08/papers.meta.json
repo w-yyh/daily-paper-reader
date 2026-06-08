@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-08",
+  "date": "2026-06-08",
+  "generated_at": "2026-06-08T21:32:35",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/08/2606.07280v1-geometric-aware-hypergraph-reasoning-for-novel-class-discovery-in-point-cloud-segmentation",
+      "section": "deep",
+      "title_en": "Geometric-Aware Hypergraph Reasoning for Novel Class Discovery in Point Cloud Segmentation",
+      "authors": "Zihao Zhang, Aming Wu, Yang Li, Yahong Han, Jialie Shen",
+      "date": "2026-06-05",
+      "pdf": "https://arxiv.org/pdf/2606.07280v1",
+      "score": "10.0",
+      "evidence": "点云分割中基于超图推理的新类发现",
+      "tldr": "现有点云新类发现方法依赖成对关联，难以捕捉已知类与新类间的复杂高阶关系，且对点云几何信息利用不足，导致分割不准。为此，我们提出几何感知超图推理框架，通过超图建模类间高阶关联，并设计几何感知原型增强空间结构传播。在SemanticKITTI和SemanticPOSS数据集上的实验表明，方法实现了更精确的新类分割，充分证明了高阶关系推理与几何信息融合的重要性，为点云语义分割提供了新范式。",
+      "tags": "query:cgcd",
+      "abstract_en": "Novel class discovery in point cloud segmentation aims to transfer knowledge from known classes to automatically identify and segment unlabeled novel classes in point clouds. Existing methods mainly rely on pairwise associations for class assignment and novel class reasoning, which limits their ability to capture complex relationships among known and novel classes and may lead to inaccurate semantic segmentation. To address this issue, we introduce a hypergraph-based framework that models high-order associations among classes and enables collaborative reasoning from known classes to novel classes beyond traditional pairwise relations. Moreover, existing methods tend to focus on semantic feature extraction while paying insufficient attention to geometric information in point clouds. To better exploit spatial structure, we propose Geometric-Aware Prototypes to enhance the representation of class-level geometric cues. By propagating geometric information through hyperedges, the proposed method improves the understanding of spatial distributions across classes and leads to more accurate segmentation. Experiments on the SemanticKITTI and SemanticPOSS datasets demonstrate the effectiveness and superiority of our method.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

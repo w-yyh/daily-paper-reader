@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-08T21:29:41.786574+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2606.07280v1",
+      "source": "arxiv",
+      "title": "Geometric-Aware Hypergraph Reasoning for Novel Class Discovery in Point Cloud Segmentation",
+      "abstract": "Novel class discovery in point cloud segmentation aims to transfer knowledge from known classes to automatically identify and segment unlabeled novel classes in point clouds. Existing methods mainly rely on pairwise associations for class assignment and novel class reasoning, which limits their ability to capture complex relationships among known and novel classes and may lead to inaccurate semantic segmentation. To address this issue, we introduce a hypergraph-based framework that models high-order associations among classes and enables collaborative reasoning from known classes to novel classes beyond traditional pairwise relations. Moreover, existing methods tend to focus on semantic feature extraction while paying insufficient attention to geometric information in point clouds. To better exploit spatial structure, we propose Geometric-Aware Prototypes to enhance the representation of class-level geometric cues. By propagating geometric information through hyperedges, the proposed method improves the understanding of spatial distributions across classes and leads to more accurate segmentation. Experiments on the SemanticKITTI and SemanticPOSS datasets demonstrate the effectiveness and superiority of our method.",
+      "authors": [
+        "Zihao Zhang",
+        "Aming Wu",
+        "Yang Li",
+        "Yahong Han",
+        "Jialie Shen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-05T13:55:58+00:00",
+      "link": "https://arxiv.org/pdf/2606.07280v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "novel class discovery in point cloud segmentation via hypergraph reasoning",
+      "llm_evidence_cn": "点云分割中基于超图推理的新类发现",
+      "llm_evidence": "点云分割中基于超图推理的新类发现",
+      "canonical_evidence": "点云分割中基于超图推理的新类发现",
+      "llm_tldr_en": "Proposes a hypergraph-based framework for novel class discovery in point cloud segmentation, modeling high-order class relations and incorporating geometric aware contrastive refinement to boost segmentation accuracy.",
+      "llm_tldr_cn": "针对点云语义分割中新类发现仅靠成对关联建模局限，本文提出几何感知超图推理框架，通过超图捕捉已知类与新类间高阶关系，并设计双层对比精炼模块强化几何特征，在多个基准上显著提升新类分割性能，为三维开放世界感知提供了有效方案。",
+      "llm_tldr": "针对点云语义分割中新类发现仅靠成对关联建模局限，本文提出几何感知超图推理框架，通过超图捕捉已知类与新类间高阶关系，并设计双层对比精炼模块强化几何特征，在多个基准上显著提升新类分割性能，为三维开放世界感知提供了有效方案。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}

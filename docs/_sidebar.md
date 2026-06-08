@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-08 <!--dpr-date:20260608-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/08/2606.07280v1-geometric-aware-hypergraph-reasoning-for-novel-class-discovery-in-point-cloud-segmentation" data-sidebar-item="{&quot;title&quot;: &quot;Geometric-Aware Hypergraph Reasoning for Novel Class Discovery in Point Cloud Segmentation&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.07280v1-geometric-aware-hypergraph-reasoning-for-novel-class-discovery-in-point-cloud-segmentation&quot;, &quot;score&quot;: &quot;10.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;点云分割中基于超图推理的新类发现&quot;}">Geometric-Aware Hypergraph Reasoning for Novel Class Discovery in Point Cloud Segmentation</a>
   * 2026-06-07 <!--dpr-date:20260607-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/07/2606.00436v1-weighted-conformal-clustering" data-sidebar-item="{&quot;title&quot;: &quot;Weighted Conformal Clustering&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.00436v1-weighted-conformal-clustering&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;提供一种共形推理聚类方法，为无标记数据的簇分配生成有效置信集。&quot;}">Weighted Conformal Clustering</a>
