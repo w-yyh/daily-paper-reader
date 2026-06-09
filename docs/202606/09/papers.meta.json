@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-09",
+  "date": "2026-06-09",
+  "generated_at": "2026-06-09T20:54:45",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/09/2606.07474v1-unsupervised-continual-clustering-via-forward-backward-knowledge-distillation",
+      "section": "deep",
+      "title_en": "Unsupervised Continual Clustering via Forward-Backward Knowledge Distillation",
+      "authors": "Mohammadreza Sadeghi, Sareh Soleimani, Zihan Wang, Narges Armanfard",
+      "date": "2026-06-05",
+      "pdf": "https://arxiv.org/pdf/2606.07474v1",
+      "score": "8.0",
+      "evidence": "无监督持续聚类处理新类别而不遗忘",
+      "tldr": "无监督持续学习面临灾难性遗忘，现有方法缺乏聚类目标且存隐私问题。本文提出无监督持续聚类（UCC）并设计FBCC框架，通过师生网络前向后向知识蒸馏，在不存储旧数据的情况下学习新簇并保留旧簇结构。在四个基准数据集上，FBCC聚类精度持续优于现有持续学习基线，显著减轻遗忘，为UCC领域开辟新途径。",
+      "tags": "query:cgcd",
+      "abstract_en": "Unsupervised Continual Learning (UCL) aims to enable neural networks to learn sequential tasks without labels or access to past data. A major challenge in this setting is Catastrophic Forgetting, where models forget previously learned tasks upon learning new ones. This challenge is amplified in UCL due to the absence of labels to guide learning and memory retention. Existing mitigation strategies, such as knowledge distillation and replay buffers, often raise memory and privacy concerns. Moreover, current UCL methods largely overlook clustering-specific objectives. To fill this gap, we introduce Unsupervised Continual Clustering (UCC) and propose Forward-Backward Knowledge Distillation for Continual Clustering (FBCC). FBCC employs a continual teacher network with a clustering projector and lightweight task-specific students. Through a dual-phase forward-backward distillation process, the teacher learns new clusters while preserving previously discovered cluster structure without storing past data. FBCC represents a pioneering approach to UCC, demonstrating improved clustering performance across sequential tasks. Experiments on four benchmark datasets demonstrate that FBCC consistently outperforms existing continual learning baselines in clustering accuracy while significantly reducing catastrophic forgetting.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/09/2606.04343v1-robust-multi-view-clustering-against-imperfect-information",
+      "section": "quick",
+      "title_en": "Robust Multi-view Clustering against Imperfect Information",
+      "authors": "Zhichao Huang, Haochen Zhou, Hao Wang, Mouxing Yang, Xi Peng",
+      "date": "2026-06-03",
+      "pdf": "https://arxiv.org/pdf/2606.04343v1",
+      "score": "7.0",
+      "evidence": "对无标签多视图数据进行聚类以发现未知类别",
+      "tldr": "真实多视图数据常因视图缺失与对应噪声而面临不完美信息挑战，现有方法需可靠对应或完整实例，难以兼顾两者。本文提出后验引导潜在对应物推断框架 PLCI，将跨视图对应物建模为潜在变量，并融合实例级可靠性与原型级语义传输推断其后验，统一处理不完整视图与噪声对应。在六个多视图数据集上，与十种前沿方法对比实验表明 PLCI 显著提升了聚类鲁棒性，为不完美信息多视图聚类提供了新的统一解决范式。",
+      "tags": "query:cgcd",
+      "abstract_en": "Real-world multi-view data always suffer from imperfect information problem, where the view-specific observations are absent (i.e., Incomplete Views, IV) and cross-view correspondences are mismatched (i.e., Noisy Correspondences, NC) for certain instances. As a remedy, numerous IV- and NC-oriented multi-view clustering (MvC) methods have been proposed, which however require either reliable correspondences or sufficiently complete instances, thus stopping short of addressing the imperfect information problem. In contrast, we observe that both IV and NC challenges originate from the same issue of imperfect cross-view counterpart information, where the counterpart of an anchor instance in another view might be either unavailable or unreliable. Based on the observation, we propose a novel robust MvC framework, termed Posterior-guided Latent Counterpart Inference (PLCI), which could handle both IV and NC in a unified manner. Specifically, PLCI formulates the desired cross-view counterpart of each anchor instance as a latent variable, and integrates both instance-level reliability and prototype-level semantic transport to infer the posterior distribution of the latent counterpart. Extensive experiments on six widely-used multi-view datasets against 10 state-of-the-art MvC methods demonstrate the effectiveness of PLCI for tackling the imperfect information problem. The code will be released upon acceptance.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/09/2606.02887v1-a-nonmonotone-gradient-based-algorithm-for-symmetric-nonnegative-matrix-factorization-and-graph-clustering",
+      "section": "quick",
+      "title_en": "A Nonmonotone Gradient-Based Algorithm for Symmetric Nonnegative Matrix Factorization and Graph Clustering",
+      "authors": "Ryan Swart, Johannes Brust",
+      "date": "2026-06-01",
+      "pdf": "https://arxiv.org/pdf/2606.02887v1",
+      "score": "6.0",
+      "evidence": "通过对称NMF的图聚类为未标注数据中的新类发现提供可迁移的聚类方法",
+      "tldr": "对称非负矩阵分解（SymNMF）在图聚类中应用广泛，但投影梯度法收敛缓慢。本文提出SNMPBB，首次将非单调Barzilai-Borwein方法用于SymNMF，并扩展至图拉普拉斯正则化和低秩近似场景。在合成数据上速度提升6倍，实现在六个真实聚类数据集上精度匹配或超越对比方法，低秩近似在34个SuiteSparse矩阵上运行时间与残差均优于现有算法。",
+      "tags": "query:cgcd",
+      "abstract_en": "Symmetric nonnegative matrix factorization (Symmetric NMF) approximates a matrix as $WW^T$ with nonnegative rectangular factor $W$. It has broad applications in graph clustering and machine learning. In contrast to the NMF, projected gradient methods for the symmetric problem had been associated with slow convergence. To address this, we introduce SNMPBB, the first adaptation of nonmonotone projected Barzilai-Borwein methods to Symmetric NMF, demonstrating that gradient algorithms are significantly more effective than previously understood. We further extend SNMPBB to graph clustering using the graph Laplacian regularization (Graph-SNMPBB) and to large problems with low-rank approximations (LAI-SNMPBB). For all variants we prove global convergence to first-order stationary points and also that Barzilai-Borwein curvature information is preserved with randomized approximations. On synthetic data, SNMPBB achieves 6 times speedup over the alternative SymANLS for similar residuals, with advantages growing at higher ranks. Across six real-world clustering benchmarks, Graph-SNMPBB matches or exceeds SymANLS accuracy. Lastly, LAI-SNMPBB outperforms state-of-the-art LAI-SymPGNCG on 34 SuiteSparse matrices in both runtime and residual quality.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

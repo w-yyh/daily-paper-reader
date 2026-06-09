@@ -1,0 +1,604 @@
+Title: A Nonmonotone Gradient-Based Algorithm for Symmetric Nonnegative Matrix Factorization and Graph Clustering
+
+URL Source: https://arxiv.org/pdf/2606.02887v1
+
+Published Time: Wed, 03 Jun 2026 00:19:55 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+A NONMONOTONE GRADIENT-BASED ALGORITHM FOR SYMMETRIC NONNEGATIVE MATRIX FACTORIZATION AND GRAPH CLUSTERING ∗
+
+RYAN SWART † AND JOHANNES J. BRUST †
+
+Abstract. Symmetric nonnegative matrix factorization (Symmetric NMF) approximates a ma-trix as W W T with nonnegative rectangular factor W . It has broad applications in graph clustering and machine learning. In contrast to the NMF, projected gradient methods for the symmetric prob-lem had been associated with slow convergence. To address this, we introduce SNMPBB, the first adaptation of nonmonotone projected Barzilai-Borwein methods to Symmetric NMF, demonstrating that gradient algorithms are significantly more effective than previously understood. We further extend SNMPBB to graph clustering using the graph Laplacian regularization (Graph-SNMPBB) and to large problems with low-rank approximations (LAI-SNMPBB). For all variants we prove global convergence to first-order stationary points and also that Barzilai-Borwein curvature informa-tion is preserved with randomized approximations. On synthetic data, SNMPBB achieves 6 times speedup over the alternative SymANLS for similar residuals, with advantages growing at higher ranks. Across six real-world clustering benchmarks, Graph-SNMPBB matches or exceeds SymANLS accuracy. Lastly, LAI-SNMPBB outperforms state-of-the-art LAI-SymPGNCG on 34 SuiteSparse matrices in both runtime and residual quality. 
+
+Key words. Nonnegative Matrix Factorization, Symmetric Nonnegative Matrix Factorization, projected gradient descent, Barzilai-Borwein step size, nonmonotone line search 
+
+MSC codes. 15A23, 65F55, 90C26, 05C85 
+
+1. Background. Nonnegative matrix factorization (NMF) is a widely used tool for sparse data extraction and machine learning. The nonnegativity constraint natu-rally aligns with many real-world datasets and allows for direct interpretations (Guo et al. [17]). Specifically, the NMF represents each data column as a positive combina-tion of nonnegative “basis” vectors, allowing the data to be decomposed into a sum of topics or features. Applications of NMF include dimensionality reduction in images (Li et al. [32], and Jing et al. [23]), text documents (Shahnaz et al. [37], and Tu et al. [38]), noise (Jaiswal et al. [22]), bioinformatics (Pascual-Montano et al. [36]), and data compression (Kong et al. [26]). Mathematically, NMF factorizes V ∈ Rm×n 
+
+> +
+
+into two low rank nonnegative ma-trices W ∈ Rm×r 
+
+> +
+
+and H ∈ Rr×n 
+
+> +
+
+, so that V ≈ W H . We define the factorization by (1.1) minimize  
+
+> W,H ≥0
+
+f (W, H ) = 12 ∥V − W H ∥2
+
+Typically r ≪ min( m, n ) and the norm in (1.1) is the Frobenius norm. The problem itself is NP-hard (cf. Vavasis [39]), because f is nonconvex in W and H. Further-more, the factorization is not unique; for any W , H pair and generalized permutation matrix D ∈ Rr×r, W D and D−1H are equally valid factors since W H = W DD −1H.However, when one factor is fixed (i.e., held constant), the problem becomes convex in the other. Thus, many algorithms use a sequence of alternating subproblems, in which W (i+1) is solved for with fixed H(i) and then fixing this newly-obtained W (i+1) 
+
+> ∗
+
+Submitted to the editors Spring/Summer 2026. 
+
+Funding: This work was partially supported by the startup fund at Arizona State University Grant PG16270 and the Simons Travel Support for Mathematicians GR48329  
+
+> †
+
+School of Mathematical and Statistical Sciences, Arizona State University, Tempe, AZ (rswart@asu.edu, jjbrust@asu.edu). 1
+
+> arXiv:2606.02887v1 [cs.LG] 1 Jun 2026
+
+2 R. SWART AND J. J. BRUST 
+
+to solve for H(i+1) . In fact, this strategy has been widely used in Lee and Seung’s multiplicative update [29] and the ANLS method (Kim and Park [24]). 
+
+1.1. Notation. We use Householder notation so that a matrix, vector and scalar are denoted as A, a, α . Unless otherwise specified, the norm ∥ · ∥ represents the Frobenius norm, ∥ · ∥ = ∥ · ∥ F , or the corresponding vector 2-norm. The absolute value of a matrix |A| represents elementwise absolute values |aij | . The Frobenius inner product of two m × n matrices A and B is ⟨A, B ⟩ = P 
+
+> i,j
+
+Aij Bij , and therefore 
+
+∥A∥2 = ⟨A, A ⟩. The gradient of a matrix valued scalar function f : Rm×n → R is the matrix ∇f ∈ Rm×n. For a function with two variables f (A, B ), when one variable is fixed we use the notation f (A, B (i)) := f (A) and f (A(i), B ) := f (B). The gradients are then denoted as ∇f (A) and ∇f (B). The identity matrix is I with the dimension depending on the context. The ith column of the identity is ei, and e represents the vector of all ones. The projection of A’s elements onto the nonnegative constraint is (Proj[ A]) ij = {Aij if Aij ≥ 0; 0 if Aij < 0}. We use a subscript k to denote an inner iteration and superscript (i) for an outer iteration, e.g., A(i) 
+
+> k
+
+. Depending on the context we suppress the outer iterations. 
+
+1.2. Symmetric NMF. Note that when V ∈ Rn×n is symmetric the NMF in (1.1) may yield factors W and H that accurately fit the data, but are otherwise unrelated. Symmetric NMF is a variant of the nonnegative matrix factorization, and requires each factor to equal the other’s transpose: V ≈ W W T . V may be the similarity matrix of a Graph and represents pairwise relationships (Kuang et al. [28]). Symmetric NMF has been shown to be equivalent to K-means clustering and can cluster nonlinear graph data (see Ding et al. [13]). The Symmetric NMF problem, although it concerns only one variable, is in some ways more difficult than minimizing (1.1). The objective may be defined as (1.2) f (W, W ) = 12 V − W W T 2
+
+This is quartic in W and also nonconvex (Li et al. [30]). Similar to the unsymmetric problem, there is no unique solution. Unconstrained solvers with additional nonneg-ativity projections could be applied to the problem (1.2) (e.g., [7, 10, 8] ), however because of its ample use in machine learning, prominent methods for Symmetric NMF have emerged. Kuang et al. [28] proposed a Symmetric Alternating Nonnegative Least Squares (SymANLS) algorithm that has been very successful with larger datasets. In this method, the standard NMF problem is modified by adding a “symmetric pen-alty”: (1.3) f (W, H ; λ) = 12 ∥V − W H ∥2 + λ
+
+2 W − HT 2
+
+The penalty term induces symmetry for sufficiently large λ (Li et al.[33]). Overall, SymANLS is very robust and has good convergence behavior under mild conditions. However, it still requires nonnegligible computational expense per iteration due to a sequence of matrix least-squares solves. The authors also proposed a Newton-based algorithm [28], which typically converges to higher accuracy but is also computation-ally much more expensive. Recently, Hayashi et al.[19] proposed the Low-rank Approximate Input SymNMF, or LAI-SymNMF approach. This is a class of methods that approximate the input SYMMETRIC NMF 3matrix, V , through randomized sketching. Using an approximate singular value de-composition, the authors drastically lowered the per-iteration cost of several NMF al-gorithms by calculating matrix multiplications using low rank approximations. They propose LAI-SymPGNCG, which implements the new features and is based on the PGNCG algorithm (Kim and Park, [25]). 
+
+1.3. Projected Gradient for NMF. For the NMF (without symmetry), ar-guably the best known method is the multiplicative update due to Lee and Seung, [29]. Related to this are projected gradient methods which use projections to en-force feasibility. Instead of solving a sequence of nonnegative least-squares prob-lems based on (1.1), these methods use projected gradients (PG). For the problem min W ≥0 f (W, H (i)), projected gradient descent uses the iteration: (1.4) Wk+1 = Proj[ Wk − αk∇f (Wk)] .
+
+The projection is computationally extremely inexpensive and requires only mr sign checks. The computational efficiency of PG usually depends on appropriate step-sizes, because gradient type algorithms are sensitive to scaling and may converge slowly on problems with large curvature (Bertsekas [4]). Since evaluating f (W, H ) in (1.1) is often expensive, conventional line-search techniques that require multiple objective evaluations may be impractical. On the other hand, simple step-size rules such as constant or exponentially decaying sizes, e.g., αk = 1 
+
+> k
+
+, k > 0, may not work well for highly nonlinear problems. A scaling rule that has proven effective is the Barzilai and Borwein (BB) step-size (Barzilai and Borwein [2], [6], [9]). For the NMF a method using this BB step size is the Quadratic Regularization Projected Barzilai–Borwein (QRPBB) algorithm outlined in Huang et al. [21]. This method incorporates the above update rule after finding Zk where Zk is the solution to the quadratically regularized and strongly convex subproblem (1.5) minimize  
+
+> Z≥0
+
+f (Wk) + ⟨∇ f (Wk), Z − Wk⟩ + ρ
+
+2 ∥Z − Wk∥2
+
+Here ρ > 0 is a scaling for the size of the quadratic regularization. A line search is then performed on the descent direction created by taking a gradient descent step from Zk with the Barzilai-Borwein step-size, i.e., Dk = Proj[ Zk − αk∇f (Zk)] − Zk to update W as Wk+1 = Zk + βkDk with step-size βk > 0. A modification to QRPBB is the Nonmonotone Projected Barzilai-Borwein (NMPBB) algorithm, which adds a relaxation factor φ > 0 for Wk+1 = Zk + φβ kDk as well as a nonmonotone line search (Li et al. [31]). QRPBB has been shown to converge faster than established methods like NeNMF (Guan et al. [16]), PG (Lin [34]) and APBB2 (Han et al. [18]) while NMPBB outperformed QRPBB (see the experiments in [21] and [31]). A pseudocode of NMPBB is in Algorithm 2.1. Surprisingly, vanilla projected gradient for the symmetric NMF has been shown to converge significantly slower than for the unsymmetric factorization (Zhu et al. [41]). 
+
+1.4. Contributions. Projected gradient methods have traditionally been over-looked for symmetric NMF due to slow convergence and poor robustness compared to alternating least-squares approaches (Zhu et al. [41], Hayashi et al. [19]). This work demonstrates that with proper adaptations projected gradients for symmetric NMF may outperform established alternatives in both speed and accuracy. To this end, we introduce SNMPBB, the first adaptation of alternating nonmonotone Barzilai-Borwein methods to symmetric NMF. Different from naive symmetric extensions that 4 R. SWART AND J. J. BRUST 
+
+1 2 3
+
+0.2
+
+0.4
+
+0.6
+
+Time (sec) 
+
+> Accuracy
+
+Graph-SNMPBB (ours) PGD Modified PGD 
+
+Fig. 1: Clustering accuracy vs. time on MNIST averaged over 10 runs. Graph-SNMPBB reaches near-peak accuracy faster than both PGD [40] and Modified PGD (using a larger step-size), motivating the approach developed in this paper. set H = W T , we employ a penalty-based coupling that maintains two variables while enforcing symmetry through gradients. For graph clustering, we extend this to Graph-SNMPBB by incorporating graph Laplacian regularization to address sometimes poor soft-clustering behavior. Furthermore, we prove global convergence to first-order sta-tionary points under this penalty-based formulation and establish that graph regu-larization preserves this convergence. Moreover, we interface the method with the recent Low-rank input (LAI) methodology (Hayashi et al. [19]) and show that the BB step-size is unchanged by the low-rank approximation error. For synthetic matrices, SNMPBB has a 6 times speedup over SymANLS for convergence and 2 times speedup over SymNewton while consistently achieving a better relative residual. Across six real-world benchmarks, Graph-SNMPBB requires far less time than SymANLS to reach high clustering accuracy. Further, LAI-SNMPBB outperforms state-of-the-art LAI-SymPGNCG on 34 SuiteSparse matrices in both speed and residual quality; we also found that early stopping of inner iterations (3-5 steps) prevents overfitting to approximation error. Figure 1 provides an illustrative example of our algorithm: on the MNIST dataset, Graph-SNMPBB achieves competitive clustering accuracy in substantially less time than a standard PGD algorithm. 
+
+2. Algorithm. 2.1. SNMPBB. A fast and effective method for the nonnegative factorization in (1.1) is the nonmonotone projected Barzilai-Borwein method (NMPBB). Algorithm 2.1 summarizes iterates for Wk+1 , while Hk+1 may be computed equivalently. The parameter ηk accounts for the previous objective function values and θk defines a sufficient decrease condition in the nonmonotone line search (this may be constant, e.g., 10 −3). The parameter φ is the “relaxation” factor that increases the descent magnitude. Furthermore, αmin and αmax are the fixed constants for Barzilai-Borwein calculations. To find β > 0 in the linesearch, typically a backtracking approach is used. I.e., starting from β(0) = 1 the step length is successively reduced until the sufficient SYMMETRIC NMF 5
+
+Algorithm 2.1 Nonmonotone Projected Barzilai-Borwein (NMPBB) 
+
+Require: ∇f (W ), W0 = W (i), H0 = H(i), η0 = η(i), θ0 = θ(i), φ, 0 < α min < α max  
+
+> 1:
+
+for k = 0 , 1, 2, . . . do  
+
+> 2:
+
+Compute projected gradient step 
+
+Zk = Proj Wk − 1 
+
+> ρ0
+
+∇f (Wk), ρ0 = ∥H0HT 
+
+> 0
+
+∥2 . 
+
+> 3:
+
+Get descent direction 
+
+Dk = Proj Zk − αk∇f (Zk) − Zk
+
+where 
+
+αk = min αmax , max αmin , ⟨Sk−1, S k−1⟩⟨Sk−1, Y k−1⟩
+
+and Sk−1 = Wk − Wk−1 and Yk−1 = ∇f (Wk) − ∇ f (Wk−1) 
+
+> 4:
+
+Nonmonotone line search. Find β s.t. 
+
+f (Zk + βD k) ≤ Fk + βθ k⟨∇ f (Zk), D k⟩
+
+where 
+
+Fk =
+
+(
+
+f (W0) if k = 0 
+
+f (Wk) + ηk−1(Fk−1 − f (Wk)) if k ≥ 1Then let Wk+1 = Zk + φβD k 
+
+> 5:
+
+end for 
+
+decrease condition in line 4 is satisfied. Note that NMPBB is designed for the NMF, and thus for two variables. The symmetric NMF, however, has only one variable and thus may lend itself to a simpler, albeit naive approach. Consider Algorithm 2.1 in the form of a function: nmpbb( W (i), H (i), H (i)H(i)T , η (i), θ (i), φ, α min , α max ). Thus an immediate approach is to simply compute the updates as nmpbb( W (i), W (i),W (i)W (i)T , η (i), θ (i), φ, α min , α max ) for the symmetric factorization and set H(i+1) ←
+
+W (i+1) T after each call. Nonetheless, this approach performs poorly in practice, possibly due to the symmetric assignments effectively reducing the degrees of freedom (i.e., fewer variables to fit the data). Instead, we develop a new approach that keeps two variables but couples them to obtain symmetric factorizations. In particular, we use a quadratic penalty similar to Li et al. [33], and adapt it for a gradient, i.e., NMPBB type, algorithm. This means using an objective such as (1.3), with a penalty parameter λ ≥ 0. We use Algorithm 2.1 with objective f given by (1.3) and the new gradients 
+
+∇W f (W, H (i); λ) = W H (i)H(i)T − V H (i)T + λW − λH (i)T
+
+(2.1) 
+
+∇H f (W (i), H ; λ) = W (i)T W (i)H − W (i)T V + λH − λW (i)T
+
+(2.2) We call this algorithm SNMPBB. For even large matrices, SNMPBB converges quickly and to similar residual values as algorithms such as SymANLS. However, for graph clustering, SNMPBB alone converges slowly, even with special initializations. 6 R. SWART AND J. J. BRUST 
+
+2.2. Graph-SNMPBB. Graph clustering is an important application, since the adjacency matrix of an undirected graph (i.e., all edges are bidirectional) is symmetric and nonnegative. In particular, any clustering problem may be formulated as a graph clustering problem by preprocessing the data with a K-nearest neighbor algorithm. However, applying the NMF directly to a graph may yield poor performance, because the factorization is known to result in so-called soft-clustering (Gao et al. [15]). Nonetheless, it has been shown that sparsity and inclusion of a graph’s geometric structure may help to increase clustering quality (Berahmand et al. [3]). Therefore, we propose to enforce additional orthogonality and sparsity with the following objective (2.3) f (W, H ; λ, γ ) = 12 ∥V − W H ∥2 + λ
+
+2 W − HT 2 + γ
+
+2 tr( HLH T )where L is the graph Laplacian derived from the problem, L = I − D−1/2V D −1/2
+
+and D is the diagonal degree matrix of V , i.e., dii = eTi V e i, 1 ≤ i ≤ n. Note that the use of the graph Laplacian for the NMF has been described before (see Cai et al. [11]), however, the authors develop a multiplicative update rule and do not explicitly enforce the symmetry of the problem. We point out that (2.3) introduces the additional sparsity parameter γ ≥ 0. Importantly, (2.3) may be effectively used with Algorithm 2.1 by developing the extended gradients 
+
+∇W f (W, H (i); λ, γ ) = W H (i)H(i)T − V H (i)T + λW − λH (i)T
+
+(2.4) 
+
+∇H f (W (i), H ; λ, γ ) = W (i)T W (i)H − W (i)T V + λH − λW (i)T + γHL (2.5) This produces Graph-SNMPBB. The best value of γ depends on the size and norm of 
+
+V as well as the type of problem. We describe parameter choices in Section 4.2. While these modifications enhance graph clustering, proper initialization and preprocessing is vital for good results. Like in Kuang et al. [28], the similarity matrix for data V
+
+is computed by applying a Gaussian kernel with parameter σ and keeping only the nearest K neighbors for each node, setting all other entries to zero. This strategy keeps the most relevant local connections for each data point in the original matrix. 
+
+2.3. LAI-SNMPBB. Using the Low-rank Approximate Input (LAI) methodol-ogy from Hayashi et al. [19], we also develop an LAI-SNMPBB algorithm. Specifically, we sketch the eigendecomposition for the input matrix V and then anywhere that V is used in a matrix multiply, we replace it with the thinner matrices from the decomposi-tion. For a random sketch S ∈ Rn×ℓ we compute the thin QR factorization V S = QR 
+
+and the small eigendecomposition QT V Q = P EP T , where P is ℓ × ℓ orthogonal and 
+
+E is diagonal. Defining orthonormal U = A := QP and B := EU T we approximate (2.6) V ≈ QQ T V QQ T = QP EP T QT = U EU T := AB 
+
+For SNMPBB, the calculation of V H , for example, is replaced with U E (U T H), where 
+
+U T H is formed first before left multiplying by U E (avoiding a large matrix multiply). The objective and gradients for LAI-SNMPBB are given by (1.3) and (2.1), (2.2) after replacing V by AB .
+
+2.4. Algorithmic Components and Design. SNMPBB enhances standard projected gradient descent with three mechanisms: an adaptive Barzilai-Borwein step-size using matrices instead of vectors, a nonmonotone line search strategy, and a two-stage projection scheme. SYMMETRIC NMF 7In line 3 of Algorithm 2.1, a Barzilai-Borwein (BB) step-size is used as αk. It pro-vides an adaptive scaling that approximates Newton-like behavior at first-order cost and was originally proposed for unconstrained vector optimization. For matrix-valued problems like NMF, we extend the vector BB step-size using the Frobenius inner prod-uct. In particular, we solve the least-squares problem min α ∥Sk−1 − αY k−1∥2 
+
+> F
+
+for m×r
+
+matrices Sk−1, Y k−1 to define 
+
+αk = ⟨Sk−1, S k−1⟩/⟨Sk−1, Y k−1⟩(2.7) To prevent extreme step-sizes when subsequent iterates are very similar (numer-ator goes to 0) or orthogonal (denominator goes to 0), we bound αk ∈ [αmin , α max ] in Algorithm 2.1, with (2.8) αk = min αmax , max αmin , ⟨Sk−1, S k−1⟩⟨Sk−1, Y k−1⟩
+
+Separately, Algorithm 2.1 performs two distinct projection operations (lines 2-3), which distinguish SNMPBB from standard projected gradient. The first trial point, 
+
+Zk, is defined by (2.9) Zk = Proj[ Wk − (1 /ρ 0)∇f (Wk)] , with ρ0 = H0HT 
+
+> 02
+
+This is a standard projected gradient step with automatic step-size scaling 1 /ρ 0.The scaling factor ρ0 is closely related to the Lipschitz constant of ∇W f (W, H ) with respect to W when H is fixed, i.e., ρ = HH T 
+
+> 2
+
++λ. Since λ is typically small relative to HH T
+
+> 2
+
+, it is omitted in the computation. Using ρ0 as the step-size denominator adapts to the local curvature induced by H. The descent direction Dk is defined by (2.10) Dk = Proj[ Zk − αk∇f (Zk)] − Zk
+
+This creates a search direction from Zk toward a second projected gradient point. Each projection incorporates different information. The first projection ( Zk) uses the current iterate Wk and Lipschitz constant ρk which captures H’s immediate influence. The second projection (along direction Dk) uses trial point Zk and BB step-size αk
+
+which captures curvature. Together, these provide a quasi-Newton-like update using only first-order information. Further, standard projected gradient methods require monotone decrease with f (Wk+1 ) < f (Wk) at every iteration. While this guarantees progress, it can be overly restrictive for nonconvex functions. SNMPBB relaxes the monotone requirement by comparing against a reference value Fk rather than the immediate previous objective f (Wk). In line 4 of the algorithm, this reference value is defined recursively: (2.11) 
+
+(
+
+F0 = f (W0)
+
+Fk = f (Wk) + ηk−1(Fk−1 − f (Wk)) for k ≥ 1where ηk ∈ [0 , 1) controls the “memory” of past iterates. When ηk = 0, we recover standard monotone descent, Fk = f (Wk). When ηk > 0, Fk becomes a weighted average of recent function values, allowing f (Wk+1 ) > f (Wk) as long as sufficient decrease holds relative to Fk. We accept a step Wk+1 = Zk + φβD k when (2.12) f (Wk+1 ) ≤ Fk + βθ k⟨∇ f (Zk), D k⟩8 R. SWART AND J. J. BRUST 
+
+where θk ∈ (0 , 1) is the Armijo parameter (cf. Armijo [1]) and β is found by backtrack-ing from β = 1. Typically, θk is a small constant like 10 −3. Note this Armijo-type condition is compared against Fk rather than f (Wk). The complete update is then as follows: (2.13) Wk+1 = Zk + φβD k
+
+where φ > 0 is a fixed relaxation factor as defined in Han et al.[18]. The relaxation factor φ amplifies this step under the assumption that the local model is overly con-servative. The authors experimentally determined that φ ≈ 1.7 was the best value of amplification. 
+
+3. Analysis. 3.1. Convergence. The following analysis is based on W , and is similar for H.
+
+Theorem 3.1. Consider the symmetric NMF objective function 
+
+(3.1) f (W, H ; λ) = 12 ∥V − W H ∥2 + λ
+
+2 ∥W − HT ∥2
+
+where W ∈ Rm×r 
+
+> +
+
+and H ∈ Rr×n 
+
+> +
+
+. Then the convergence analysis from Li et al. [31, Theorem 4] holds for SNMPBB, and any accumulation point of the sequence {Wk}k≥0
+
+is a first-order stationary point. Proof. We observe that SNMPBB based on Algorithm 2.1 can leverage the analy-sis for global convergence in Li et al.[31, Theorem 4]. Their result relies fundamentally on two properties outside of the algorithm itself: convexity of the objective and Lip-schitz continuity of its gradient. In order to give a self-contained discussion we restate the convergence arguments first. In particular, for [31, Lemma 1], the authors observe that the objective function 
+
+f (W ) = f (W, H (i)) = 12 V − W H (i) 2 is convex and its gradient is Lipschitz contin-uous. Then, it is shown that given the scaled projected gradient for step size αDα(W ) = Proj W − α∇f (W ) − W
+
+that for every W ≥ 0, 
+
+∇f (W ), D α(W ) ≤ − 1 
+
+> α
+
+∥Dα(W )∥2 and Dα(W ) = 0 ⇐⇒ W is stationary This is proved in Birgin et al. [5] and in [31, Lemma 2]. Furthermore, let Dk equal 
+
+Dα after the line search is completed. It is shown that 
+
+Dk(Zk) = 0 ⇐⇒ Zk is stationary which is in [31, Lemma 3]. This is then combined with the established nonmonotone reference sequence Fk in step 4 of algorithm 2.1 and established by straightforward algebra (using the descent bound above) that 
+
+f (Wk) ≤ Fk ≤ Fk−1 ≤ · · · ≤ F0,
+
+so {Fk} is nonincreasing and bounded below. This references both [31, Lemma 6] and [31, Theorem 1]. This implies 
+
+f  Zk + βkDk(Zk) ≤ Fk + θk βk ⟨∇ f (Zk), D k(Zk)⟩SYMMETRIC NMF 9and that each nonmonotone Armijo line search must terminate after finitely many backtracking steps by combining the descent estimate of the previous step with Lip-schitz continuity of ∇f . The resulting step sizes {βk} satisfy βk ≥ eβ > 0 whenever 
+
+Wk+1 is not already stationary, which forces a uniform amount of decrease in the nonmonotone reference [31, Lemma 7]. This yields lim k→∞ Fk = lim k→∞ f (Wk) and the existence of δ > 0 such that Fk − f (Wk+1 ) ≥ δ ∥Dk(Zk)∥2 [31, Lemma 8]. From this, lim k→∞ ∥Dk(Zk)∥ = 0 and hence any accumulation point of {Wk} is a first-order stationary point [31, Theorem 3, Theorem 4]. To apply this framework to our symmetric penalty objective (1.3), we verify con-vexity and gradient Lipschitz continuity. To show convexity for SNMPBB, we analyze the symmetric penalty term first. Since W − HT 2 = tr  (W − HT )T (W − HT ),which is quadratic in W when H is fixed (and vice versa), this term is convex. There-fore, f is still convex when this is added to ∥V − W H ∥2 
+
+> F
+
+, since the sum of convex functions is convex [16]. To show Lipschitz continuity, we use the fact that ∇W f (W ) = W HH T − V H T +
+
+λW − λH T
+
+∥∇ W f (W1) − ∇ W f (W2)∥2
+
+= W1HH T − V H T + λW 1 − λH T − W2HH T + V H T − λW 2 + λH T 2
+
+= (W1 − W2)HH T + λ(W1 − W2) 2
+
+= (W1 − W2)( HH T + λI r ) 2 where Ir ∈ Rr×r
+
+We let A = HH T + λI r , and by the proof of Lemma 2 in [16], we can say that 
+
+∥(W1 − W2)A∥2 ≤ δ21 ∥W1 − W2∥2 where δ1 is the largest singular value of A. There-fore, 
+
+∥∇ W f (W1) − ∇ W f (W2)∥ ≤ L ∥W1 − W2∥
+
+where L = δ1 = HH T
+
+> 2
+
++λ since λ shifts the eigenvalues by a positive amount. Thus, we have shown that the symmetric objective function (3.1) is convex and Lipschitz continuous and that thus SNMPBB converges to a stationary point according to the original argument. 
+
+3.2. Convergence properties for modifications. When adding graph regu-larization, the gradient for W remains unchanged since H is the only element in the modified objective function. In particular, the gradient for H changes through the addition of γH . Since the original function is strongly convex quadratic, adding a lin-ear term does not impact the original convexity. Further, we show that this gradient is also Lipschitz continuous. For the gradient w.r.t. W , the proof is unchanged. But w.r.t. H, and using similar algebra as before, 
+
+∥∇ H f (H1) − ∇ H f (H2)∥
+
+= (H1 − H2)( W T W + λI r + γL )
+
+Again, we let A = W T W + λI r + γL . The only difference is γL ; this is positive semidefinite since γ > 0 and L is the normalized graph Laplacian. Since W T W and 
+
+γL are both positive semidefinite, their sum is, as well. Further, when adding λI r
+
+where λ > 0, the largest eigenvalue is positive; let it equal δ1. Thus, ∥(H1 − H2)A∥2 ≤
+
+δ21 ∥H1 − H2∥2, and furthermore, 
+
+∥∇ H f (H1) − ∇ H f (H2)∥ ≤ L2 ∥H1 − H2∥10 R. SWART AND J. J. BRUST 
+
+where L2 is the Lipschitz constant equal to the largest eigenvalue of W T W +λI r +γL .Finally, for LAI-SNMPBB, convergence similarly holds, but for the low-rank version of V computed through randomized sketching. We restate proposition 3.1 from Hayashi et al, to obtain a general error bound: (3.2) 0 ≤ ∥ V − W ∗H∗∥ − min  
+
+> W,H
+
+∥V − W H ∥ ≤ 2 ∥V − AB ∥ = 2 μ
+
+where W ∗ and H∗ is the computed solution of LAI-SNMPBB, i.e. lim i→∞ W (i)H(i) =
+
+W ∗H∗. That is, the gap between the LAI algorithm’s residual for V and the optimal residual is at most twice the error of approximating V by AB , μ = ∥V − AB ∥
+
+3.3. LAI Curvature Analysis. We now analyze how the LAI approximation affects the gradient and curvature information used by SNMPBB. This provides theo-retical context for the empirical results in Figures 4 and 5. Recall that the LAI objec-tive replaces V with a low rank approximation AB where A ∈ Rm×ℓ and B ∈ Rℓ×n.Then μ = ∥V − AB ∥ measures the approximation quality. For SNMPBB, the gradient with respect to W with LAI approximations is (3.3) ∇W fLAI (W ) = W HH T − ABH T + λW − λH T
+
+Now, the bias created by the modification when compared to the original, non-LAI objective is (3.4) ∇W fLAI (W ) − ∇ W f (W ) = ( V − AB )HT
+
+We note that, given the definition of μ and properties of the Frobenius norm, the gradient error ϵ satisfies (3.5) ϵ = ∥∇ W fLAI (W ) − ∇ W f (W )∥ ≤ μ ∥H∥
+
+for all W . Further, the BB step size αk computed using fLAI is identical to the BB step size computed from f :(3.6) Y LAI  
+
+> k−1
+
+= ∇W fLAI (Wk) − ∇ W fLAI (Wk−1) = ( Wk − Wk−1)( HH T + λI ) = Y true 
+
+> k−1
+
+Since H is held fixed here, the bias term ( V − AB )HT is constant in W and cancels exactly in the gradient difference. The BB step size therefore depends only on the curvature of fLAI with respect to W , which equals that of f . The quality of the BB step size remains the same as if V was still full rank. The only effect of the approximation is on the gradient bias which decreases as l increases and μ approaches 0. 
+
+4. Numerical Experiments. All numerical experiments are performed on a 64-bit macOS laptop with 64GB RAM and an Apple M1 Max chip with 10 CPU cores. The tests are run on MATLAB R2025a. A GitHub repository contains the codes: https://github.com/rswart0604/SNMPBB. 
+
+4.1. Overview. We summarize the symmetric NMF algorithms used for the comparisons. 
+
+• SymANLS [28]: Alternating nonnegative least squares; O(n2r2)
+
+• SymNewton [28]: Constrained Newton updates; O(n3r3)
+
+• PGD [40]: Proj. gradient on both W ,H simultaneously; O(n2r)
+
+• LAI-SymPGNCG [19]: Gauss-Newton with conjugate gradient solver and low-rank approximate input; O(n2r2)SYMMETRIC NMF 11 
+
+• SNMPBB (our): Proj. gradient with BB step, nonmnt. line search; O(n2r)
+
+• Graph-SNMPBB (our): Proj. gradient with BB step, nonmnt. line search and graph regularization parameters; O(n2r)
+
+• LAI-SNMPBB (our): Proj. gradient with BB step, nonmnt. line search and low-rank approximate input; O(nℓr )We also consider a modified PGD algorithm that uses a larger step-size for each update step as opposed to the Lipschitz estimate in the code for [40]. 
+
+4.2. Practical Considerations for SNMPBB. There are three main hyper-parameters in SNMPBB: λ, the value of K for the K-means preprocessing, and γ. A too-large value of λ will cause the sparsity of W and H to increase too much; the same is true for γ. Some guidelines for the hyperparameters are: (1) The symmetric penalty parameter, λ, should scale roughly with the size of the matrix and its magnitude. For synthetic data, a good value is about 0 .01 · ∥ V ∥. This ensures that the weight of the symmetric penalty is approximately equal to that of the objective function’s gradient itself and does not dominate nor get ignored. (2) γ follows a similar fashion, typically also set to 0 .001 · ∥ V ∥. (3) The value of K in the K-means preprocessing of graph data for Graph-SNMPBB should also roughly scale with the data. This parameter may vary widely depending on the sparsity of data and number of clusters. Some values include for 3000 points, k = 80; for 1000, k = 50; and for 300, k = 15. (4) Typically, purely random initialization for W0 and H0 with values between 0 and 1 works well. However, for many problems, the following methodology developed by [28] is effective: generate a random matrix of values from 0 to 1 and then multiply this by 2 · pζ/r , where ζ is the average value of the elements of V and r is the ap-proximating rank; that is, W0 ∈ Rm×r . To find H0 we simply transpose W0. This is the method of initialization used for every numerical experiment. For graph-based methods, it is best to set W0 and H0 to the singular value decomposition of V . As-suming V ≈ U EP T with E as the diagonal matrix of singular values, W0 is set equal to U E 1/2 and H0 to E1/2P T . However, due to the high cost of such initializations, they are not necessarily recommended for larger problems and not used in this paper. (5) For some problems that include very large and sparse matrices, sometimes the line search struggles to find an effective magnitude for the descent direction. This is likely due to the lack of curvature for such problems. To resolve this, we suggest reducing the maximum number of iterations for the line-search. 
+
+4.3. Synthetic data. We first validate on synthetic data. Our goal is to demon-strate that the combination of BB step-sizes, nonmonotone line search, and the penalty-based symmetric formulation yields a method that is fast and accurate even when compared to well-known higher-order methods. Similar as in the work of [21] and [31] we provide a comparison for dense synthetic data first. For various sizes and ranks we initialize a matrix W ∈ Rn×r 
+
+> +
+
+and compute 
+
+V = W W T ; the residual is ∥V − W H ∥ / ∥V ∥. The convergence of the SNMPBB, Symmetric Alternating Nonnegative Least Squares (ANLS), and Symmetric Newton algorithms are presented in table 1. The results of table 1 show that SNMPBB converges to similar tolerances as ANLS [28] and SymNewton [28] in as much or less time. Notably, as the rank r grows, the time to convergence for ANLS and SymNewton grows much larger than for SNMPBB while the residual remains similar. This trend is true of even smaller problems. While the value of m has some influence on the time, r has a more notable effect. This shows that SNMPBB may perform better for larger problems with high-rank settings. 12 R. SWART AND J. J. BRUST 
+
+m r Algorithm Time Residual 100 2 SNMPBB 3.943 × 10 −3 1.318 × 10 −1
+
+ANLS 9.971 × 10 −3 1.327 × 10 −1
+
+Newton 6.659 × 10 −3 2.398 × 10 −1
+
+100 5 SNMPBB 9.257 × 10 −3 7.844 × 10 −2
+
+ANLS 1.228 × 10 −1 9.530 × 10 −2
+
+Newton 1.083 × 10 −2 1.042 × 10 −1
+
+100 20 SNMPBB 9.291 × 10 −2 1.333 × 10 −2
+
+ANLS 5.228 × 10 −1 1.629 × 10 −1
+
+Newton 3.482 × 10 −2 9.520 × 10 −2
+
+200 2 SNMPBB 4.911 × 10 −3 1.412 × 10 −1
+
+ANLS 6.900 × 10 −2 1.413 × 10 −1
+
+Newton 1.570 × 10 −2 1.479 × 10 −1
+
+200 5 SNMPBB 2.336 × 10 −2 8.287 × 10 −2
+
+ANLS 2.094 × 10 −1 8.848 × 10 −2
+
+Newton 3.387 × 10 −2 9.047 × 10 −2
+
+200 20 SNMPBB 8.474 × 10 −2 1.533 × 10 −2
+
+ANLS 1.084 1.338 × 10 −1
+
+Newton 9.246 × 10 −2 8.643 × 10 −2
+
+300 2 SNMPBB 9.745 × 10 −3 1.438 × 10 −1
+
+ANLS 1.470 × 10 −1 1.439 × 10 −1
+
+Newton 3.628 × 10 −2 1.590 × 10 −1
+
+300 5 SNMPBB 3.659 × 10 −2 8.066 × 10 −2
+
+ANLS 5.641 × 10 −1 8.965 × 10 −2
+
+Newton 7.296 × 10 −2 8.824 × 10 −2
+
+300 20 SNMPBB 1.217 × 10 −1 1.803 × 10 −2
+
+ANLS 1.776 1.233 × 10 −1
+
+Newton 2.007 × 10 −1 8.645 × 10 −2
+
+500 2 SNMPBB 2.695 × 10 −2 1.460 × 10 −1
+
+ANLS 1.549 × 10 −1 1.460 × 10 −1
+
+Newton 1.034 × 10 −1 1.461 × 10 −1
+
+500 5 SNMPBB 1.158 × 10 −1 7.888 × 10 −2
+
+ANLS 8.276 × 10 −1 8.245 × 10 −2
+
+Newton 2.273 × 10 −1 8.085 × 10 −2
+
+500 20 SNMPBB 2.158 × 10 −1 1.769 × 10 −2
+
+ANLS 2.871 1.189 × 10 −1
+
+Newton 6.353 × 10 −1 1.553 × 10 −1
+
+1000 2 SNMPBB 6.556 × 10 −2 1.516 × 10 −1
+
+ANLS 2.692 × 10 −1 1.516 × 10 −1
+
+Newton 4.412 × 10 −1 2.483 × 10 −1
+
+1000 5 SNMPBB 4.346 × 10 −1 8.450 × 10 −2
+
+ANLS 1.218 8.463 × 10 −2
+
+Newton 7.044 × 10 −1 2.776 × 10 −1
+
+1000 20 SNMPBB 6.035 × 10 −1 1.774 × 10 −2
+
+ANLS 6.044 9.781 × 10 −2
+
+Newton 2.246 1.333 × 10 −1
+
+Table 1: Runtime and relative residual comparisons on dense synthetic symmetric NMF problems. For each experiment, a random matrix W ∈ Rn×r 
+
+> +
+
+is used to form the symmetric input V = W W T . Across all settings, SNMPBB achieves residuals comparable to or lower than SymANLS [28] and SymNewton [28] while requiring less computational time. The largest advantages occur for higher-rank factorizations where scalability benefits of first-order gradient methods become most apparent. SYMMETRIC NMF 13 
+
+4.4. Geometric graph clustering. For graph clustering, we first compare Graph-SNMPBB to SNMPBB, SymANLS, PGD, and SymNewton on a bullseye dataset inspired by Kuang et al. [28]. From Fig. 2, the convergence is clearly much faster for Graph-SNMPBB than regular SNMPBB or even SymANLS. For larger num-bers of points the value of K in the nearest neighbors preprocessing is increased (cf. the discussion in Sec. 4.2). Furthermore, Graph-SNMPBB and SNMPBB may take advantage of sparsity when computing gradients and especially when using the Lapla-cian. Visual graph data for the 3000 point bullseye is shown in the two right plots of figure 2; the nonlinearity of the bullseyes is pertinent to the use case of symmetric NMF. 4 6 8 10 0.40.60.8Time (sec) Accuracy Graph-SNMPBB SNMPBB Graph-SNMPBB (ours) ANLS PGD SNMPBB Newton Fig. 2: Convergence and clustering results on a concentric bullseye dataset ( n =3000 points, r = 3 clusters, K = 80 nearest neighbors). Left: clustering accuracy vs. wall-clock time for all five algorithms averaged over 10 random initializations. Right: final cluster assignments produced by Graph-SNMPBB (left) and SNMPBB (right). Graph-SNMPBB achieves higher clustering accuracy in less wall-clock time than competing methods while correctly recovering the nonlinear ring structure more often. 
+
+4.5. Higher-dimensional graph clustering. For other clustering tasks, we use the following real world datasets: 1. COIL20 1, or Columbia Object Image Library with 20 objects, is an image library from Columbia University that contains 1440 normalized images of toys with the size of each image being 128 by 128 pixels of grayscale. The background has been discarded from each image and the object is fit to the border. For each object, each image was taken 5 degrees apart as the object was rotated around its center, giving 72 images for each object. 2. Isolet1 2: This dataset contains spoken letter recognition data. 30 subjects said each letter of the alphabet twice. There are 1560 examples and each example has 617 features. 3. MNIST Train 2 contains 128 by 128 pixel images of handwritten digits in grayscale. The training set uses 2000 images and 10 classes (one for each digit) split evenly. 4. The ORL 3 (Olivetti Research Laboratory) face database contains 40 different 
+
+> 1https://www.cs.columbia.edu/CAVE/software/softlib/coil-20.php
+> 2http://www.cad.zju.edu.cn/home/dengcai/Data/MLData.html
+> 3https://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html
+
+14 R. SWART AND J. J. BRUST 
+
+people whose faces were taken photos of at various times with various lightings and facial details/expressions. There are 10 different normalized 32 by 32 pixel grayscaled images for each person, resulting in 400 examples and 40 classes. 5. Reuters-21578 4 is a popular collection of texts from the Reuters newswire that categorizes financial news across categories. The set contains 8293 different articles with 18933 words; our analysis uses the 20 largest clusters with most articles, resulting in 7800 total articles and 20 classes. 6. The TDT2 5 set is a collection of word documents (from the first half of 1998) including 2 newswires, 2 television programs, and 2 radio programs. We again only use the term documents from the top 20 clusters by size, resulting in 8741 documents with 36771 words in the encoding. Figure 3 shows, averaged over 10 runs, the results of different algorithms’ accuracy versus time when clustering these datasets. We found that the clustering methodol-ogy from [28] worked much better for many algorithms than the preprocessing steps described earlier for the geometric clustering. Every algorithm in the figure uses this different processing. The same random initialization was used for each algorithm with the methodology described earlier. Furthermore, we do not show the results for either SNMPBB without graph regularization or Newton methods due to very poor perfor-mance in clustering. This underpins the importance of the graph regularization in the Graph-SNMPBB algorithm. Graph-SNMPBB demonstrates consistently strong performance across all six datasets, achieving either the best or near-best clustering accuracy in significantly less time than competing methods. Compared to specifi-cally ANLS, it matches or exceeds its final accuracy on five of six datasets while still converging substantially faster. These speed advantages are more pronounced on larger, sparser datasets like Reuters and TDT2 (where the computational benefits of the O(n2r) complexity versus O(n2r2) for ANLS become evident). The relative performance varies with dataset characteristics. On image datasets with strong visual structure such as COIL20 or MNIST, Graph-SNMPBB shows the largest advantage. For text datasets like Reuters or TDT2, both ANLS and Graph-SNMPBB achieve high accuracies, but Graph-SNMPBB still converges faster. 
+
+4.6. Low-rank Approximate Input comparisons. Using the Low-rank Ap-proximate Input (LAI) methodology from Hayashi et al. [19], we compare LAI-SNMPBB to LAI-SymPGNCG (the best of the algorithms outlined in Hayashi et al). We tested both algorithms on 34 symmetric matrices from SuiteSparse (Davis and Hu [12]), selected by a minimum density threshold (nonzeros divided by total entries). The benchmark set spans a wide range of problem sizes and application domains, including structural engineering (Boeing/nasa2910, Rothberg/struct4), graph com-binatorics (Gset, Mycielski), and biological gene networks (Belcastro/human gene1, Belcastro/mouse gene). Matrix sizes range from n = 1000 to n = 49 , 151 with nonzero counts ranging from approximately 4 × 10 4 to 2 .4 × 10 9 (Mycielski/mycielskian16). Given that several matrices exceed n = 14 , 000 with hundreds of millions of nonzeros, this experiment was conducted at a large scale. The performance profiles (Mor´ e and Dolan, [14]) for both time to convergence and final residual are presented in figure 4. Although the two algorithms employ different internal update strategies, both are evaluated on the same residual metric V − W H T / ∥V ∥ and share an identical stop-ping criterion. We can see that SNMPBB outperforms SymPGNCG in both, almost  
+
+> 4https://www.daviddlewis.com/resources/testcollections/reuters21578/
+> 5http://www.cad.zju.edu.cn/home/dengcai/Data/TextData.html SYMMETRIC NMF
+
+15 5 · 10 −2 0.1 0.15 0.20.20.40.60.8Time (sec) Accuracy 
+
+> (a) ORL
+
+0.5 1
+
+0.2
+
+0.4
+
+0.6
+
+Time (sec) 
+
+> Accuracy
+> (b) COIL20
+
+0.1 0.2 0.3 0.4
+
+0.2
+
+0.4
+
+0.6
+
+Time (sec) 
+
+> Accuracy
+> (c) Isolet1
+
+1 2 3
+
+0.2
+
+0.4
+
+0.6
+
+Time (sec) 
+
+> Accuracy
+> (d) MNIST
+
+2 4 6 8
+
+0.1
+
+0.2
+
+0.3
+
+0.4
+
+Time (sec) 
+
+> Accuracy
+> (e) Reuters
+
+10 20 30 40 
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+Time (sec) 
+
+> Accuracy
+> (f) TDT2
+
+Graph-SNMPBB (ours) ANLS PGD Modified PGD 
+
+Fig. 3: Clustering accuracy vs. wall-clock time on six benchmark datasets, averaged over 10 random initializations. All methods use the similarity-matrix preprocess-ing of Kuang et al. [28]. Graph-SNMPBB matches or exceeds the final accuracy of SymANLS on five of six datasets while converging substantially faster, with the largest advantages on the high-dimensional sparse text Reuters-21578 and TDT2, where its 
+
+O(n2r) per-iteration cost versus O(n2r2) for SymANLS is most pronounced. (See also Figure 1 for an enlarged view of MNIST.) 16 R. SWART AND J. J. BRUST 
+
+always achieving a better residual in less time. We also observed that LAI-SNMPBB performed substantially better when the max number of iterations for each inner gradient descent subproblem was limited to about 3-5 iterations. This is significantly fewer than the iterations required to reach full convergence tolerance for the SuiteSparse matrices in particular. This behavior aligns closely with theoretical results on inexact iterative regularization by Molinari et al. [35]. The authors’ framework for inexact proximal operators shows that controlled inexactness in inner computations can act as an implicit regularization mechanism when using appropriate early stopping. In our LAI setting, the low-rank approxi-mation error μ = ∥V − AB ∥ is similar to their proximal inexactness parameter, and limiting inner iterations prevents the algorithm to overcommitting to the approximate low-rank surrogate AB rather than V . Specifically, when inner solves converge to high accuracy, the alternating minimization may fit the approximation error rather than the true underlying structure. By contrast, inexact inner solves allow the algorithm to make progress in directions informed by the low-rank approximation without fully converging to solutions that encode the approximation error. 1 1.5 200.51
+
+τ
+
+> ρs(τ )
+
+Time to Convergence 1 2 300.51
+
+τ
+
+> ρs(τ )
+
+Final Residual LAI-SNMPBB (ours) LAI-SymPGNCG [20] Fig. 4: Performance profiles for LAI-SNMPBB and LAI-SymPGNCG on 34 SuiteS-parse matrices (selected by fill density; rank r = 10, inner iterations capped at 3-5 for LAI-SNMPBB). The horizontal axis τ is the performance ratio relative to the best method on each problem; ρs(τ ) is the fraction of problems for which algorithm 
+
+s achieves a ratio within τ of the best. A curve that is higher and further left domi-nates. LAI-SNMPBB dominates in both time to convergence (left) and final residual 
+
+∥V −W H ∥/∥V ∥ (right), achieving a lower residual on approximately 70% of problems at τ = 1. Finally, we use the same dense clustering example as in [19], i.e. the Web of Sci-ence dataset [27]. This is a set of 46985 term documents that represent academic ab-stracts with 7 broad categories of scientific disciplines used as labels. We preprocessed using Hypergraph with Edge Dependent Vertex Weights, the same methodology used in the LAI paper and was originally outlined in Hayashi et al. [20]. The Adjusted Rand Index (ARI) is computed as in [20] to evaluate clustering accuracy. Over ten SYMMETRIC NMF 17 runs with random initializations, the mean residual when clustering this dataset for SNMPBB was 7 .365 × 10 −1 with a mean ARI of 2 .798 × 10 −1; the mean residual for SymPGNCG was 7 .357 × 10 −1 with a mean ARI of 2 .954 × 10 −1.10 11 12 13 14 15 16 17 0.75 0.8Time (sec) Residual LAI-SNMPBB (ours) LAI-SymPGNCG [20] Fig. 5: Residual ∥V − W H ∥/∥V ∥ vs. wall-clock time on the Web of Science dataset (46985 term documents, 7 categories, rank r = 7, averaged over 10 runs). Both algorithms use the Hypergraph-with-Edge-Dependent-Vertex-Weights preprocessing of Hayashi et al. [20]. LAI-SNMPBB and LAI-SymPGNCG reach comparable final residuals (7 .365 × 10 −1 vs. 7 .357 × 10 −1), but LAI-SNMPBB does so in consistently less time across all runs. 
+
+5. Conclusion. This work demonstrates the effectiveness of projected gradient methods in symmetric nonnegative matrix factorization. In particular, we show that PGD-based alternating methods augmented with nonmonotone line search, Barzilai-Borwein step-sizes, and judicious regularization routinely exceed the performance of established approaches like SymANLS and SymNewton. The proposed SNMPBB algorithm is the first adaptation of nonmonotone pro-jected Barzilai-Borwein methods to the symmetric NMF setting. Like some other algorithms, rather than enforcing symmetry through a direct variable identification, the method maintains two coupled variables through a quadratic penalty formulation. We further extend the approach with graph Laplacian regularization, resulting in the Graph-SNMPBB algorithm for clustering applications. The numerical experiments demonstrate that these mechanisms substantially im-prove the practical behavior of projected gradient methods for symmetric problems. We additionally incorporated the recent low-rank approximate input methodol-ogy into SNMPBB and show both theoretically and experimentally that the Barzi-lai–Borwein curvature information is preserved under the approximation. The result-ing LAI-SNMPBB method outperformed LAI-SymPGNCG on SuiteSparse matrices in both runtime and residual quality, with empirical evidence suggesting that limited inner iterations act as an implicit regularization mechanism. Overall, the results suggest that projected gradient methods for symmetric NMF have been historically underestimated. When combined with appropriate curvature scaling, globalization strategies, and regularization, first-order methods can provide 18 R. SWART AND J. J. BRUST 
+
+an effective balance between computational efficiency, scalability, and solution quality for both matrix factorization and graph clustering problems. 
+
+Acknowledgments. We are very grateful to Koby Hayashi for providing codes for the LAI algorithms and experiments. 
+
+REFERENCES [1] L. Armijo , Minimization of functions having lipschitz continuous first partial derivatives , Pa-cific Journal of mathematics, 16 (1966), pp. 1–3. [2] J. Barzilai and J. M. Borwein , Two-point step size gradient methods , IMA journal of nu-merical analysis, 8 (1988), pp. 141–148. [3] K. Berahmand, M. Mohammadi, R. Sheikhpour, Y. Li, and Y. Xu , WSNMF: weighted sym-metric nonnegative matrix factorization for attributed graph clustering , Neurocomputing, 566 (2024), p. 127041, https://doi.org/10.1016/j.neucom.2023.127041. [4] D. Bertsekas , Nonlinear Programming , Athena Scientific, 1999. [5] E. G. Birgin, J. M. Mart´ ınez, and M. Raydan , Nonmonotone spectral projected gradient methods on convex sets , SIAM Journal on Optimization, 10 (2000), pp. 1196–1211, https: //doi.org/10.1137/S1052623497330963. [6] J. Brust, O. Burdakov, J. B. Erway, and R. F. Marcia , A dense initialization for limited-memory quasi-newton methods , Computational Optimization and Applications, 74 (2019), pp. 121–142. [7] J. J. Brust , Nonlinear least squares for large-scale machine learning using stochastic jacobian estimates , arXiv preprint arXiv:2107.05598, (2021). [8] J. J. Brust , Useful compact representations for data-fitting , arXiv preprint arXiv:2403.12206, (2024). [9] J. J. Brust, Z. Di, S. Leyffer, and C. G. Petra , Compact representations of structured bfgs matrices , Computational Optimization and Applications, 80 (2021), pp. 55–88. [10] J. J. Brust and P. E. Gill , An trust-region quasi-newton method , SIAM Journal on Scientific Computing, 46 (2024), pp. A3330–A3351. [11] D. Cai, X. He, J. Han, and T. S. Huang , Graph regularized nonnegative matrix factorization for data representation , IEEE Transactions on Pattern Analysis and Machine Intelligence, 33 (2011), pp. 1548–1560, https://doi.org/10.1109/TPAMI.2010.231. [12] T. A. Davis and Y. Hu , The university of florida sparse matrix collection , ACM Trans. Math. Softw., 38 (2011), https://doi.org/10.1145/2049662.2049663. [13] C. Ding, X. He, and H. D. Simon , On the equivalence of nonnegative matrix factorization and spectral clustering , pp. 606–610, https://doi.org/10.1137/1.9781611972757.70. [14] E. D. Dolan and J. J. Mor´ e, Benchmarking optimization software with performance profiles ,Mathematical programming, 91 (2002), pp. 201–213. [15] Z. Gao, N. Guan, and L. Su , Graph regularized symmetric non-negative matrix factorization for graph clustering , in 2018 IEEE International Conference on Data Mining Workshops (ICDMW), 2018, pp. 379–384, https://doi.org/10.1109/ICDMW.2018.00062. [16] N. Guan, D. Tao, Z. Luo, and B. Yuan , NeNMF: an optimal gradient method for nonnegative matrix factorization , IEEE Transactions on Signal Processing, 60 (2012), pp. 2882–2898. [17] Y.-T. Guo, Q.-Q. Li, and C.-S. Liang , The rise of nonnegative matrix factorization: algo-rithms and applications , Information Systems, 123 (2024), p. 102379, https://doi.org/10. 1016/j.is.2024.102379. [18] L. Han, M. Neumann, and U. Prasad , Alternating projected barzilai-borwein methods for nonnegative matrix factorization , Electron. Trans. Numer. Anal, 36 (2009), pp. 54–82. [19] K. Hayashi, S. G. Aksoy, G. Ballard, and H. Park , Randomized algorithms for symmetric nonnegative matrix factorization , SIAM Journal on Matrix Analysis and Applications, 46 (2025), pp. 584–625, https://doi.org/10.1137/24M1638355. [20] K. Hayashi, S. G. Aksoy, C. H. Park, and H. Park , Hypergraph random walks, laplacians, and clustering , in Proceedings of the 29th ACM International Conference on Information & Knowledge Management, CIKM ’20, New York, NY, USA, 2020, Association for Computing Machinery, p. 495–504, https://doi.org/10.1145/3340531.3412034. [21] Y. Huang, H. Liu, and S. Zhou , Quadratic regularization projected barzilai–borwein method for nonnegative matrix factorization , Data Min Knowl Disc, 29 (2015), pp. 1665–1684, https://doi.org/10.1007/s10618-014-0390-x. [22] R. Jaiswal, D. FitzGerald, D. Barry, E. Coyle, and S. Rickard , Clustering nmf basis functions using shifted nmf for monaural sound source separation , in 2011 IEEE Interna-SYMMETRIC NMF 19 
+
+tional Conference on Acoustics, Speech and Signal Processing (ICASSP), 2011, pp. 245– 248, https://doi.org/10.1109/ICASSP.2011.5946386. [23] L. Jing, C. Zhang, and M. K. Ng , SNMFCA: supervised nmf-based image classification and sannotation , IEEE Transactions on Image Processing, 21 (2012), pp. 4508–4521, https: //doi.org/10.1109/TIP.2012.2206040. [24] H. Kim and H. Park , Nonnegative matrix factorization based on alternating nonnegativity constrained least squares and active set method , SIAM journal on matrix analysis and applications, 30 (2008), pp. 713–730. [25] J. Kim and H. Park , Toward faster nonnegative matrix factorization: A new algorithm and comparisons , in 2008 Eighth IEEE International Conference on Data Mining, IEEE, 2008, pp. 353–362. [26] S. Kong, L. Sun, C. Han, and J. Guo , An image compression scheme in wireless multimedia sensor networks based on nmf , Information, 8 (2017), https://doi.org/10.3390/info8010026. [27] K. Kowsari, D. E. Brown, M. Heidarysafa, K. Jafari Meimandi, , M. S. Gerber, and L. E. Barnes , Hdltex: hierarchical deep learning for text classification , in Machine Learning and Applications (ICMLA), 2017 16th IEEE International Conference on, IEEE, 2017. [28] D. Kuang, S. Yun, and H. Park , SymNMF: nonnegative low-rank approximation of asimilarity matrix for graph clustering , J Glob Optim, 62 (2015), pp. 545–574, https: //doi.org/10.1007/s10898-014-0247-2. [29] D. D. Lee and H. S. Seung , Learning the parts of objects by non-negative matrix factorization ,Nature, 401 (1999), pp. 788–791, https://doi.org/10.1038/44565. [30] B. Li, X. Shi, and Z. Zhang , A two-phase algorithm for robust symmetric non-negative matrix factorization , Symmetry, 13 (2021), https://doi.org/10.3390/sym13091757. [31] W. Li and X. Shi , A gradient-based algorithm with nonmonotone line search for nonnegative matrix factorization , Symmetry, 16 (2024), https://doi.org/10.3390/sym16020154. [32] X. Li, M. Chen, and Q. Wang , Discrimination-aware projected matrix factorization , IEEE Transactions on Knowledge and Data Engineering, 32 (2020), pp. 809–814, https://doi. org/10.1109/TKDE.2019.2936855. [33] X. Li, Z. Zhu, Q. Li, and K. Liu , A provable splitting approach for symmetric nonnegative matrix factorization , IEEE Transactions on Knowledge and Data Engineering, 35 (2023), pp. 2206–2219, https://doi.org/10.1109/TKDE.2021.3125947. [34] C.-J. Lin , Projected gradient methods for nonnegative matrix factorization , Neural computa-tion, 19 (2007), pp. 2756–2779. [35] C. Molinari, M. Massias, L. Rosasco, and S. Villa , Iterative regularization for low com-plexity regularizers , Numerische Mathematik, 156 (2024), pp. 641–689, https://doi.org/10. 1007/s00211-023-01390-8. [36] A. Pascual-Montano, P. Carmona-Saez, M. Chagoyen, F. Tirado, J. M. Carazo, and A. Pascual-Montano , bioNMF: a versatile tool for non-negative matrix factorization in biology , BMC Bioinformatics, 7 (2006), p. 366, https://doi.org/10.1186/1471-2105-7-366. [37] F. Shahnaz, M. W. Berry, V. Pauca, and R. J. Plemmons , Document clustering using non-negative matrix factorization , Information Processing & Management, 42 (2006), pp. 373– 386, https://doi.org/10.1016/j.ipm.2004.11.005. [38] D. Tu, L. Chen, M. Lv, H. Shi, and G. Chen , Hierarchical online nmf for detecting and tracking topic hierarchies in a text stream , Pattern Recognition, 76 (2018), pp. 203–214, https://doi.org/10.1016/j.patcog.2017.11.002. [39] S. A. Vavasis , On the complexity of nonnegative matrix factorization , 2007, https://arxiv.org/ abs/0708.4149. [40] M. Zhang and K. Liu , Rethinking symmetric matrix factorization: A more general and better clustering perspective , 2023, https://arxiv.org/abs/2209.02528. [41] Z. Zhu, X. Li, K. Liu, and Q. Li , Dropping symmetry for fast symmetric nonnegative matrix factorization , ArXiv, abs/1811.05642 (2018), https://api.semanticscholar.org/CorpusID: 53306891.

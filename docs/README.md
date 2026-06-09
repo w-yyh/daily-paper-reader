@@ -6,26 +6,31 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-08
-- 运行时间：2026-06-08 21:32:25 UTC
+- 最新运行日期：2026-06-09
+- 运行时间：2026-06-09 20:54:35 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：3
 - 精读区：1
-- 速读区：0
+- 速读区：2
 
 ### 今日简报（AI）
-今日精读：用几何感知超图推理，让点云3D分割在无标注新类别上也能准确发现。  
-最值关注：将超图结构与点云几何特性融合，显著提升新类发现召回率，为自动驾驶场景中未知物体识别提供新思路。  
-下步可试：在自己数据上用该框架迁移学习，优先关注局部几何特征的构建方式。
-- 详情：[/202606/08/README](/202606/08/README)
+今日研读3篇聚类前沿论文，重点关注无监督连续学习和鲁棒多视图方法。  
+最值得看：无监督连续聚类通过前向后向知识蒸馏抵御灾难性遗忘，多视图聚类可应对视图缺失等不完美信息。  
+建议读者尝试将知识蒸馏思路引入自己的增量学习任务，或加强多源融合模型的抗噪设计。
+- 详情：[/202606/09/README](/202606/09/README)
 
 ### 精读区论文标签
-1. [Geometric-Aware Hypergraph Reasoning for Novel Class Discovery in Point Cloud Segmentation](/202606/08/2606.07280v1-geometric-aware-hypergraph-reasoning-for-novel-class-discovery-in-point-cloud-segmentation)  
-   标签：评分：10.0/10、query:cgcd
-   evidence：点云分割中基于超图推理的新类发现
+1. [Unsupervised Continual Clustering via Forward-Backward Knowledge Distillation](/202606/09/2606.07474v1-unsupervised-continual-clustering-via-forward-backward-knowledge-distillation)  
+   标签：评分：8.0/10、query:cgcd
+   evidence：无监督持续聚类处理新类别而不遗忘
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Robust Multi-view Clustering against Imperfect Information](/202606/09/2606.04343v1-robust-multi-view-clustering-against-imperfect-information)  
+   标签：评分：7.0/10、query:cgcd
+   evidence：对无标签多视图数据进行聚类以发现未知类别
+2. [A Nonmonotone Gradient-Based Algorithm for Symmetric Nonnegative Matrix Factorization and Graph Clustering](/202606/09/2606.02887v1-a-nonmonotone-gradient-based-algorithm-for-symmetric-nonnegative-matrix-factorization-and-graph-clustering)  
+   标签：评分：6.0/10、query:cgcd
+   evidence：通过对称NMF的图聚类为未标注数据中的新类发现提供可迁移的聚类方法
 
 
 <div class="dpr-home-promo-card">
