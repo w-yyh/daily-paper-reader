@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-11T22:05:44.743913+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.12209v1",
+      "source": "arxiv",
+      "title": "Interpretable enzyme function prediction via sparse autoencoder features of ESMC across the microbial protein universe",
+      "abstract": "Microbial genomes and metagenomes contain millions of proteins whose enzymatic functions remain unknown, the enzyme dark matter. While deep learning has improved protein function prediction, most methods are black boxes relying on sequence or structural similarity, limiting discovery of novel catalytic activities. The ESMC-6B protein language model and its sparse autoencoder with a 16,384-dimensional codebook of interpretable biological concepts, each annotated by GPT-5, creates a new opportunity: using these features directly as semantic signatures for enzyme function. Here, we show that ESMC-SAE features enable accurate and interpretable enzyme commission (EC) number prediction without task-specific training or GPU-intensive computation. On a balanced benchmark of 4,868 microbial SwissProt enzymes across 161 EC3 subclasses, ESMC-SAE binary features achieve 78.9% top-1 and 88.5% top-5 accuracy, 37.6% higher than 3-mer baselines (57.3%). In leave-one-EC3-class-out evaluation simulating discovery of novel enzyme classes, SAE features recover the EC1 superclass in 47.7% of cases (3.3x random, 14.3%), versus 26.6% for sequence methods. Discriminative features correspond to mechanistically interpretable concepts: catalytic triad geometry for hydrolases, NAD(P)H-binding Rossmann folds for oxidoreductases, phosphate-binding P-loops for transferases. We also survey the ESM Atlas of 7.7 million clusters and identify 169,859 dark enzyme-like candidates across all major microbial phyla. Our results establish a paradigm for enzyme function discovery in microbial dark matter: interpretable by design, scalable without GPU clusters, and applicable to the billions of proteins in the ESM Atlas.",
+      "authors": [
+        "Yue Hu",
+        "Wanyu Cheng",
+        "Junqing Wang",
+        "Yingchao Liu"
+      ],
+      "primary_category": "q-bio.QM",
+      "categories": [
+        "q-bio.QM"
+      ],
+      "published": "2026-06-10T15:27:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.12209v1",
+      "tags": [
+        "keyword:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Discovers novel enzyme classes from unlabeled protein data",
+      "llm_evidence_cn": "从未标记蛋白质数据中发现新酶类",
+      "llm_evidence": "从未标记蛋白质数据中发现新酶类",
+      "canonical_evidence": "从未标记蛋白质数据中发现新酶类",
+      "llm_tldr_en": "Uses a protein language model and sparse autoencoder to create interpretable features for predicting enzyme commission numbers, enabling accurate discovery of novel catalytic activities among unannotated microbial proteins.",
+      "llm_tldr_cn": "在微生物蛋白质组中，大量蛋白质的酶功能未知（酶暗物质），现有预测方法多依赖序列或结构相似性，限制了对全新催化活性的发现。本研究利用ESMC-6B蛋白质语言模型结合稀疏自编码器，将蛋白质序列映射到16,384维可解释生物概念特征，直接作为酶功能的语义签名，无需特定任务训练即可高精度预测酶分类编号。实验证明，该方法能有效发现未知酶的新催化功能，为大规模微生物酶功能注释提供了可解释、高效的计算工具，有力推动了酶暗物质的挖掘。",
+      "llm_tldr": "在微生物蛋白质组中，大量蛋白质的酶功能未知（酶暗物质），现有预测方法多依赖序列或结构相似性，限制了对全新催化活性的发现。本研究利用ESMC-6B蛋白质语言模型结合稀疏自编码器，将蛋白质序列映射到16,384维可解释生物概念特征，直接作为酶功能的语义签名，无需特定任务训练即可高精度预测酶分类编号。实验证明，该方法能有效发现未知酶的新催化功能，为大规模微生物酶功能注释提供了可解释、高效的计算工具，有力推动了酶暗物质的挖掘。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

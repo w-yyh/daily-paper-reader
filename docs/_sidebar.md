@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-11 <!--dpr-date:20260611-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/11/2606.12209v1-interpretable-enzyme-function-prediction-via-sparse-autoencoder-features-of-esmc-across-the-microbial-protein-universe" data-sidebar-item="{&quot;title&quot;: &quot;Interpretable enzyme function prediction via sparse autoencoder features of ESMC across the microbial protein universe&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.12209v1-interpretable-enzyme-function-prediction-via-sparse-autoencoder-features-of-esmc-across-the-microbial-protein-universe&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;从未标记蛋白质数据中发现新酶类&quot;}">Interpretable enzyme function prediction via sparse autoencoder features of ESMC across the microbial protein universe</a>
   * 2026-06-09 <!--dpr-date:20260609-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/09/2606.07474v1-unsupervised-continual-clustering-via-forward-backward-knowledge-distillation" data-sidebar-item="{&quot;title&quot;: &quot;Unsupervised Continual Clustering via Forward-Backward Knowledge Distillation&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.07474v1-unsupervised-continual-clustering-via-forward-backward-knowledge-distillation&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;无监督持续聚类处理新类别而不遗忘&quot;}">Unsupervised Continual Clustering via Forward-Backward Knowledge Distillation</a>
