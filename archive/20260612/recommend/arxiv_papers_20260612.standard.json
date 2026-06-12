@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-12T21:17:32.780525+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.06183v1",
+      "source": "arxiv",
+      "title": "Revisiting Lexicon Evaluation in Unsupervised Word Discovery",
+      "abstract": "Building a lexicon from discovered word-like units is a central goal in zero-resource speech processing. But do our evaluations provide a trustworthy indication of lexicon quality? A common metric, normalized edit distance, averages the phoneme edit distances between discovered units in each cluster. We show that this metric has an inherent bias toward the quality of large clusters, inhibiting fair evaluation. Moreover, it ignores how well true classes are distributed across clusters. Based on established theory in clustering literature, we propose two metrics that address these shortcomings: a modified metric that weighs cluster size when assessing within-cluster consistency, and an inverse metric that assesses how true words are spread across clusters. Through experiments on synthetic and real-world lexicons, we demonstrate that combined, these metrics are: (1) more closely correlated with how similar a lexicon is to the ground-truth distribution, and (2) more robust to biases that skew lexicon evaluations.",
+      "authors": [
+        "Simon Malan",
+        "Danel Slabbert",
+        "Herman Kamper"
+      ],
+      "primary_category": "eess.AS",
+      "categories": [
+        "eess.AS",
+        "cs.CL"
+      ],
+      "published": "2026-06-04T13:55:09+00:00",
+      "link": "https://arxiv.org/pdf/2606.06183v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Addresses evaluation of unsupervised word discovery (novel class discovery) via clustering metrics, improving assessment for category discovery.",
+      "llm_evidence_cn": "通过聚类指标改进无监督词汇发现（新类发现）的评估",
+      "llm_evidence": "通过聚类指标改进无监督词汇发现（新类发现）的评估",
+      "canonical_evidence": "通过聚类指标改进无监督词汇发现（新类发现）的评估",
+      "llm_tldr_en": "Identifies bias in the common evaluation metric for unsupervised word discovery and proposes two new metrics that better assess cluster quality and class distribution, providing more reliable evaluation for category discovery in zero-resource settings.",
+      "llm_tldr_cn": "针对零资源语音处理中无监督词汇发现评估的偏差问题，揭示了归一化编辑距离偏向大聚类质量的缺陷，并忽略了真实词类在聚类中的分布。基于聚类理论，提出两种新指标：加权聚类内一致性和真实词类分布逆指标，以更公平地评估发现单元的质量。实验表明新指标能提供更可靠的词典质量评估，改进了广义类别发现的评估框架。",
+      "llm_tldr": "针对零资源语音处理中无监督词汇发现评估的偏差问题，揭示了归一化编辑距离偏向大聚类质量的缺陷，并忽略了真实词类在聚类中的分布。基于聚类理论，提出两种新指标：加权聚类内一致性和真实词类分布逆指标，以更公平地评估发现单元的质量。实验表明新指标能提供更可靠的词典质量评估，改进了广义类别发现的评估框架。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
