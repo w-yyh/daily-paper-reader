@@ -1,0 +1,461 @@
+Title: Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+
+URL Source: https://arxiv.org/pdf/2606.13444v1
+
+Published Time: Fri, 12 Jun 2026 01:05:53 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# Clustering Node Attributed Networks with Graph Neural Networks and Self Learning 
+
+## Rodrigo de Sapienza Luna a,∗,, Daniel Ratton Figueiredo a,∗,
+
+> a
+
+Systems Engineering and Computer Science (PESC), Federal University of Rio de Janeiro (UFRJ), Technology Center, Block H, Room 319, 68511, Cidade Universitária, Rio de Janeiro, Brazil 
+
+A R T I C L E I N F O 
+
+Keywords :graph clustering, attributed networks, graph neural networks, self learning 
+
+A B S T R A C T 
+
+Graph clustering – partitioning the node set of a graph into disjoint subsets that reflect some latent information – is a fundamental problem as it finds applications in a myriad of different scenarios. While this classic problem has been tackled for decades by different communities, a recent variation of the problem driven by real data considers the scenario where nodes have attributes that are also informative. This has triggered novel methods that simultaneously leverage network information (edges) and node information (attributed) in the design of novel clustering algorithms. This work proposes a novel framework that builds on prior works that have applied graph neural networks (GNN) to graph clustering. The proposed framework operates in rounds of self learning in a fully unsupervised setting. In each round, a GNN generates representations for nodes that are used to cluster the nodes. This clustering influences the graph used to generate the node representation in the next round. Moreover, a context graph built in each round using the original graph is used to generate the node representations. Empirical results show that the proposed methodology extracts information from both network edges and node attributes in synthetic data, outperforming algorithms focused solely on the network or attributes when neither are very informative. Multiple rounds of learning also improve the performance and always outperforms a long single round of training (i.e., classic GNN graph clustering). When considering real datasets, empirical results indicate that the proposed methodology is competitive to state-of-the-art methods when cluster sizes are balanced. 
+
+## 1. Introduction 
+
+Graph clustering or graph partitioning or community detection consists of partitioning the set of nodes of a graph into disjoint subsets that reflect some higher order structure (e.g., many more edges within the subsets than across sub-sets) [20, 10]. This is a fundamental problem in data science and network science since it finds applications in a myriad of contexts such as social networks, biological networks and information networks [17]. Not surprising, graph clustering has been investigated for decades by various communities using different problem formulations and approaches (e.g., fast heuristics for minimizing modularity in network science, or approximation algorithms for optimal ratio-cut in graph theory). A related but even more fundamental problem is data clustering where a set of points in some space must be partitioned into disjoint subsets that reflect some higher order structure (e.g. points in a subset are much closer than points in different subsets) [3]. Data clustering finds even more applications as the input are just data points (and not a network) and an extensive literature in various communities. Indeed, the k-means algorithm was proposed over 50 years ago and is perhaps the most ubiquitous approach to tackle data clustering.  
+
+> ⋆
+
+This work received financial support through research grants provided by CNPq and FAPERJ (Brazil). 
+
+> ∗
+
+Corresponding author  
+
+> rluna@cos.ufrj.br
+
+(R.d.S. Luna); daniel@cos.ufrj.br (D.R. Figueiredo)  
+
+> https://www.cos.ufrj.br/~daniel/
+
+(D.R. Figueiredo) 
+
+> ORCID
+
+(s): 
+
+While both graph and data clustering are classic, only recently have they been unified into a single formulation [8, 22]. In attributed networks, each network node is associated with some feature that is representative of the node (e.g., the DNA of the person in a social network). Suppose such feature is a point in some space. Note that nodes of this network can be clustered using just the node attributes (data clustering), just the network structure (graph clustering), or both kinds of information (joint data and graph clustering). This work considers the latter problem. Jointly using node attributes and network structure to cluster nodes of an attributed network requires mixing ev-idence from the attributes with evidence from the network structure. Intuitively, such approaches should outperform any approach that uses just one kind of information, and performance gains should be higher when both kinds of information are relatively noisy (and independent). In this scenario, the joint approach can use more reliable attribute information to correct for noisy network information, and vice-versa. Of course, designing methodologies and building algorithms that can leverage this intuition is not trivial, and has been an active area of research over the past few years [8, 22, 30, 23]. An important consideration concerning graph or data clustering is prior information, or supervision. In a super-vised setting, the labels of nodes or data points are avail-able and indicate their clusters (or partially available in a semi-supervised setting). This information can be used to train a model that determines the cluster of unseen nodes. In contrast, in an unsupervised setting there is no prior information concerning the clusters. In modern and large 
+
+R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 1 
+
+> arXiv:2606.13444v1 [cs.LG] 11 Jun 2026 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+
+problem instances, it is often the case that label information is not available (or is not reliable). This work considers the unsupervised scenario. The sole input to the problem here considered is a single instance of an attributed network. Graph Neural Network (GNN) can be interpreted as a framework to generate representation for nodes using both the network structure and node attributes [15]. Such repre-sentations are points in some dimensional space and reflect some higher order structure of the network nodes (their local network structure and attributes). GNN has been success-fully applied to node classification and link prediction in various scenarios. Not surprising, GNN has also recently been applied to clustering nodes of attributed network (see Section 2). In a nutshell, the representations generated by the GNN can be used as the input to a data clustering problem. However, when representations are generated as to optimize a generic objective function, such naive approaches often do not exhibit good performance. Most alternative solutions use a supervised (or semi-supervised) scenario where the label information can be used in the objective function or in some other stage. More recently, fully unsupervised approaches have also been proposed (more details in Section 2). This work proposes a novel fully unsupervised frame-work for clustering attributed networks, called Dynamic Context Self-Learning Graph Neural Network (DCSL-GNN). The framework operates in rounds and its main contribution is the self-learning component and generation of the context over the rounds. Using the representation and clusters of the previous round as well as the original network, the context (a set of nodes of fixed size) for each node is randomly generated. This context is used to generate a representation for nodes via a GNN (where "neighbors" are the nodes in the context). These representations are the input to a data clustering problem in Euclidean space, that can be solved with the classic k-means algorithm. These clusters and representations are then used to determine the context graph for the next round and their new representations. In a nutshell, representation and clusters found in the previous round influence the context generated for the nodes in the current round that is used by a GNN to generate new node representations, that are then used to determine the clusters of the current round. The multiple rounds allows the framework to learn the right context for the nodes, leading to a better represen-tation and consequently to a more effective clustering. In essence, DCSL-GNN employs a self-reinforcement mech-anism: better representations generate better clusters, while better clusters generate better representations. The idea of node context is related to attention mechanisms in GNNs where edges incident to a node are weighted to focus on a subset of its neighbors. However, in DCSL-GNN any node can be in the context of another node, and not only a subset of its neighbors (as in attention mechanisms). This allows for nodes that are central in a cluster to be in the context of other nodes that belong to this cluster even when they are not neighbors in the original graph. The framework is implemented and results on synthetic networks indicate its effectiveness in extracting information from both the network and attributes to generate effective clusters across the rounds of self-learning. Results clearly indicate that multiple rounds of self-learning are beneficial, and performance can be good even when one of the sources of information is very noisy (network or attributes). An eval-uation using three benchmark datasets, DCSL-GNN outper-forms all state-of-the-art algorithms in one of the datasets, indicating its potential in delivering good performance in the wild. 
+
+## 2. Related Work 
+
+In this section, we review the related work in two cate-gories that are related to our framework. 
+
+2.1. Community Detection 
+
+Community detection (or graph clustering) is one of most important topics of modern network science, with prac-tical application across various domains. Researchers from different fields have explored this problem for many years, employing various problem formulations and approaches, such as fast heuristics for minimizing modularity in network or approximating algorithms for optimal ratio-cut in graph theory [9]. Modularity is a metric to measure the quality of a com-munity (cluster) partition of a network using the difference between the number of edges within communities and the expected number of such edges across all pairs of nodes [18]. Modularity optimization is the most used technique in com-munity detection, and Newman and Girvan [18] proposed the first heuristic to find communities that optimize modular-ity. Another popular and fast community detection algorithm is the Louvain algorithm proposed by Blondel et al. [4] which employs a greedy and efficient strategy to optimize the network modularity. 
+
+2.2. Graph Embedding via Random Walks 
+
+Graph embedding refers to the problem of generating a vector representation for nodes of a graph such that vectors capture some graph property of the nodes [7, 25]. This technique has been successfully applied to node classifi-cation and link prediction. Most of the techniques rely on generating a context for each network node often using short random walks that start at each node and considering a short sequence of visited nodes (window), such as DeepWalk, node2vec and struc2vec [7, 25]. This approach has been be applied to graph clustering by simply performing data clus-tering on the vector representation of the nodes. However, this approach does not directly consider node attributes and has been shown to have inferior performance [23, 21]. While the framework here proposed relies on random walks over a weighted graph (where weights are determined from the previous round), the sequence of visited vertices are used to determine the relative importance of visited nodes and not to determine the context within a short sequence (window). More details in Section 3.   
+
+> R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 2 of 11 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+
+2.3. Graph Neural Network for clustering 
+
+Recently, Graph Neural Networks (GNNs) have been introduced to address community detection on attributed graphs. One popular approach is employ a GNN in the graph reconstruction task (with node attributes) and use the em-bedding of the nodes in a classic data clustering task [6, 24, 21]. In this approach, the GNN serves as node encoders that leverages both structural and node attribute information. The learning process is achieved through the decoder process, where the model parameters are learned by comparing the difference between the original graph and the reconstructed graph (graph reconstruction with node attributes). After obtaining the node embedding through the encoder-decoder process, these embeddings are typically used as input to a data cluster algorithm to detect communities within the graph. For example, Wang et al. [24] utilize a GNN encoder-decoder architecture for community detection. Bo et al. [6] developed a graph reconstruction-based clustering method that employs dual self-supervised learning to optimize the model jointly with the encoder-decoder. Shchur et al. apply a similar framework but that leverages the minimization of the likelihood function to detect overlapping communities generated by the GNN [21]. Another popular unsupervised approaches adopt con-trastive methods with specific loss functions to detect the network communities. The loss function reflects the quality of the communities using graph properties as well as a regularization term to reduce the number of communities. Zhang et al. [30] introduced SENet, which utilizes a spectral clustering loss to capture the global cluster structure and learn node embedding. CommDGI [28] proposes a com-bined objective of three loss functions: mutual information, modularity, and contrastive loss. DMoN [23] is another framework that learns the model parameters through a loss function based on modularity but introduces a novel regular-ization term (linear in number of communities). Addition-ally, SEComm [2] combines the self-expressiveness with a self-supervised GNN for community detection through the optimization of two combined loss function. Last, DCOM-GNN [26] proposes a methodology to enhance the embed-dings generated by an arbitrary GNN. The idea is to learn weights and matrices that manipulate the original GNN em-bedding to better discriminate inter-cluster and intra-cluster representations. Our work introduces a novel approach to learning node representations for community detection in attributed graphs. Unlike most methods in the literature, the proposed frame-work does not rely on specific loss functions related to clustering such as modularity. Instead, we employ a dynamic graph and a self-learning module that iterative optimize the node embeddings through rounds. This approach allows to refine the dynamic graph based on the evolving node repre-sentations, enhancing community detection performance.                                 
+
+> Notations Definition
+> 𝐺 = ( 𝑉 , 𝐸, 𝑋 )Attributed graph
+> 𝐺 𝑐 = ( 𝑉 𝑐 , 𝐸 𝑐 , 𝑋 )Context graph
+> 𝑋 ∈ℝ𝑛 ×𝐹 Node feature matrix
+> 𝐻 (⋅)Embedding for node 𝑣 𝑊 Learning matrix
+> 𝐶 𝑙 ∈ℝ𝐾 Community sets at 𝑙 -th round
+> || 𝑋, 𝑌 || Euclidean distance between 𝑋 and 𝑌 𝐿 (𝜃 )Triplet loss function
+> 𝐾 Number of communities
+> 𝑁 (𝑣 )Neighborhood of node 𝑣 𝑠 (𝑣 )Silhouette value of node 𝑣 𝑛 𝑒 Number of epochs
+> 𝑛 𝑢 Mini-batch size
+> 𝑛 𝑤 number of random walks at each node
+> 𝑛 𝑠 number of random walk steps
+> Table 1
+> Notation.
+
+## 3. Framework 
+
+In this section, we present our proposed framework Dynamic Context Self-Learning Graph Neural Network (DCSL-GNN). As shown in Fig 1 our model contains three main modules: Dynamic Context, Embedding and Clustering. These modules are jointly learn in end-to-end manner to benefits each other. 
+
+3.1. Problem Formulation 
+
+Given an undirected attributed graph 𝐺 = ( 𝑉 , 𝐸, 𝑋 ),where 𝑉 = { 𝑣 1, 𝑣 2, … , 𝑣 𝑛 } is a set of n nodes and 𝐸 is a set of edges with 𝑒 𝑖𝑗 = ( 𝑣 𝑖 , 𝑣 𝑗 ) ∈ 𝐸 if an edge exists between nodes 𝑣 𝑖 and 𝑣 𝑗 , and 𝑋 = { 𝑥 1, 𝑥 2, … , 𝑥 𝑛 } ∈ ℝ𝑛 ×𝐹 
+
+is the attribute matrix, where each node 𝑣 𝑖 is associated by an attribute vector 𝑥 𝑖 with dimension F. Our goal is to partition the nodes into disjoint sets accordingly to the topological structure and the nodes attributes. Thus, we want to learn a function 𝑓 ∶ 𝑉 → 𝐶 where 𝐶 = { 𝐶 1, 𝐶 2, … , 𝐶 𝐾 } is the set of communities (or clusters), which map each node into a community 𝐶 𝑖 . We want to achieve the partitioning in the unsupervised way, i.e, without having any ground truth community information of a node, just knowing the number of communities. Important notation is described in Table 1. 
+
+3.2. Dynamic Context 
+
+GNNs aim to learn each node’s embeddings by integrat-ing their attributes with graph structure. In GNN, a layer can be viewed as a message passing between nodes, where each node updates its latent representation by aggregating the messages from its direct neighbors. In the context of the graph clustering problem, nodes most representative of the cluster for a given node 𝑣 are not necessarily its neighbors. Suppose that the most central node 
+
+𝑢 for a cluster is ℎ hops away from a given node 𝑣 . Then, the GNN should have at least ℎ layers for the information    
+
+> R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 3 of 11 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+> Figure 1: Schematic representation of DCSL-GNN framework. Note that the clustering result is used to determine the edge weights of the original graph in the next round that is then used to generate the next context graph. Thus, embeddings influence clustering, and clustering influences embeddings.
+
+about 𝑢 to reach node 𝑣 . Without this depth, the informa-tion propagation in the GNN is constrained and can hinder performance, resulting in a phenomenon known as under-reaching [5]. However, unlike conventional neural network models, when additional layers are stacked in GNNs, the representation of the nodes becomes increasingly noisy. This leads to a significant degradation in prediction accuracy and overall performance, a problem known as over-smoothing [12, 1, 13]. For that reason, most GNN models have very few layers, such as 2 or 3, and often deploy mechanism to avoid over-smoothing, such as dropout. In order to avoid under-reaching and over-smoothing, our proposal modifies the graph that over which the GNN will be executed. The original node neighborhood may not adequately represent the propagation of cluster signals. Thence, we design a flexible neighborhood sampling strat-egy biased by the similarity of nodes in the representation space. To capture cluster information, we add virtual edges to the closest nodes of cluster center of mass (in representa-tion space). This approach allows both the information from cluster center through virtual edges and local structure of a node from original edges to be directly aggregated into a node, this new graph built is known as Context Graph, 
+
+𝐺 𝑐 . As mentioned, DCSL-GNN is a self-learning framework trained in end-to-end manner across multiple rounds. This means in order to achieve better clustering performance, the nodes embedding and label assignments in previous round are employed to guide the optimization procedure of current round. In particular, the parameters obtained in the current round are use to generate the context of nodes in next round. DCSL-GNN utilizes random walks as a mechanism to generate nodes that will then be used to determine the context of a given node. The original graph is augmented with edge weights that will bias the random walks. Each edge weight reflects the degree of similarity of the two nodes terms of their cluster membership (higher value means more similar). Moreover, virtual edges are added to the original graph, allowing the random walk to jump directly       
+
+> (a) Original Graph (b) Random walk perspective
+> Figure 2: In each step of the random walk, a decision is made to either follow a virtual edge towards the cluster center nodes or explore the neighborhood of the current node. For each node, a total of 𝑛 𝑤 short independent random walks are generated each taking 𝑛 𝑠 steps.
+
+to nodes that are not neighbors of the current node. Figure 2 illustrates the idea of virtual edges, where at each step of the random walk, a decision is made to either traverse an edge in original graph (with probability 𝑝 ) or traverse a virtual edge (with probability 1 − 𝑝 ). Virtual edges takes the walker to a node that is close to the center of mass of the cluster. If a virtual edge is selected, the node to which the random walk transitions is chosen uniformly at random from the set of nodes closest to the cluster’s mass center, with the |𝐶𝐶 (⋅)|
+
+defined by a parameter. Otherwise, when selecting an origi-nal edge, the random walk explores the neighborhood based on proximity in the embedding space, resulting in a biased random walk where edge weights are inversely proportional to distances between the node representations. To guide the random walk in the original graph, an edge weight function denoted by 𝑤 𝐻 (⋅) use the nodes represen-tations generated by the previous round of DCSL-GNN, to bias the walk. It is worth noting that in the first round (no prior information available), transitions are made uniformly within the node’s neighborhood. The 𝑤 𝐻 (⋅) value rises as   
+
+> R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 4 of 11 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+
+the Euclidean distance between node representations dimin-ishes. This characteristic steers the random walk towards nodes that are more inclined to connect to nodes with similar embedding, ensuring that the exploration of the random walk focuses on nodes that are closer in the embedding space. The following equation determines the edge weight func-tion: 
+
+𝑤 𝐻 (𝑣, 𝑢 ) = max 
+
+> 𝑧 ∈𝑁 (𝑣 )
+
+(|| 𝐻 (𝑣 )− 𝐻 (𝑧 )|| )− || 𝐻 (𝑣 )− 𝐻 (𝑢 )|| , (1) where 𝐻 (⋅) is the node representation in euclidean space. Note that the value max 𝑧 ∈𝑁 (𝑣 ) || 𝐻 (𝑣 ) − 𝐻 (𝑧 )|| represents the largest distance from node 𝑣 to its neighbors. The value tends to be higher for nodes closer to 𝑣 , approaching 
+
+max 𝑧 ∈𝑁 (𝑣 ) || 𝐻 (𝑣 ) − 𝐻 (𝑧 )|| , and tends to be lower for nodes that are farther away, being zero for the farthest node. In essence, the weight function 𝑤 𝐻 (⋅) corresponds to the Euclidean distance relative to node 𝑣 and will bias the random walks. Given a node 𝑢 , a total of 𝑛 𝑤 short and independent ran-dom walks are simulated, each random walk taking exactly 
+
+𝑛 𝑠 steps. In order to be clear, the transition probability of the random walks is given as follows. Let 𝑐 𝑖 denote the 𝑖 -th node visited by the walk, starting with 𝑐 0 = 𝑢 . Nodes 𝑐 𝑖 are generated by the following distribution:                  
+
+> 𝑃 (𝑐 𝑖 =𝑘 |𝑐 𝑖 −1 =𝑣 ) =
+> {
+> 𝑤 𝐻 (𝑣, 𝑘 )∕ 𝑍 𝑣 ,𝑘 ∈𝑁 (𝑣 )w.p. 𝑝
+> 1∕ |𝐶𝐶 (𝑣 )|,𝑘 ∈𝐶𝐶 (𝑣 )w.p. 1 − 𝑝
+
+(2) where 𝐶𝐶 (𝑢 ) is the set of nodes nearest to the cluster mass center of node u, and 𝑍 𝑣 is the normalization constant for vertex 𝑣 given by: 
+
+𝑍 𝑣 = ∑
+
+> 𝑖 ∈𝑁 (𝑣 )
+
+𝑤 𝐻 (𝑣, 𝑖 ) (3) Note that for each node 𝑢 , the random walks starting from 𝑢 
+
+visit a total of 𝑛 𝑠 𝑛 𝑙 nodes (with repetition). Moreover, some nodes will be visited multiple times and each node visited by the walkers will have a visit count. The visit count will be used to determine the context graph, as follows. The neighborhood of node 𝑢 in the Context Graph 
+
+𝐺 𝑐 , denoted as 𝑁 𝑐 (𝑢 ), is determined using the idea of importance-based neighborhoods, as originally proposed in the PinSage algorithm [27]. This method defines the neighborhood of a node 𝑢 as the the nodes that exert the most influence on node 𝑢 . Thus, the most visited nodes by the random walks starting at 𝑢 will be the neighbors of node 
+
+𝑢 . Since each node 𝑢 is associated with an independent non-identically visit count distribution, we employ a threshold value to determine if a visited node will be included in its neighborhood. This threshold value is defined as the 𝑘 -th percentile of the visit distribution. Consequently, 𝑁 𝑐 (𝑢 ) is comprised of nodes that have been visited at least the value of the 𝑘 -th percentile. Note that this will generate nodes with different degrees in the context graph, since the visit count distribution can be quite different among different nodes. Note that constructing node neighborhoods based on importance has several advantages. First, the selection of the most important nodes is based by visits counts, it enables nodes with high visit counts being direct neighbors in the 
+
+𝐺 𝑐 , even when the node is many hops away in the original graph. This will reduce the noise and amplify the signal of important nodes. Second, a few layers stacked in GNN in the original graph could already incur unwelcome messages between clusters, however this is less likely to occurs in the context graph, because the neighborhood contains only similar nodes that are likely to belongs to the same clusters. Third, as only the most important nodes are chosen, it allows to reduce the neighbourhood size without loss of generality and helps to decrease the algorithm’s memory consumption. The framework can handle graphs that are not connected, as the neighborhood for a node in 𝐺 𝑐 will be generated independently for all nodes. Thus, multiple connected com-ponents in the original graph will be represented by multiple connected components in the context graph. However, the context graph can also have more connected components than the original graph. Nevertheless, nodes in different connected components in the 𝐺 𝑐 can be part of the same cluster, as the node attributes play an important role when generating node representations. 
+
+3.3. Weights in Context Graph 
+
+Edges of the context graph will also have weights that will better guide the learning of the representation by the GNN. In the first round, all edges in 𝐺 𝑐 are assigned a weight value of 1, implying that all messages from the neighborhood hold equal importance during the aggregation step. However, due the stochastic nature of the context graph, uncertain edges may be included in the neighborhood, potentially introducing noise and mixing their latent repre-sentations. Furthermore, nodes that exhibit high similarity in their attributes should contribute with greater importance during the aggregation step of the GNN. Thus, an edge (𝑢, 𝑣 )
+
+in 𝐺 𝑐 is deemed uncertain when the attributes from nodes 𝑢 
+
+and 𝑣 lack similarity and at least one of the nodes has an attribute that is highly similar to the attributes of the cluster to which it belongs. The silhouette coefficient algorithm [19] is employed to quantify the cohesion of attributes within a cluster. This coefficient measures the similarity of a data point (node attribute) to its own cluster compared to other clusters. It considers both the distance between the data point and other points within its own cluster (cohesion) and the distance be-tween the data point and points in other clusters (separation). Assuming the node embeddings have been clustered into 
+
+𝐶 clusters using some clustering algorithm, the silhouette coefficient for each data point 𝑖 can be defined as follows: 
+
+𝑠 (𝑖 ) = 𝑏 (𝑖 ) − 𝑎 (𝑖 )max( 𝑎 (𝑖 ), 𝑏 (𝑖 )) , (4) where 𝑎 (𝑖 ) is the average intra-cluster distance, i.e., the average distance between each point within the cluster of node 𝑖 , and 𝑏 (𝑖 ) is the average inter-cluster distance, which   
+
+> R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 5 of 11 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+
+is the average distance between the node 𝑖 and all points in other clusters, defined as follows: 
+
+𝑎 (𝑖 ) = 1
+
+|𝐶 𝑧 𝑖 | − 1 
+
+∑ 
+
+> 𝑗 ∈𝐶 𝑧 𝑖 ,𝑖 ≠𝑗
+
+𝑑 (𝑖, 𝑗 ) (5) 
+
+𝑏 (𝑖 ) = min 
+
+> 𝑦 ≠𝑧 𝑖
+
+1
+
+𝐶 𝑦 
+
+∑
+
+> 𝑗 ∈𝐶 𝑦
+
+𝑑 (𝑖, 𝑗 ) (6) where 𝐶 𝑧 𝑖 is the cluster of node 𝑖 (set of nodes) and 𝑧 𝑖 is the cluster number of node 𝑖 .For each node 𝑢 in a cluster, −1 ≤ 𝑠 (𝑢 ) ≤ 1. A silhouette value closer to 1 indicates that the data is appropriately clustered, a value closer by -1 indicates poor clustering, and a value closer to 0 suggests the value is on the border between multiples clusters. The dynamic nature of context graph enables the utiliza-tion of the previous clustering results to guide the optmiza-tion of the current round. DCSL-GNN determines the edge weights of 𝐺 𝑐 in current process using the clusters obtained in the previous round. However, this optmization process might take a considerable amount of rounds to discover consistent clusters. Thus, an attribute 𝑋 [𝑢 ] of node 𝑢 is considered properly clustered only if 𝑠 (𝑢 ) ≥ 𝛽 , where is 
+
+𝛽 is a threshold value. If one of the nodes from an edge satisfies this condition, the edge weight value will depend on the inverse Euclidean distance between the attribute values of the nodes, otherwise the weight is considered 1. The following equation determines the edge weight:            
+
+> 𝑤 (𝑣, 𝑢 ) =
+> {
+> min
+> (1
+> ‖𝑋 [𝑢 ],𝑋 [𝑣 ]‖, 𝛼
+> )
+> ,if 𝑠 (𝑢 )≥𝛽 or 𝑠 (𝑣 )≥𝛽
+> 1
+
+(7) An edge weight 𝑤 (𝑣, 𝑢 ) with nodes attributes 𝑋 [𝑣 ] and 
+
+𝑋 [𝑢 ] assumes values between [0 , 𝛼 ]. It is important to note that 𝛼 is a parameter which controls the upper bound of the weight, in order to prevent the edge weight from ap-proaching infinity and dominating the aggregation in the GNN. Therefore, when 𝑤 (𝑖, 𝑗 ) < 1, the edge is penalized as it reduces the importance between the nodes. Conversely, when 𝑤 (𝑖, 𝑗 ) > 1, it increases the influence in the messages between them. Finally, when 𝑤 (𝑖, 𝑗 ) = 1 the clustering of the nodes is not reliable and the edge is neutral. Last, these edge weights is part of the input to the GNN, along with 𝐺 𝑐 
+
+and the node attributes. 
+
+3.4. Embedding 
+
+The encoder proposed in [12] was adopted in the em-bedding module of the framework. Given the context graph 
+
+𝐺 𝑐 with a adjacency matrix 𝐴 a stack layer of the model is defined as follow: 
+
+𝐻 (𝑙 +1) = 𝜎 
+
+(̃𝐷 − 12̃ 𝐴̃𝐷 − 12 𝐻 (𝑙 )𝑊 (𝑙 ))
+
+(8) where ̃ 𝐴 = 𝐴 + 𝐼 , where 𝐼 ∈ ℝ𝑛 ×𝑛 is the identity matrix with goal to add self-loops and the degree diagonal matrix with ̃ 𝐷 𝑖𝑖 = ∑𝑗 ∈𝑉 ̃ 𝐴 𝑖𝑗 . The matrix 𝑊 𝑙 of the 𝑙 -th layer is a trainable parameter in GCN and 𝜎 is the activation function (𝑅𝑒𝐿𝑢 in the experiments). The last layer of embedding matrix 𝐻 𝑙 ∈ ℝ𝑛 ×𝐹 is the representation matrix and contains in each row the corresponding node representation with dimension 𝐹 .The operator can be defined in the perspective of a node as follow: 
+
+𝐻 (𝑙 +1)  
+
+> 𝑖
+
+= 𝑊 (𝑙 ) ∑
+
+> 𝑗 ∈𝑁 (𝑖 )
+
+𝑤 (𝑗, 𝑖 )
+
+√̃𝑑 𝑗 ̃ 𝑑 𝑖 
+
+𝐻 (𝑙 ) 
+
+> 𝑗
+
+(9) where 𝑤 (𝑗, 𝑖 ) denotes the edge weight from source node 𝑗 to target node 𝑖 and ̃ 𝑑 𝑗 denotes the node 𝑗 degree. Note that 𝐺 𝑐 is the input (along with node attributes) to learning the node representations in the GNN. However, each round the framework builds a new context graph 𝐺 𝑐 .Thus, for each round, the learning of the node embedding uses on a potentially different graph. However, the parame-ters of the GNN model (i.e., the weight matrices 𝑊 (𝑙 )) are carried over from the previous round (and not re-initalized), and this reduces the training time of the GNN model in each round. 
+
+3.5. Clustering 
+
+We apply the K-means clustering algorithm on the data points provided by the Embedding module. Given a set ob-servations 𝑋 = { 𝑥 1, … , 𝑥 𝑛 } this algorithm aims to partition the data points into 𝐾 disjoint sets 𝐶 = { 𝐶 1, … , 𝐶 𝑘 } with go to minimize the objective function bellow: 
+
+𝐿 =
+
+> 𝑁
+
+∑
+
+> 𝑛 =1
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+𝑟 𝑛𝑘 || 𝑥 𝑛 − 𝜇 𝑘 || 2 (10) K-means aims to optimize the parameters 𝜇 𝑘 and 𝑟 𝑛𝑘 
+
+that minimizes the objective function.These parameters are, respectively, the mean data points that belongs to the cluster k and a variable indicator, as described, respectively, in Equations 11 and 12. Note that if one of the parameters is known, another one can be inferred. For this, an iterative method is applied in order to optimize one by one. 
+
+𝜇 𝑘 =
+
+∑𝑛 𝑟 𝑛𝑘 𝑥 𝑛 
+
+∑𝑛 𝑟 𝑛𝑘 
+
+, for 𝑘 = 1 , … , 𝐾 (11) 
+
+𝑟 𝑛𝑘 =
+
+{
+
+1, if 𝑘 = arg min 𝑗 ‖𝑥 𝑛 − 𝜇 𝑗 ‖2, 𝑘 = 1 , … , 𝐾, 
+
+0, otherwise. (12) Standard optimization methods are used to solve the 𝐾 -means problem in order to determine the cluster assignment matrix 𝑟 𝑛𝑘 .  
+
+> R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 6 of 11 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+
+3.6. Model training 
+
+An important contribution of this work is the self-learning component in the proposed framework. In the training stage the process involves passing through each module, Dynamic Context, Embedding, and Clustering, in iterative rounds. In each round, the model in the Embedding module is trained for a fixed number of epochs to optimize and learn the weights matrices and bias for each layer in GNN. For each epoch, (Context Graph) is considered, as opposed to a sample the entire network. However, we evaluate the loss function and update the parameters by 𝑛 𝑛 𝑏 
+
+times using mini-batches of size 𝑛 𝑏 which are uniformly sampled without replacement from the graph nodes. Despite using all nodes and edges in message passing, only the nodes in the batch are used to evaluate the loss function at each mini-batch. This approach allows us to make efficient use of the entire network while still updating the model parameters in a batch-wise manner, an approach known to be lead to better convergence. Algorithm 1 illustrates the DCSL-GNN framework. In the very first round, before the clusters are formed, each node is considered to be in its own individual cluster (cluster 𝐶 0). Thus, during the first random walk procedure, each node in the neighborhood has an equal probability of being visited, and the walk can return to the given node (as the node is the cluster center) with probability (1 − 𝑝 ).
+
+Algorithm 1 DCSL-GCN: model training using mini-batches for the evaluation function 
+
+for 𝑟 = 1 , … , 𝑛 𝑟 do 
+
+𝐺 𝑐 ← GENERATE CONTEXT (𝐺, 𝐻 𝑟 −1 , 𝐶 𝑟 −1 )
+
+for 𝑒 = 1 , … , 𝑛 𝑒 do 
+
+𝐻 𝑟 = 𝐺𝑒𝑛𝑒𝑟𝑎𝑡𝑒𝐸𝑚𝑏𝑒𝑑𝑑𝑖𝑛𝑔𝑠 (𝐺 𝑐 , 𝑊 )
+
+for 𝑖 = 1 , … , 𝑛 𝑛 𝑏 
+
+do 
+
+S ← GENERATE SEEDS (𝑉 𝑐 , 𝑛 𝑢 )L ← COMPUTE LOSS (𝑆, 𝐻 𝑟 )UPDATE WEIGHTS (W,L) 
+
+end for end for 
+
+𝐶 𝑟 ← GENERATE CLUSTERS (𝐻 𝑟 )
+
+end for 
+
+For training the GNN model, a loss function based on triplet loss was adopted, as shown in Equation 13. In this function a sample data point (known as anchor) is com-pared with the matching input (positive sample) and non-matching input (negative sample). Nodes that belong to the same cluster as the anchor node are considered positive samples, denoted as 𝑥 + 
+
+> 𝑛
+
+. Nodes that do not belong to the same cluster are considered negative samples, denoted as 𝑥 − 
+
+> 𝑛
+
+. This function aims to minimize the distance between an anchor and a positive sample; and maximizes the distance between the anchor and a negative sample. The hyper-parameter Δ
+
+enforces a margin distance between positive and negative pairs. 
+
+𝐿 (Θ) = 1
+
+𝑁 
+
+> 𝑁
+
+∑
+
+> 𝑛 =1
+
+max (|| 𝑥 𝑛 − 𝑥 + 
+
+> 𝑛
+
+|| 2 − || 𝑥 𝑛 − 𝑥 − 
+
+> 𝑛
+
+|| 2 + Δ , 0)
+
+(13) This loss function was adopted because it aims to min-imize the distances between similar data points (positive pairs) and increase the distances between dissimilar data points (negative pairs). This behavior is aligned with the pro-cedure to construct the Context Graph, as the random walks are biased by the Euclidean distance in the latent space. Therefore, in every round, similar nodes in embedding space becomes closer and distinct nodes becomes farther apart away. This process contributes to create a better context in the subsequent round. Finally, the relatively simple GCN architecture proposed by [12] was adopted. It a simple model with only a few trainable parameters (only the weights and bias matrices). A GCN model with only two layers is considered, and thus, we need to learn two matrices, 𝑊 (0) and 𝑊 (1) as seen in the Equation 8. In each round of training, the parameters of the GCN for round 𝑟 are initialized with the parameter values obtained from the previous round 𝑟 −1 . The computa-tional cost of a simple model is reduced and the framework becomes relevant in scenarios where the graph has a large number of vertices and edges. Moreover, this procedure must be efficient since a model will be trained in every round of the proposed framework. 
+
+## 4. Evaluation 
+
+This section provides an evaluation of DCSL-GNN in various scenarios using synthetic attributed networks and benchmark datasets, as well as a direct comparison with other algorithms. 
+
+4.1. Attributed Stochastic Block Model 
+
+The Stochastic Block Model (SBM) [11] is a generative model for random graphs that produces networks containing cluster structure. The model is defined by the number of clusters 𝐾 , the number of nodes in each cluster, 𝑛 𝑖 , 𝑖 =1, … , 𝐾 , and a symmetric matrix 𝐵 ∈ [0 , 1] 𝐾 ×𝐾 specifying the connectivity probabilities between clusters. Thus, 𝐵 [𝑖, 𝑗 ]
+
+is the probability that an edge is present between a pair of nodes 𝑢 and 𝑣 that belong to clusters 𝑖 and 𝑗 , respectively. To model homophily and induce clusters, 𝐵 [𝑖, 𝑖 ] > 𝐵 [𝑖, 𝑗 ], 𝑖 ≠
+
+𝑗 .The classic SBM has been recently extended to incorpo-rate a model for node attributes that can be correlated with network structure [22, 8]. A simple model for node attributes assumes that all nodes in the same cluster have a random attribute drawn from the same distribution. In particular, the attributes of such nodes are independently and identically distributed. Gaussian distributions with parameters 𝜇 𝑖 and 
+
+𝜎 2 
+
+> 𝑖
+
+, 𝑖 = 1 , … , 𝐾 , are used to model the attributes of nodes in cluster 𝑖 . Note that, conditioned on its cluster, the edges incident to a node and its attribute are independent.    
+
+> R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 7 of 11 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+> Figure 3: Normalized Mutual Information over 50 rounds in different scenarios.
+
+This model allows us to explore the role of network information, represented by edges, and node information, represented by attributes, in the identification of clusters. In particular, by increasing the variance 𝜎 2 
+
+> 𝑖
+
+for all 𝑖 , the node information becomes noisier and less reliable. Similarly, by decreasing 𝐵 [𝑖, 𝑖 ] for all 𝑖 , the network information becomes noisier and less reliable. The Normalized Mutual Information (NMI) is a classic metric used to evaluate the quality of a clustering with re-spect to a ground truth. NMI values range from [0 , 1] , where values close to 0 indicate poor cluster quality, while values approaching 1 indicate high cluster quality. This metric is used to assess the performance of DCSL-GNN and the other algorithms. To ensure statistical significance given the stochastic nature of DCSL-GNN and the synthetic networks, multiple independent experiments using different sampled networks were conducted for each scenario. The reported results are the mean values obtained from multiple runs, with 50 runs per scenario. For the experiments, the generated networks have 𝐾 = 4 
+
+clusters with 𝑛 𝑖 = 100 , 𝑖 = 1 , … , 4, resulting in a total of 
+
+𝑁 = 400 nodes. The intra-cluster probability 𝐵 [𝑖, 𝑖 ] = 𝑝 𝐼 
+
+is the same for all clusters and is varied in the experiments, while the inter-cluster probability is fixed at 𝐵 [𝑖, 𝑗 ] = 0 .1,
+
+𝑖 ≠ 𝑗 . Thus, the average number of edges between a node and nodes in different clusters is 30, corresponding to 10 edges per cluster. The attributes for each cluster follow Gaussian distributions with means [10 , 20 , 30 , 40] , respectively, and have identical variance 𝜎 2, which is varied in the experi-ments. 
+
+4.2. Self-learning potential 
+
+DCSL-GNN utilizes a self-supervised mechanism to learn through multiple rounds. The goal is to understand the behavior of the model across multiple rounds under different scenarios of noise in the network structure and node attributes. Figure 3 shows the evolution of the NMI as a function of the learning rounds for the different scenarios. Note that in scenarios where the network information has little noise, namely 𝑝 𝐼 = 0 .5, DCSL-GNN exhibits rapid convergence towards a perfect clustering after a few rounds of self-learning. This occurs even when the node information is very noisy, with 𝜎 2 = 50 . However, when the network information becomes noisier, with 𝑝 𝐼 = 0 .3, the model’s performance improves over the rounds of self-learning and converges, but not to a perfect clustering. This occurs even when node attributes have little noise, with 𝜎 2 = 1 . Finally, in the challenging scenarios where the network information is very noisy, with 𝑝 𝐼 = 0.2, and attributes have little noise, with 𝜎 2 = 1 , DCSL-GNN improves its performance over many rounds of self-learning, eventually converging and delivering good performance. However, when attributes are also very noisy, with 𝜎 2 = 50 , the multiple rounds of self-learning do not improve performance, and the model converges to low cluster quality, similar to a random guess. Indeed, in such a scenario, there is not enough information to perform effective clustering. Figure 4 shows the t-SNE projection in two dimensions of the node embeddings generated by DCSL-GNN at the end of different rounds in the scenario where 𝑝 𝐼 = 0 .2 and 
+
+𝜎 2 = 1 . Initially, the projections do not reflect any cluster          
+
+> R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 8 of 11 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning
+> Figure 4: Projection of node embeddings at the end of different rounds for the scenario where 𝑝 𝐼 = 0 .2and 𝜎 2= 1 (two-dimensional projection via t-SNE).
+
+structure. However, as the rounds progress, the clusters begin to form. 
+
+4.3. Network and node noise 
+
+The performance of DCSL-GNN in different scenarios of noise for the network and node attributes is evaluated. This is compared with the performance of algorithms that consider only the network structure, namely Louvain mod-ularity, and only the node attributes, namely K-means, to cluster the data in the exact same networks. Additionally, DCSL-GNN is evaluated without the self-learning compo-nent, denoted as NSL in the results, which is trained with only one round but with the same total number of epochs as the self-learning model. 
+
+Figure 5: Performance, with mean and standard deviation shown as shaded regions, of different clustering algorithms under different scenarios as a function of 𝑝 𝐼 for different attribute variances. Figure 5 compares the performance of the algorithms under a fixed variance in each plot but varying intra-cluster probabilities. Observe that in regimes with high intra-cluster probability, namely 𝑝 𝐼 ≥ 0.4, the model achieves similar results to the Louvain algorithm, even when the attributes are very noisy, with 𝜎 2 = 30 . Note that in all scenarios, the performance decays as the network information becomes noisier, that is, as 𝑝 𝐼 is reduced. However, this decay depends on the quality of the attribute information, with better per-formance when the attribute information is less noisy, as in the case 𝜎 2 = 0 .5. Interestingly, DCSL-GNN consistently outperforms the model without the self-learning component in all scenarios, indicating the effectiveness of the self-learning mechanism in improving performance. Figure 6 shows the result for a fixed intra-cluster proba-bility while the attribute variance is varied. Note that in all scenarios, the performance of DCSL-GNN decays with the increase in the variance. However, this decay depends on 𝑝 𝐼 .When the network information has little noise, with 𝑝 𝐼 =0.6, DCSL-GNN provides perfect clustering even under very high attribute noise, with 𝜎 2 = 50 . Note that DCSL-GNN outperforms K-means when attribute information is noisy but network information has little noise. Moreover, DCSL-GNN outperforms Louvain modularity when network infor-mation is noisy but attribute information has little noise. This indicates that DCSL-GNN is flexible and capable of extracting information from both the network structure and node attributes to perform more effective clusterings. 
+
+4.4. Benchmark datasets 
+
+Experiments were performed on three real citation net-works that are commonly used to evaluate different network analysis algorithms: Cora, Citeseer, and PubMed. These datasets are widely employed in community detection stud-ies, serving as benchmark graphs for evaluating the perfor-mance of various frameworks and methods. DCSL-GNN was executed 20 times with the hyperparameters manually   
+
+> R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 9 of 11
+
+Clustering Node Attributed Networks with Graph Neural Networks and Self Learning 
+
+Figure 6: Performance, with mean and standard deviation shown as shaded regions, of different clustering algorithms under different scenarios as a function of attribute variance for different values of 𝑝 𝐼 .Dataset Nodes Edges 𝐹 𝐾 cc < 𝑘 > Imbalance Cora 2708 5278 1433 7 0.24 3.89 4.54               
+
+> Citeseer 4230 4732 5337 60.11 2.52 1.48
+> PubMed 19717 44324 500 30.06 4.49 1.91
+
+Table 2 
+
+Network characteristics of the benchmark datasets. 𝐹 repre-sents the dimension of the node attributes, 𝐾 is the number of clusters, 𝑐𝑐 denotes the average clustering coefficient of the network, < 𝑘 > is the average node degree, and imbalance is the ratio between the largest and smallest cluster. 
+
+tuned according to the dataset. Table 2 describes important characteristics of these datasets. Table 3 presents the evaluation of multiple frameworks for clustering attributed graphs, with the NMI metric used to measure cluster quality. Note that for each dataset, the performance of the different algorithms is very different. Moreover, the performance of each algorithm across datasets is also very different. In the Cora dataset, the MGCCN framework [14] achieves the highest NMI value and is con-sidered state-of-the-art. Similarly, in the PubMed dataset, SEComm [2] is considered state-of-the-art. Furthermore, the proposed framework DCSL-GNN shows superior per-formance for the Citeseer dataset. Clearly, there is no single algorithm that is best across all datasets. While DCSL-GNN shows superior performance on the Citeseer dataset, its performance on the other two datasets is relatively far from the state-of-the-art. A possible cause for this lower performance is cluster, or class, imbalance, which can significantly impact the performance of DCSL-GNN. In particular, clusters with fewer nodes contribute less to the objective function, which can result in a bias towards the dominant cluster. Indeed, for the Cora dataset, DCSL-GNN shows very good accuracy for the dominant cluster but negligible accuracy for the smallest cluster, although these results are not shown here. 
+
+## 5. Conclusion 
+
+This paper proposed a novel fully unsupervised frame-work for clustering network nodes with attributes, called DCSL-GNN. The framework is based on two key ingre-dients: context graph and self-learning. The context graph                                    
+
+> Cora Citeseer PubMed K-means ∗12 .8 ± 3 .526 .54 ± 2 .326 .77 ± 0 .2
+> Louvain ∗41 .49 28 .62 21 .81
+> GAE [2] 40 .69 18 .34 22 .97
+> GIC [16] 53 .70 45 .30 31 .90
+> AGC [29] 53 .68 41 .13 31 .59
+> MGCCN [14] 60 .20 43 .20 −
+> DNENC-Att [24] 52 .80 39 .70 26 .60
+> DMoN [23] 48 .80 33 .70 29 .80
+> CommDGI [28] 57 .90 41 .90 35 .70
+> SEComm [2] 56 .04 42 .53 36 .50
+> DCSL-GNN ∗46 .95 ± 3 .147 .74 ± 2 .824 .27 ± 1 .20
+
+Table 3 
+
+Normalized Mutual Information (NMI) of clustering perfor-mance of different algorithms for Cora, Citeseer, and PubMed datasets. Performance values were obtained from the corre-sponding papers and were not reproduced in this work. The performance of algorithms marked by ∗ was obtained in this work. Highlighted in red is the best result for each dataset, illustrating the lack of a single best algorithm across all datasets. 
+
+is a weighted graph built from the original graph where edges indicate that nodes should belong to the same cluster (independent of their graph distance in the original graph). The self-learning allows DCSL-GNN to generate clusters and that generate new and better context graphs that can then be used to generate better clusters. A GNN is responsible for generating the node representations from the context graph which are in turn used by a clustering algorithm in Euclidean space. The GNN leverages the network and at-tribute information as well as a loss function that depends on clustering assignments of the previous self-learning round in order to generate meaningful representations. This iterative self-learning approach enables DCSL-GNN to refine both the node representations and the clustering assignments in a mutually beneficial manner. Using a network model with clusters and attributes, DCSL-GNN is evaluated and compared to other algorithms with results indicating its potential in extracting information from both the network and attributes to generate effective clusters. In particular, multiple rounds of self-learning are always advantageous, and network or attribute information 
+
+R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 10 of 11 Clustering Node Attributed Networks with Graph Neural Networks and Self Learning 
+
+can be leveraged even when the other is very noisy. Fi-nally, when considering benchmark datasets, DCSL-GNN achieved mixed results being superior to all state-of-the-art algorithms for one dataset. 
+
+## CRediT authorship contribution statement 
+
+Rodrigo de Sapienza Luna: Conceptualization of this study, Methodology, Software, Writing. Daniel Ratton Figueiredo: Supervision, Conceptualization, Methodology, Writing. 
+
+## Declaration of competing interest 
+
+The authors declare the following financial interests/personal relationships which may be considered as potential com-peting interests: Daniel Ratton Figueiredo reports financial support was provided by National Council for Scientific and Technological Development (CNPq), Brazil. 
+
+## Data availability 
+
+Data will be made available on request. 
+
+## References 
+
+[1] et al., B., 2021a. Analyzing the expressive power of graph neural networks in a spectral perspective, in: International Conference on Learning Representations. [2] et al., B., 2021b. Unsupervised constrained community detection via self-expressive graph neural network, in: Uncertainty in Artificial Intelligence, PMLR. [3] et al., H., 2022. Data mining: concepts and techniques. Morgan kaufmann. [4] et al., V.D.B., 2008. Fast unfolding of communities in large networks. Journal of Statistical Mechanics . [5] Barceló, P., Kostylev, E.V., Monet, M., Pérez, J., Reutter, J., Silva, J.P., 2020. The logical expressiveness of graph neural networks, in: International Conference on Learning Representations. [6] Bo, D., Wang, X., Shi, C., Zhu, M., Lu, E., Cui, P., 2020. Structural deep clustering network, in: Proceedings of the web conference 2020, pp. 1400–1410. [7] Cui, P., Wang, X., Pei, J., Zhu, W., 2018. A survey on network embedding. IEEE transactions on knowledge and data engineering 31, 833–852. [8] Deshpande, Y., Sen, S., Montanari, A., Mossel, E., 2018. Contextual stochastic block models. Advances in Neural Information Processing Systems 31. [9] Fortunato, S., 2010. Community detection in graphs. Physics reports 486. [10] Fortunato, S., Hric, D., 2016. Community detection in networks: A user guide. Physics reports 659. [11] Holland, P.W., Laskey, K.B., Leinhardt, S., 1983. Stochastic block-models: First steps. Social networks 5. [12] Kipf, T.N., Welling, M., 2017. Semi-supervised classification with graph convolutional networks, in: International Conference on Learn-ing Representations. [13] Li, Q., Han, Z., Wu, X.M., 2018. Deeper insights into graph con-volutional networks for semi-supervised learning, in: Thirty-Second AAAI conference on artificial intelligence. [14] Liu, L., Kang, Z., Ruan, J., He, X., 2022. Multilayer graph contrastive clustering network. Information Sciences 613. [15] Liu, Z., Zhou, J., 2022. Introduction to graph neural networks. Springer Nature. [16] Mavromatis, C., Karypis, G., 2021. Graph infoclust: Maximizing coarse-grain mutual information in graphs, in: Pacific-Asia Confer-ence on Knowledge Discovery and Data Mining, Springer. [17] Newman, M., 2018. Networks. Oxford university press. [18] Newman, M.E., Girvan, M., 2004. Finding and evaluating community structure in networks. Physical review E 69. [19] Rousseeuw, P.J., 1987. Silhouettes: a graphical aid to the interpreta-tion and validation of cluster analysis. Journal of computational and applied mathematics 20. [20] Schaeffer, S.E., 2007. Graph clustering. Computer science review 1. [21] Shchur, O., Günnemann, S., 2019. Overlapping community detection with graph neural networks. arXiv preprint arXiv:1909.12201 . [22] Stanley, N., Bonacci, T., Kwitt, R., Niethammer, M., Mucha, P.J., 2019. Stochastic block models with multiple continuous attributes. Applied Network Science , 1–22. [23] Tsitsulin, A., Palowitch, J., Perozzi, B., Muller, E., 2023. Graph clustering with graph neural networks. Journal of Machine Learning Research (JMLR) 24, 1–21. URL: http://jmlr.org/papers/v24/ 20-998.html .[24] Wang, C., Pan, S., Celina, P.Y., Hu, R., Long, G., Zhang, C., 2022. Deep neighbor-aware embedding for node clustering in attributed graphs. Pattern Recognition . [25] Xu, M., 2021. Understanding graph embedding methods and their applications. SIAM Review 63, 825–853. [26] Yang, H., Wang, J., Duan, R., Yan, C., 2023. Dcom-gnn: A deep clus-tering optimization method for graph neural networks. Knowledge-Based Systems 279. [27] Ying, R., He, R., Chen, K., Eksombatchai, P., Hamilton, W.L., Leskovec, J., 2018. Graph convolutional neural networks for web-scale recommender systems, in: ACM SIGKDD. [28] Zhang, T., Xiong, Y., Zhang, J., Zhang, Y., Jiao, Y., Zhu, Y., 2020. Commdgi: community detection oriented deep graph infomax, in: Proceedings of the 29th ACM international conference on information & knowledge management. [29] Zhang, X., Liu, H., Li, Q., Wu, X.M., 2019. Attributed graph cluster-ing via adaptive graph convolution. arXiv preprint arXiv:1906.01210 .[30] Zhang, X., Liu, H., Wu, X.M., Zhang, X., Liu, X., 2021. Spectral embedding network for attributed graph clustering. Neural Networks .
+
+Rodrigo de Sapienza Luna received a BS in Computer Science from the Federal University of Rio de Janeiro (UFRJ), Brazil, in 2020. Subsequently, he obtained a Master of Science in Engineering and Computer Science from the same institution in 2023, and is currently pursuing an PhD degree in Systems Engineering and Computer Science in the same university. His research interests include graph neural networks, machine learning and network science. 
+
+Daniel Ratton Figueiredo received a BS cum laude degree in Computer Science and MSc degree in Computer and Systems Engineering from the Federal University of Rio de Janeiro (UFRJ) Brazil, in 1996 and 1999, respectively. He received a MSc and PhD degrees in Computer Science from the University of Massachusetts Amherst (UMass) in 2005. He worked as a post-doc researcher at the Swiss Federal Institute of Technology, Lausanne (EPFL). In 2007, he joined the Department of Computer and Systems Engineering (PESC/COPPE) at the Federal University of Rio de Janeiro (UFRJ), Brazil where he currently holds an Associate Professor position. He has a Research Productivity Fellowship granted by CNPq (since 2009) and was member of the Young Scientists Program granted by FAPERJ (from 2010 to 2018). He was a Visiting Fulbright Scholar at Columbia University (6 months in 2017). His current main interests are in Network Science and Graph Learning. 
+
+R.S. Luna and D.R Figueiredo : Preprint submitted to Elsevier Page 11 of 11
