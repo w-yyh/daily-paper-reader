@@ -6,26 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-15
-- 运行时间：2026-06-15 22:41:45 UTC
+- 最新运行日期：2026-06-16
+- 运行时间：2026-06-16 21:49:34 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：0
+- 本次总论文数：2
+- 精读区：1
 - 速读区：1
 
 ### 今日简报（AI）
-今日速读一篇关于图神经网络与自学习结合的节点属性网络聚类研究，评分尚可。
-论文指出通过GNN增强自学习聚类，能在保留图结构与节点属性的同时自动优化簇数。
-对此方向感兴趣的读者不妨找两篇深度聚类综述与开源代码跑跑看，直观感受效果。
-- 详情：[/202606/15/README](/202606/15/README)
+今日精读高评分论文《S²COPE》，速览《ExDet》；聚焦自监督概念发现与开放词汇检测。
+最值得关注的是用偏好学习驱动无监督概念挖掘的自监督框架，以及跨模态外推在开放域检测中的尝试。
+建议先精读偏好学习表示方向，再跟进跨模态检测的局限分析，理解二者在概念对齐上的互补思路。
+- 详情：[/202606/16/README](/202606/16/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [S$^2$COPE: Self-Supervised Concept Discovery via Preference Learning](/202606/16/2606.14586v1-s2cope-self-supervised-concept-discovery-via-preference-learning)  
+   标签：评分：9.0/10、query:cgcd
+   evidence：自监督概念发现从未标注图像中发现新颖结构化概念，直接解决新类发现问题。
 
 ### 速读区论文标签
-1. [Clustering Node Attributed Networks with Graph Neural Networks and Self Learning](/202606/15/2606.13444v1-clustering-node-attributed-networks-with-graph-neural-networks-and-self-learning)  
+1. [ExDet: Open-Domain Open-Vocabulary Detection with Cross-modal Extrapolation and Rectification](/202606/16/2606.09360v1-exdet-open-domain-open-vocabulary-detection-with-cross-modal-extrapolation-and-rectification)  
    标签：评分：6.0/10、query:cgcd
-   evidence：基于图神经网络和自学习的图聚类方法
+   evidence：开放域开放词汇检测泛化到新类别和未见过域，处理含未知类的开放世界。
 
 
 <div class="dpr-home-promo-card">

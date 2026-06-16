@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-16",
+  "date": "2026-06-16",
+  "generated_at": "2026-06-16T21:49:43",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/16/2606.14586v1-s2cope-self-supervised-concept-discovery-via-preference-learning",
+      "section": "deep",
+      "title_en": "S$^2$COPE: Self-Supervised Concept Discovery via Preference Learning",
+      "authors": "Shilong Xiang, Zirui Zhang, Chengzhi Mao",
+      "date": "2026-06-12",
+      "pdf": "https://arxiv.org/pdf/2606.14586v1",
+      "score": "9.0",
+      "evidence": "自监督概念发现从未标注图像中发现新颖结构化概念，直接解决新类发现问题。",
+      "tldr": "S$^2$COPE针对自监督方法特征不解释而可解释模型依赖密集标注的矛盾，提出一种无标签的自监督概念发现框架。将视觉大语言模型作为主动参与者，在偏好优化循环中自主假设、验证和强化候选视觉属性，直接从原始图像中发现新颖结构化概念，无需任何人工标签。在多个数据集上实验表明，所发现的语义概念具有可解释性和准确性，为开放世界新类发现提供了自监督学习途径，实现了标注自由下的概念挖掘。",
+      "tags": "query:cgcd",
+      "abstract_en": "Current representation learning paradigms force a fundamental compromise: self-supervised methods scale to massive datasets but yield opaque features, whereas interpretable models remain bottlenecked by the need for dense human annotation. We introduce Self-Supervised Concept discOvery via Preference lEarning (\\model), a label-free framework that resolves this dilemma. Instead of treating Vision-Large-Language Models (VLLMs) as static feature extractors, \\model leverages them as active participants in a self-supervised preference optimization loop. By autonomously hypothesizing, validating, and reinforcing candidate visual attributes directly from raw imagery, our framework discovers novel, structured concepts without a single label. Extensive experiments across natural, medical, and physics domains demonstrate that \\model successfully extracts domain-specific concepts where standard VLLMs often fail to generate. By amortizing concept discovery directly into the VLLM backbone through our self-supervised preference objective -- rather than relying on static generation and disjoint filtering -- we achieve up to a 24-point absolute improvement in downstream top-1 classification accuracy on unseen data. Our work suggest that interpretability can emerge through a model's autonomous interaction with incidental visual structures, without any human supervision.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/16/2606.09360v1-exdet-open-domain-open-vocabulary-detection-with-cross-modal-extrapolation-and-rectification",
+      "section": "quick",
+      "title_en": "ExDet: Open-Domain Open-Vocabulary Detection with Cross-modal Extrapolation and Rectification",
+      "authors": "Yupeng Zhang, Yuzhong Feng, Ruize Han, Zhiwei Chen, Wei Feng, Liang Wan",
+      "date": "2026-06-08",
+      "pdf": "https://arxiv.org/pdf/2606.09360v1",
+      "score": "6.0",
+      "evidence": "开放域开放词汇检测泛化到新类别和未见过域，处理含未知类的开放世界。",
+      "tldr": "开放域开放词汇检测（ODOVD）要求检测器泛化到新类别和未见域，现有方法通常从头训练，成本高昂。ExDet提出轻量级类别-域协同框架，通过文本引导外推（TGE）从文本推断代理视觉原型，轻量级检测器兼容矫正（DCR）在推理时矫正表示，ExRPN结合语义相似度重校提案得分。该方法无需检测器再训练，在多个基准上达到最先进性能，为ODOVD提供了高效的即插即用方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-domain open-vocabulary detection (ODOVD) requires detectors to generalize to both novel categories and unseen domains, making it more challenging than open-vocabulary detection. Existing methods typically train open-vocabulary detectors together with domain generalization modules from scratch, leading to high training cost. we propose ExDet, a lightweight category-domain collaborative generalization framework for ODOVD that enhances the cross-category and cross-domain generalization of existing detectors. ExDet consists of Text-Guided Extrapolation (TGE), a lightweight Detector-Compatible Rectification (DCR) module, and ExRPN. Specifically, TGE exploits the DeltaSpace property of vision-language models (VLMs) to infer category- and domain-aware proxy visual prototypes from text. DCR is learned from the TGE-generated prototypes in a detector training-free and real-data-free manner, and is inserted after the classification head at inference to rectify representations toward a detector-compatible source-domain visual distribution, thereby enhancing classification for targets from novel categories and unseen domains. ExRPN recalibrates proposal scores by combining semantic similarity with RPN confidence, improving recall for novel and domain-shifted objects while providing better support for subsequent classification and DCR. ExDet achieves SOTA performance on OD-LVIS, OV-LVIS, Objects365, and MSOSB.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
