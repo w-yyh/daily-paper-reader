@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-18 <!--dpr-date:20260618-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/18/2606.18833v1-seed-guided-semi-supervised-clustering-by-a-contrario-anomaly-detection" data-sidebar-item="{&quot;title&quot;: &quot;Seed-Guided Semi-Supervised Clustering by A-Contrario Anomaly Detection&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.18833v1-seed-guided-semi-supervised-clustering-by-a-contrario-anomaly-detection&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;基于种子引导的半监督聚类，可鲁棒地发现群组，适用于已知类种子下的新类别发现。&quot;}">Seed-Guided Semi-Supervised Clustering by A-Contrario Anomaly Detection</a>
   * 2026-06-16 <!--dpr-date:20260616-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/16/2606.14586v1-s2cope-self-supervised-concept-discovery-via-preference-learning" data-sidebar-item="{&quot;title&quot;: &quot;S$^2$COPE: Self-Supervised Concept Discovery via Preference Learning&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.14586v1-s2cope-self-supervised-concept-discovery-via-preference-learning&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;自监督概念发现从未标注图像中发现新颖结构化概念，直接解决新类发现问题。&quot;}">S$^2$COPE: Self-Supervised Concept Discovery via Preference Learning</a>

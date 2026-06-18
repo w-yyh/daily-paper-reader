@@ -1,0 +1,52 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-18T21:41:30.006173+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.18833v1",
+      "source": "arxiv",
+      "title": "Seed-Guided Semi-Supervised Clustering by A-Contrario Anomaly Detection",
+      "abstract": "This paper introduces a semi-supervised clustering framework grounded in the statistical duality between grouping principles and anomaly detection. We address the challenge of robust cluster definition in noisy environments -- a task where partitioning algorithms often over-assign outliers and density-based methods remain sensitive to heuristic global parameters. Drawing on \\textit{a-contrario} statistical reasoning and Gestalt proximity principles, we define a cluster as a maximal subset of data points containing no anomalies relative to a null hypothesis of uniform randomness. Central to this approach is the Perception algorithm, which utilises a principled expectation-based threshold ($\\mathbb{E} < 1$) to identify outliers without manual parameter tuning. By treating clustering as the dual of anomaly detection, we employ an iterative ``clustering-by-exclusion'' mechanism. The algorithm is seed-guided, leveraging minimal user-provided labels to initialise robust cluster medians and form initial groups, which are subsequently expanded by admitting non-anomalous points. This approach naturally isolates fringe points, isolated noise, and emerging unknown clusters. We evaluate the method on synthetic and real-world benchmarks, including image and text datasets represented through raw, linear-reduced, and neighbourhood-preserving embeddings. Results demonstrate that with as few as 10--30 seeds per cluster, the proposed method achieves competitive and often very strong performance under a practical low-tuning benchmarking protocol, while maintaining linear scalability with respect to both observations and dimensionality for a fixed number of seeded clusters and iterations.",
+      "authors": [
+        "Nassir Mohammad"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-17T09:08:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.18833v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Semi-supervised clustering with seed guidance that robustly discovers groups, applicable to novel category discovery with known class seeds.",
+      "llm_evidence_cn": "基于种子引导的半监督聚类，可鲁棒地发现群组，适用于已知类种子下的新类别发现。",
+      "llm_evidence": "基于种子引导的半监督聚类，可鲁棒地发现群组，适用于已知类种子下的新类别发现。",
+      "canonical_evidence": "基于种子引导的半监督聚类，可鲁棒地发现群组，适用于已知类种子下的新类别发现。",
+      "llm_tldr_en": "This paper proposes a seed-guided semi-supervised clustering method using a-contrario anomaly detection to define clusters as maximal anomaly-free subsets, robustly handling outliers; it is methodologically useful for novel class discovery in open-world scenarios when some known class seeds are available.",
+      "llm_tldr_cn": "针对噪声环境中传统聚类算法易误分异常点的问题，本文提出一种基于种子引导和反事实异常检测的半监督聚类框架，将簇定义为相对于随机零假设无异常的最大子集，并通过期望阈值自动识别离群点。实验表明，该方法无需人工参数即可鲁棒聚类，为开放世界新类发现任务提供了一种统计上可靠的聚类工具。",
+      "llm_tldr": "针对噪声环境中传统聚类算法易误分异常点的问题，本文提出一种基于种子引导和反事实异常检测的半监督聚类框架，将簇定义为相对于随机零假设无异常的最大子集，并通过期望阈值自动识别离群点。实验表明，该方法无需人工参数即可鲁棒聚类，为开放世界新类发现任务提供了一种统计上可靠的聚类工具。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
