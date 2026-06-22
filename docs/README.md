@@ -6,22 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-21
-- 运行时间：2026-06-21 20:39:38 UTC
+- 最新运行日期：2026-06-22
+- 运行时间：2026-06-22 21:30:02 UTC
 - 运行状态：成功
-- 本次总论文数：0
+- 本次总论文数：1
 - 精读区：0
-- 速读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-> 今日无新推荐，系统未产出可展示论文。
-- 详情：[/202606/21/README](/202606/21/README)
+今天速读了一篇将强化学习优化器用于分布外检测理论的论文。
+
+该文为OOD检测提供了收敛性理论保障，是值得关注的交叉方向。
+
+普通读者想入手可先回顾强化学习与不确定性估计的基础概念。
+- 详情：[/202606/22/README](/202606/22/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Theoretical Grounding of Out-Of-Distribution Detection With Reinforcement Learning Optimizer](/202606/22/2606.17477v1-theoretical-grounding-of-out-of-distribution-detection-with-reinforcement-learning-optimizer)  
+   标签：评分：7.0/10、query:cgcd
+   evidence：动态开放世界中的OOD检测处理未知类别
 
 
 <div class="dpr-home-promo-card">

@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-22 <!--dpr-date:20260622-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/22/2606.17477v1-theoretical-grounding-of-out-of-distribution-detection-with-reinforcement-learning-optimizer" data-sidebar-item="{&quot;title&quot;: &quot;Theoretical Grounding of Out-Of-Distribution Detection With Reinforcement Learning Optimizer&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.17477v1-theoretical-grounding-of-out-of-distribution-detection-with-reinforcement-learning-optimizer&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;动态开放世界中的OOD检测处理未知类别&quot;}">Theoretical Grounding of Out-Of-Distribution Detection With Reinforcement Learning Optimizer</a>
   * 2026-06-18 <!--dpr-date:20260618-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/18/2606.18833v1-seed-guided-semi-supervised-clustering-by-a-contrario-anomaly-detection" data-sidebar-item="{&quot;title&quot;: &quot;Seed-Guided Semi-Supervised Clustering by A-Contrario Anomaly Detection&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.18833v1-seed-guided-semi-supervised-clustering-by-a-contrario-anomaly-detection&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;基于种子引导的半监督聚类，可鲁棒地发现群组，适用于已知类种子下的新类别发现。&quot;}">Seed-Guided Semi-Supervised Clustering by A-Contrario Anomaly Detection</a>

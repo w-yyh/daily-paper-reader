@@ -1,0 +1,2596 @@
+Title: Theoretical Grounding of Out-Of-Distribution Detection With Reinforcement Learning Optimizer
+
+URL Source: https://arxiv.org/pdf/2606.17477v1
+
+Published Time: Wed, 17 Jun 2026 00:27:55 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# Theoretical Grounding of Out-Of-Distribution Detection With Reinforcement Learning Optimizer 
+
+Salimeh Sekeh ∗
+
+San Diego State University 
+
+ssekeh@sdsu.edu 
+
+Xin Zhang ∗
+
+San Diego State University 
+
+xzhang19@sdsu.edu 
+
+## Abstract 
+
+Out-of-distribution (OOD) detection in dynamic open-world environments requires a model to continually adapt to evolving data distributions while generalizing to covariate-shifted inputs and rejecting semantic-shifted OOD examples. Most existing OOD detection methods optimize only the current-step objective and do not explicitly account for how post-deployment environment changes affect future OOD behavior. In this paper, we establish a theoretical grounding for dynamic OOD detection using a reinforcement learning (RL)–guided optimizer that explicitly favors updates that reduce the semantic OOD false positive rate over time. We develop a novel augmented optimizer that uses an RL-guided correction term on top of standard gradient descent (GD) and show its improvement over both future-domain generalization and semantic-OOD rejection. We analyze temporal error decomposition in terms of model-change and environment-change generalization errors and develop a new theoretical framework for comparing the generalization errors under both GD and RL-guided optimizers. 
+
+## 1 Introduction 
+
+Consider an object-recognition system deployed on a mobile robot in a warehouse. During commis-sioning, the system is calibrated on summer imagery; six months later, lighting conditions, seasonal clutter, and equipment upgrades have quietly shifted the data distribution. A model update that minimized last week’s classification loss may have simultaneously pushed the detector’s energy surface in a direction that weakens its response to genuinely anomalous inputs. By the time an out-of-distribution (OOD) object reaches the sensor, the detector has already degraded without any single update being obviously wrong. This failure mode highlights a fundamental challenge in dy-namic OOD detection: an update that improves current-step performance may inadvertently degrade 
+
+future-domain OOD robustness. Most existing OOD detection methods are developed under a static deployment assumption, where the test distribution remains fixed after training [ 7 , 12 , 13 ]. Even methods that adapt at test time, such as entropy minimization [ 21 ] and related test-time adaptation approaches [ 17 ], optimize instantaneous objectives and do not explicitly account for how parameter updates affect the detector’s behavior in subsequent environments. As a result, adaptation steps may gradually erode the separation between in-distribution (ID) and semantic-OOD samples, potentially leading to accumulated performance degradation, which is a phenomenon not previously formalized. This paper addresses the question: can we design an optimization framework for dynamic OOD detection that explicitly accounts for the future-domain consequences of each update? 
+
+A natural approach is to incorporate information about future performance into the current update. We formalize this idea through a value-function perspective: by training a value function that estimates cumulative future OOD performance via temporal-difference (TD) learning, we obtain a differentiable proxy for future-domain robustness that can be directly integrated into the optimization process. 
+
+> ∗Equal contribution. Preprint.
+> arXiv:2606.17477v1 [cs.CV] 16 Jun 2026
+
+Building on this insight, we introduce a reinforcement-learning (RL)-guided optimization framework 
+
+that augments standard gradient descent (GD) with a learned correction term. In our formulation, RL is used in a value-learning sense : a value function, trained via TD learning, captures cumulative future OOD performance and provides a differentiable update-shaping signal through its gradient. The value function operates purely through its gradient: at each update step, its gradient is added as a correction to the standard parameter update, requiring no discrete action selection, no environment model, and no additional inference-time overhead. Unlike general-purpose learned optimizers [ 2, 15 ], the value function is explicitly tied to semantic-OOD false positive rate (FPR), enabling a direct theoretical connection between optimization dynamics and OOD detection performance. 
+
+Theoretical contributions. We provide a theoretical framework that explains how and when the RL-guided update improves dynamic OOD detection. The analysis proceeds in five steps. Temporal error decomposition (Def. 4.1). We decompose the change in future-domain generalization error into two parts: one caused by the environment shift, which is uncontrollable, and one caused by the model update, which is determined by the optimizer. This decomposition isolates the component that optimization can influence. Gradient alignment (Lemma 4.10). We show that, under a structural condition, the update direction induced by the value function is aligned with directions that reduce future-domain generalization error. Model-change improvement (Lemma 4.11). This alignment implies that the RL-guided update consistently reduces the model-induced component of temporal error compared to standard gradient descent. Energy bridge (Lemma 4.12). We further show that this improvement in parameter updates translates into stronger separation between ID and semantic-OOD samples, leading to lower FPR. Unified main result (Thm 4.13). Combining these results, we establish that the RL-guided optimizer improves both future-domain generalization and OOD detection performance relative to gradient descent, up to higher-order effects from environment drift, with the advantage growing across adaptation steps. Our analysis relies on structural assumptions capturing the geometric relationship between covariate-domain learning and OOD separation. We show that these assumptions admit interpretable instantia-tions and can be analyzed concretely in simplified model classes. In particular, we instantiate the framework on a head-only one-layer transformer [ 1], where the gradient-conflict condition reduces to an explicit condition on label alignment and feature-space correlation (Prop. 4.14). Further, we provide theoretical understanding of RL-GD training regimes and analyze the behavior of the RL optimizer during training by RL-GD loss gap (Thm 5.6) along with alternative bounds based on the gradient of energy (Cor. 5.7) and training step-based gradient energy state (Cor. 5.8). Finally, we show that RL-guided optimizer improves the effective gradient flow (Thm 5.13 and Thm 5.14). 
+
+Our contributions are listed below: 
+
+• A temporal error decomposition that isolates the optimizer’s controllable influence on future-domain OOD robustness. • An RL-guided optimization framework in which a TD-trained value function provides a differen-tiable, temporally-aware correction signal. • A theoretical guarantee that the RL-guided optimizer achieves lower future-domain generalization error and lower semantic-OOD false positive rate than standard gradient descent, with improve-ments accumulating across environments. • A concrete instantiation on a head-only one-layer transformer, where the gradient-conflict assump-tion reduces to a verifiable condition on label alignment and feature-space correlation. • A theoretical analysis of the training regimes for our RL-guided optimizer, including a bound on the loss gap between RL and GD optimization, and a demonstration on how the RL-based approach improves effective gradient flow under environment changes and across training updates. 
+
+## 2 Related Work 
+
+Many OOD detection methods assume static distributions, including post-hoc scoring approaches such as maximum softmax probability [ 7], input perturbation [ 12 ], Mahalanobis distance [ 11 ], and energy-based scores [ 13 ], as well as training-time strategies like outlier exposure [ 8 ]. Test-time adaptation methods [ 21 , 17 ] address distribution shift by updating models on unlabeled data [ 21 , 17 ], but optimize instantaneous objectives without considering long-term OOD behavior. Recent work leverages wild or mixed ID/OOD data to improve detection and generalization [ 8, 3], yet typically operates in batch settings with independent updates. Related lines on continual learning and online 2adaptation study stability under sequential shifts [ 9, 14 , 5 ], while RL and meta-learning approaches learn adaptive update rules [ 2, 6 ], and energy-based theories provide geometric interpretations of OOD detection [ 13 ]. In contrast, our work provides a unified temporal perspective , explicitly modeling how optimization dynamics influence future-domain OOD robustness. Extended discussions are in Appendix B. 
+
+## 3 Method 
+
+We study dynamic OOD detection in a non-stationary environment, where the detector must continu-ally adapt to a changing mixture of ID, covariate-shifted, and semantic-OOD samples. Our method augments gradient descent with a learned correction term derived from a value function trained via TD learning. Unlike standard RL formulations that rely on explicit action selection, our framework uses RL in a value-learning sense : the learned value function does not produce actions or define a control policy; instead, its gradient serves as a differentiable signal that shapes the parameter update. This allows the optimizer to incorporate information about cumulative future OOD performance without introducing discrete decisions or environment models. 
+
+Preliminaries: Dynamic OOD detection setup on wild data . At each outer step t, the detector encounters data drawn from a non-stationary distribution 
+
+Pwild  
+
+> t
+
+= (1 − αcov  
+
+> t
+
+− αsem  
+
+> t
+
+)PID + αcov  
+
+> t
+
+PCov  
+
+> t
+
++ αsem  
+
+> t
+
+PSem  
+
+> t
+
+, (1) where PID denotes the in-distribution data, PCov  
+
+> t
+
+denotes covariate-shifted OOD data that remain in the known label space, and PSem  
+
+> t
+
+denotes semantic OOD data that should be rejected. The detector must simultaneously: i) maintain classification performance on ID and covariate-shifted samples, and 
+
+ii) reduce FPR on semantic OOD samples. Let fθ : X → RN be a classifier and let Eθ (x) = − log PNy=1 exp  f (y) 
+
+> θ
+
+(x) be its energy score as the OOD detection statistics. We train the detector with an OOD-aware objective 
+
+LOW (θ) = LID (θ) + λSem LOOD (θ), (2) where LID is the cross-entropy on ID data and LOOD encourages high uncertainty on semantic-OOD samples. Optimizing LOW alone is insufficient in a dynamic setting: it ignores how the 
+
+update direction affects future-domain OOD performance. In particular, updates that minimize the instantaneous objective may reduce future-domain energy separation, leading to gradual degradation in OOD detection performance. This observation motivates our approach: we introduce a learned correction term that captures long-term OOD behavior and explicitly biases the optimization trajectory toward improving future-domain robustness. 
+
+RL-Guided Optimizer . We now describe how the proposed approach is realized as an optimization rule that augments standard gradient descent with a learned, temporally-aware correction. 
+
+Pseudo-OOD partition. Since semantic-OOD labels are unavailable, we construct a pseudo semantic-OOD subset by thresholding the energy score using a percentile-based threshold calibrated from ID samples. This partition serves only as a training proxy and does not utilize ground-truth OOD labels. 
+
+Soft FPR surrogate. Since the hard false-positive indicator is non-differentiable, we use a smooth surrogate 
+
+[FPR soft  
+
+> t,k
+
+= 1
+
+|Bsem  
+
+> t,k
+
+|
+
+X
+
+> x∈Bsem
+> t,k
+
+σ
+
+ τt − Eθt,k (x)
+
+β
+
+
+
+, (3) where σ(·) is the logistic sigmoid, β > 0 controls the sharpness, and τt is a threshold calibrated from the current ID batch. This provides a differentiable approximation of FPR that is used both in the reward and in computing gradients through the state. 
+
+State representation. We use t to index environment changes (outer steps) and k to index the inner optimization steps used to adapt the model within each environment. The detector’s behavior is summarized by a low-dimensional state: 
+
+st,k =
+
+h
+
+μid  
+
+> E
+
+, μ sem  
+
+> E
+
+, Var( Eid ), Var( Esem ), [FPR soft  
+
+> t,k
+
+, dAcc t,k 
+
+i
+
+. (4) where μid  
+
+> E
+
+and μsem  
+
+> E
+
+denote the mean energy on ID and pseudo semantic-OOD samples, the variance terms capture uncertainty in energy estimation, and [FPR soft  
+
+> t,k
+
+and dAcc t,k denote the t-detection and classification performance. This low-dimensional state captures the key statistics for OOD separation. 3Reward. We define the reward to directly reflect the OOD detection objective: rt,k = −[FPR t,k . This choice ensures that the value function is aligned with the theoretical objective. In practice, additional stabilization and accuracy terms may be included to improve optimization robustness, but they reduce to the above form when their weights vanish. 
+
+Value function. We introduce a value function Vϕ(st,k ) that estimates cumulative future OOD perfor-mance from the current state. It is trained via TD learning using transitions (st,k , r t,k , s t,k +1 ). RL is used here purely in a value-learning sense : the value function does not produce actions; instead, its gradient provides a differentiable signal that shapes the optimization trajectory. The gradient is computed via chain rule through the differentiable state: ∇θ Vϕ(st,k ) = ∂V ϕ 
+
+> ∂s t,k
+
+· ∂s t,k  
+
+> ∂θ
+
+.
+
+Update rule. At time step t and update step k with learning rate η, the gradient descent update is 
+
+θGD t,k +1 = θGD t,k − η∇θ LOW (θt,k ), (5) Our RL-guided update augments this with a correction term: 
+
+θRL t,k +1 = θRL t,k − η∇θ LOW (θt,k ) + ηRL ∇θ Vϕ(st,k ). (6) This can be interpreted as locally optimizing the augmented objective LOW RL (θ) = LOW (θ) −
+
+λRL Vϕ(s(θ)) . A key structural condition underlying our analysis is that the gradient of the covariate-domain loss and the gradient of the semantic-OOD energy score are negatively aligned on average. Intuitively, this reflects a tension between improving covariate-domain accuracy and maintaining energy separation for semantic-OOD detection. We formalize this condition in Assumption 4 and verify it in a concrete model setting. Our method is a gradient-based optimizer augmented with a learned, temporally aware objective, where the value function’s gradient encodes future-domain OOD behavior. 
+
+## 4 Theory 
+
+We analyze why the RL-guided update improves dynamic OOD detection by isolating the optimizer-controllable component of future-domain error and showing that the value gradient systematically reduces it. 
+
+Setup and Assumptions. Let θt, 0 and θt,K denote the detector parameters before and after K inner updates at outer step t, and write GErr t(fθ ) for future-domain generalization error. For brevity, we denote θt as θt, 0, and θt,K as θt+1 .
+
+Definition 4.1 (Temporal error decomposition) . The one-step future-domain generalization error change satisfies 
+
+GErr t+1 (fθt+1 )−GErr t(fθt ) = GErr t+1 (fθt+1 ) − GErr t+1 (fθt )
+
+| {z }
+
+> model-change
+
++ GErr t+1 (fθt ) − GErr t(fθt )
+
+| {z }
+
+> environment-change
+
+.
+
+Def. 4.1 separates the part of temporal error that is induced by external distribution drift from the part induced by the optimizer. Because environment-change effects are not controllable by the learning rule, our RL-guided optimizer focuses on reducing the model-change term. While the existing work [ 22 , 16 ] analyzes bounds for environment-change generalization error, we provide a theoretical analysis of the model-change generalization error, highlighting the differences between standard gradient descent and our RL-guided approach. We state the assumptions needed for the analysis. Full discussion is deferred to Appendix C. 
+
+Assumption 4.2 (Optimization regularity) . We assume that LOW and GErr t+1 are β-smooth and 
+
+LG-Lipschitz in θ. We also assume the step sizes are small with ηRL ≤ η, and η + ηRL ≤ 12β .
+
+Assumption 4.3 (Energy-FPR coupling) . FPR is coupled to the expected energy on semantic-OOD samples through a differentiable decreasing function ϕ, i.e ., FPR t(θ) ≤ ϕ(Ex∼P sem  
+
+> t
+
+[Eθ (x)]) .
+
+Assumption 4.4 (Reward monotonicity) . The value function is monotone w.r.t. FPR: ∂V ∂FPR t ≤ − c < 
+
+0, and partial derivatives of V are uniformly bounded. 
+
+Assumption 4.5 (Gradient conflict) . On average, the gradient of future covariate-domain cross-entropy is negatively aligned with the gradient of semantic-OOD energy. That is, for some ρmin > 0,uniformly over x ∼ P sem  
+
+> t
+
+and t ≤ T :
+
+Ex′∼P cov 
+
+> t+1
+
+⟨∇ θ LCE (fθ (x′)) , ∇θ Eθ (x)⟩ ≤ − ρmin ∥∇ θ Eθ (x)∥. (7) 4Assumption 4.6 (Slow drift) . The environment changes slowly across outer steps, so that 
+
+dTV (P sem  
+
+> t+1
+
+, P sem  
+
+> t
+
+) ≤ ξt ≤ Cdist ηRL .
+
+Assumption 4.7 (Slow error drift) . Slow environment-induced error drift: |GErr t+1 (fθt ) −
+
+GErr t(fθt )| ≤ Cgerr ηRL .
+
+Assumption 4.8 (Bounded gradients) . The gradients of the objective, value function, and energy score are uniformly bounded: ∥∇ θ LOW ∥ ≤ G, ∥∇ θ V ∥ ≤ GV , ∥∇ θ Eθ (x)∥ ≤ GE .
+
+Assumption 4.9 (Energy smoothness and non-degeneracy) . The energy function is smooth and non-degenerate: Eθ (x) is βE -smooth in θ, the density at the threshold satisfies p(τ ) > 0, and 
+
+μmin := min t≤T, k<K Ex∼P sem  
+
+> t
+
+[∇θ EθGD  
+
+> t,k
+
+(x)] > 0.
+
+Remark. Assumptions 4.6 and 4.7 are logically independent: the first is a distributional-geometry condition used in Lemma 4.10; the second is an arithmetic condition on the loss landscape used in Thm. 4.13. We state them separately to avoid conflating the two. Since the full state st contains multiple statistics, but the analysis depends primarily on two key components: the semantic-OOD energy shift and FPR. We thus restrict attention to a reduced state representation, zt,k := Ex∼P sem  
+
+> t+1
+
+[Eθt,k (x)] − Ex∼P sem  
+
+> t
+
+[Eθt,k (x)] which captures the change in semantic-OOD energy across environments. 
+
+4.1 RL Value Gradient Aligns with Future-Domain Improvement 
+
+We next explain why the RL correction term provides a useful update direction. The key point is that the value function depends on OOD-relevant state statistics, in particular the semantic-OOD energy and FPR. Under the assumptions above, this induces a systematic negative alignment between the value gradient and the future-domain generalization gradient. 
+
+Lemma 4.10 (Gradient alignment) . Under Assumptions 4.4,4.5, 4.6, and 4.8, for every t and k,
+
+∇θ GErr t+1 (θt,k ), ∇θ V (st,k ) ≤ − κ(θt,k ) + O(ξt),
+
+where κ(θt,k ) := c p (τ ) ρmin Ex∼PSem t
+
+∥∇ θ Eθt,k (x)∥ > 0.Proof sketch. We decompose the value gradient through the state into a semantic-drift component and an FPR component. The drift component is small, ∥∇ θ zt,k ∥ = O(ξt), by Assumption 4.6. For the FPR component, ∇θ FPR t,k = −p(τ ) EP sem  
+
+> t
+
+[∇θ Eθt,k ]. By Assumption 4.5 and Fubini’s theorem [], its inner product with ∇θ GErr t+1 is strictly positive, and since ∂V ∂FPR t,k < 0, this yields a negative term. Combining the two parts gives the result. Lemma 4.10 shows that the RL correction is not an arbitrary perturbation of the update, but a directionally meaningful term that reduces future-domain error up to a small drift-induced remainder. 
+
+4.2 Model-Change Improvement and Energy Bridge 
+
+We first turn Lemma 4.10 into a quantitative improvement on the model-change term in Def. 4.1. For □ ∈ { GD , RL }, we denote the cumulative model-change error at outer step t as ∆□ 
+
+> t
+
+:= GErr t+1 (fθ□
+
+> t,K
+
+) − GErr t+1 (fθ□
+
+> t, 0
+
+), when both optimizers start with the shared initialization θt, 0.
+
+Lemma 4.11 (RL tightens the model-change) . Under Assumptions 4.2, 4.4, 4.5, 4.6, and 4.8, below holds 
+
+∆RL  
+
+> t
+
+≤ ∆GD  
+
+> t
+
+− ηRL K−1X
+
+> k=0
+
+κ(θt,k ) + O(K2η η RL ).
+
+Proof sketch. Using β-smoothness of GErr t+1 at θGD  
+
+> t,K
+
+yields a linear term in the parameter gap 
+
+θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+and a quadratic remainder. A standard recursion shows ∥θRL  
+
+> t,k
+
+− θGD  
+
+> t,k
+
+∥ = O(kη RL ), so 
+
+θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+= ηRL 
+
+PK−1 
+
+> k=0
+
+∇θ V (st,k ) + O(K2η η RL ). Applying Lemma 4.10 to the linear term yields the gain, and all remaining terms are absorbed into O(K2η η RL ).5Lemma 4.11 shows that the RL correction improves the model-change component of temporal generalization error within each adaptation window. The improvement is governed by the cumulative value-gradient contribution, while the higher-order remainder O(K2η η RL ) depends only on the relative step sizes. In particular, when η ≍ ηRL , this reduces to O(K2η2RL ).We next show how this parameter-space advantage translates into improved OOD detection behavior. Since the expected semantic-OOD energy is a smooth function of the model parameters, a first-order expansion relates the energy difference between RL and GD to the inner product between the energy gradient and the parameter gap, up to a higher-order remainder. 
+
+Lemma 4.12 (Energy bridge) . Under Assumptions 4.2, 4.4, 4.5, and 4.8-4.9, with shared initialization 
+
+θt, 0 and sufficiently small ηRL ,
+
+Ex∼P sem  
+
+> t
+
+[EθRL  
+
+> t,K
+
+(x)] − Ex∼P sem  
+
+> t
+
+[EθGD  
+
+> t,K
+
+(x)] ≥ ηRL Kc p (τ ) μ2min − O (K2η η RL ) > 0. (8) 
+
+By Assumption 4.3, this yields FPR RL  
+
+> t
+
+≤ FPR GD  
+
+> t
+
+.Proof sketch. Using βE -smoothness, the expected energy difference admits a first-order expansion in the parameter gap: EP sem  
+
+> t
+
+[EθRL ]−EP sem  
+
+> t
+
+[EθGD ] = EP sem  
+
+> t
+
+[∇θ E], θ RL −θGD +O(∥θRL −θGD ∥2).Substituting the parameter gap from Lemma 4.11 reduces this to a sum of inner products between ∇θ E
+
+and ∇θ V , up to an O(K2η η RL ) remainder. By the same FPR-channel argument as in Lemma 4.10, each term is lower bounded by c p (τ ) μ2min + O(ηRL ), where both expectations in the inner product are evaluated at the same θGD  
+
+> t,k
+
+, so the inner product reduces to the squared norm. The result is yielded after summing over k.By Assumption 4.3, this directly implies a lower semantic-OOD FPR for the RL-guided detector. 
+
+4.3 Main Guarantee Over Time 
+
+We now combine the temporal decomposition, the one-step model-change improvement, and the energy bridge. The remaining issue is that, across outer steps, the RL and GD trajectories no longer start from exactly the same parameters. This produces a drift term that accumulates over time. We define the minimum gain constant κmin := c p (τ ) ρmin μmin > 0, which characterizes the strength of the RL-induced improvement across updates. 
+
+Theorem 4.13 (RL improves generalization and OOD rejection) . Under Assumptions 4.2-4.9, 
+
+GErr RL  
+
+> t+1
+
+≤ GErr GD  
+
+> t+1
+
+− ηRL κmin (t + 1) K + O(tK 2η η RL ) + O(t2KL GηRL ), (9) 
+
+FPR RL  
+
+> t
+
+≤ FPR GD  
+
+> t
+
+− c p (τ ) μ2min K η RL + O(K2η η RL ). (10) 
+
+In particular, the generalization gap is strictly negative whenever the cumulative RL gain dominates the drift term. The FPR gap is strictly negative whenever the leading energy-improvement term dominates the O(K2η η RL ) remainder. Proof sketch. Telescoping Def. 4.1 over τ = 0 , . . . , t and subtracting the GD equation from RL, the initial terms cancel. Lemma 4.11 contributes the gain −ηRL κmin (t + 1) K plus O(tK 2η η RL ). The environment-change difference is bounded by O(t2KL GηRL ) via LG-Lipschitz continuity of GErr 
+
+and the starting-point drift δτ = O(τ Kη RL ) from iterating Lemma 4.11. Together these give Eq. (9). Eq. (10) follows from Lemma 4.12 applied at each outer step. 
+
+Remark. The gain grows as Θ( tKη RL ) while the drift grows as O(t2KL GηRL ), so the RL advan-tage is most pronounced in the early-to-mid adaptation regime. Theorem 4.13 provides the main theoretical justification for our method: the RL-guided correction si-multaneously improves future-domain generalization and semantic-OOD rejection over time, relative to standard gradient descent. 
+
+4.4 Example: Head-Only One-Layer Transformer 
+
+We show a concrete specialization that makes the abstract gradient-conflict assumption directly inter-pretable. Consider a head-only one-layer transformer setting, where fW (x) = W h (x), E W (x) = 
+
+− log PNj=1 exp  w⊤ 
+
+> j
+
+h(x), and only the classification head W is updated. 6In this setting, the gradients of the energy and cross-entropy loss admit closed-form expressions, 
+
+∇W EW (x) = − p(x)h(x)⊤, ∇W LCE (W ; x, y ) =  p(x) − ey
+
+h(x)⊤, where p(x) is the softmax output, and ey denotes the one-hot encoding of label y. Taking their Frobenius inner product gives 
+
+∇W LCE (W ; x, y ), ∇W EW (x′) F = − p(x) − ey
+
+⊤p(x′) h(x)⊤h(x′). (11) where (x, y ) ∼ P cov  
+
+> t+1
+
+and x′ ∼ P sem  
+
+> t
+
+are drawn independently. This expression reveals that the abstract gradient-conflict condition depends on two factors: i) the alignment between predictions and labels, through (p(x) − ey ), and ii) the similarity between feature representations, through 
+
+h(x)⊤h(x′).
+
+Proposition 4.14. In the head-only one-layer-transformer setting, the gradient-conflict assumption holds whenever E(x,y )∼P cov t+1 Ex′∼P sem t
+
+(ey − p(x)) ⊤p(x′) · h(x)⊤h(x′) ≥ m > 0, with ρmin = mR
+
+with R = sup x′ ∥p(x′)∥∥ h(x′)∥.Sketch. From Eq. (11), taking expectations yields E[⟨∇ W LCE , ∇W EW ⟩F ] ≤ −m. Since 
+
+∥∇ W EW (x′)∥F ≤ R, dividing gives ρmin = mR .
+
+Discussion. This example shows that gradient conflict arises from the interaction between prediction alignment and feature similarity. In particular, Prop. 4.14 provides a simple, computationally verifiable sufficient condition for Assumption 4.5. 
+
+## 5 Understanding the Role of Training Regimes 
+
+The goal of this section is to analyze the behavior of the RL optimizer in comparison to the GD optimizer across training steps. A key assumption throughout this section is that the learning dynamics can be characterized using a second-order Taylor expansion of the loss function during model training. Here we introduce the effect of loss gap between GD vs RL training on a sequence of environments. 
+
+Definition 5.1 (Loss gap by optimizers) . For the environment t, F OW t evaluates the loss gap of the optimized parameter θ∗ under both GD and RL optimizers (i.e. θRL  
+
+> t, ∗
+
+and θGD  
+
+> t, ∗
+
+): 
+
+F OW t := LOW (θRL 
+
+> t, ∗
+
+) − L OW (θGD  
+
+> t, ∗
+
+).
+
+Definition 5.2 (Training step-based gradient energy state) . For the environment t„ we define the training step-based gradient energy state at optimization step k, denoted by S(k)
+
+> t, ∇
+
+, as follows 
+
+S(k) 
+
+> t, ∇
+
+:= Ex∼P sem t+1 
+
+h
+
+∇(k) 
+
+> θ
+
+Eθt (x)
+
+i
+
+− Ex∼P sem t
+
+h
+
+∇(k) 
+
+> θ
+
+Eθt (x)
+
+i
+
+, (12) 
+
+where ∇(k) 
+
+> θ
+
+Eθt (x) ≈ Eθt,k (x) − Eθt,k −1 (x).
+
+The assumptions below capture the conditions under which both GD and RL optimizers are trained. Lipschitz continuity of the gradient (Assumption 5.3) bounds gradient magnitude and stabilizes optimization, compactness (Assumption 5.4) prevents extreme changes in the parameter values θ
+
+during training, and the slow generalization drift condition (Assumption 5.5) navigates the influence of semantic OOD data change on the gradient of the energy function. 
+
+Assumption 5.3 (Lipschitz continuous gradient) . We assume that the function V (st) (and LOW ) is 
+
+LV -Lipschitz (and L-Lipschitz) continuous gradient. 
+
+Assumption 5.4 (Compactness) . At each training update k both θGD  
+
+> t,k
+
+, θ RL  
+
+> t,k
+
+∈ B (θ, r ) with radius r.
+
+Assumption 5.5 (Slow generalization differ) . We assume that the semantic-shifted environment does not change arbitrarily the gradient of energy at each training step: 
+
+Ex∼P sem  
+
+> t+1
+
+[∇θ Eθt,k (x)] − Ex∼P sem  
+
+> t
+
+[∇θ Eθt,k (x)] = O(ξt,k ).
+
+5.1 RL-GD Loss Gap Bounds 
+
+We next analyze the training gap between GD and our RL optimizers. We recall Def. 5.1 and show that the loss gap is bounded by the average gap of RL agent state during training steps. 7Theorem 5.6 (Loss gap bound) . Suppose Assumptions 5.3 and 5.4 hold true. We bound F OW t by 
+
+F OW t ≤ 12 λmax 
+
+ηK,r + ηRL KX
+
+> k=1
+> k−1
+
+X
+
+> k′=1
+
+∥st,k ′ − st,k ′−1∥2, (13) 
+
+where ηRL is constant and sufficiently small, st,k is the state of RL agent at time step t and training step k. ηK,r is a constant in terms of total training steps K and radius r, and λmax is the maximum eigenvalue of the Hessian matrix of loss at θGD  
+
+> t, ∗
+
+, ∇2LOW (θGD  
+
+> t, ∗
+
+).Proof sketch. To establish the upper bound in (13), we use a multi-step argument: (1) applying second-order Taylor expansion, we approximate LOW (θRL 
+
+> t, ∗
+
+) around θGD  
+
+> t, ∗
+
+, (2) we bound the Hessian matrix of loss by the maximum eigenvalue eigenvalue λmax , (3) we recursively use training updates for GD and RL-guided optimizers in (5) and (6), (4) we extend the gradient of value function ∥∇ θ V (st,k −1)∥2
+
+in terms of gradient of value function gap between training steps from the initialization; and finally (5) we yield the result after applying Assumptions 5.3 and 5.4. 
+
+Corollary 5.7 (Gradient of energy bounds loss gap) . Under the Assumptions 4.9, and 5.3- 5.5 we bound F OW t in terms of the gradient of energy function: 
+
+F OW t ≤ 12 λmax 
+
+O(ηK,r ξt) + ¯ ηRL KX
+
+> k=1
+
+∥Ex∼P sem  
+
+> t
+
+[∇θ Eθt,k −1 (x)] ∥2, (14) 
+
+where ξt is the rage of state st gradient, ¯ηRL is a constant and sufficiently small, and ηK,r is a constant in terms of total number of training steps K and radius r.
+
+Corollary 5.8 (Training step-based gradient energy state bounds loss gap) . The F OW t bound in Theorem 5.6 is derived in terms of training step-based gradient energy state in Def. 5.2: 
+
+F OW t ≤ 12 λmax 
+
+ηK,r + ηRL KX
+
+> k=1
+> k−1
+
+X
+
+> k′=1
+
+∥S(k′) 
+
+> t, ∇
+
+∥2, (15) 
+
+where ηRL is constant, ηK,r is a constant in terms of total training steps K and radius r, and λmax is the maximum eigenvalue of ∇2LOW (θGD  
+
+> t, ∗
+
+).
+
+5.2 RL Improves the Effective Gradient Flow 
+
+Theorem 5.6 develops the loss gap for RL optimizer compared to GD optimizer. We next study environment and training effective gradient flow (EGF) and how our RL-guided optimizer improves the EGF across environment change and during training steps. 
+
+Definition 5.9 (Effective gradient flow) . We define two versions of effective gradient flow (EGF): 
+
+• (Gradient flow (GF) over environment change) measures optimization dynamics and is typically approximated using the norm of the gradients of the loss over time. Define the matrix of GT := [∇θ LG(θ1) ∇θ LG(θ2) . . . ∇θ LG(θT )] = [ G1G2 . . . GT ] for T environments E = {E 1, . . . , ET }.Note that LG = LOW (for GD optimizer) and LG = LOW + ηRL V (s) (for RL optimizer). The environment-effective gradient flow for t = 1 , . . . , T is defined as 
+
+EGF env p := 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+∥Gt∥p, where Gt = ∇θ LG(θt).
+
+• (Gradient flow (GF) over training steps) measures optimization per training update and is typically approximated using the norm of the gradients of the loss over epochs at each time step. Define the matrix of GK := [ ∇θ LG(θt, 1) ∇θ LG(θt, 2) . . . ∇θ LG(θt,K )] = [ G1G2 . . . GK ] for K training updates. The training-effective gradient flow at time t is defined as EGF train t,p := 1
+
+> K
+
+PKk=1 ∥Gk∥p,where Gk = ∇θ LG(θt,k ).
+
+Consider three consecutive environments Et−1, Et, and Et+1 . The model fθ has been trained using RL/GD optimizer, with energy values Eθt−1 , Eθt , and Eθt+1 (resp.). To evaluate the RL and GD optimizers, we introduce two new query-based notions: (1) Energy generalization transferability. 
+
+Is the gap in EGF env p between RL and GD optimizers indicative of energy generalization transfer 8across environments? Here, energy generalization transferability refers to evaluating Eθt−1 and Eθt
+
+on semantically shifted environments Esem t and Esem t+1 , drawn from distributions P sem t and P sem t+1 
+
+(resp.). (2) Semantic-shifted energy gap. Is the gap in EGF env p between RL and GD optimizers related to the energy gap induced by semantic shifts across environments? In this case, Eθt and Eθt+1 
+
+are evaluated on the semantic-shifted environments Esem t and Esem t+1 with distributions P sem t and 
+
+P sem t+1 (resp.). Before investigating these queries (Thms 5.14, 5.13) we introduce the definition below. 
+
+Definition 5.10. At time steps t and t − 1, we define the environment-transfer generalization energy, St→t+1 , by Ex∼P sem t+1 [Eθt (x)] − Ex∼P sem t
+
+Eθt−1 (x) . And we define the environment-based semantic shifted energy bridge, Et→t+1 , by Ex∼P sem t+1 
+
+Eθt+1 (x) − Ex∼P sem t [Eθt (x)] .
+
+Assumption 5.11 (Slow environment-transfer generalization energy) . We assume that the environment does not transfer energy arbitrarily fast that is St→t+1 = O(ξSt→t+1 ).
+
+Assumption 5.12 (Slow environment-based semantic shifted energy) . We assume that the environment does not change semantic shifted energy arbitrarily fast that is Et→t+1 = O(ξEt→t+1 ).
+
+Theorem 5.13 (Training effective gradient flow gap bound) . Consider training-effective gradient flow EGF train t,p under both GD and RL optimizers. Then under Assumptions 5.3 and5.4, we have 
+
+EGF train t, 2 (RL ) − EGF train t, 2 (GD ) ≤ Lr + LK−RL KX
+
+> k=1
+> k
+
+X
+
+> k′=1
+
+∥S(k′) 
+
+> t, ∇
+
+∥2, (16) 
+
+where Lr and LK−RL are constants and Lr = 2 √Lr , LK−RL = ηRL  
+
+> √LV
+> K
+
+. Here S(k′) 
+
+> t, ∇
+
+is the training step-based gradient energy state at training step k′ introduced in Def. 5.2. 
+
+Theorem 5.14 (Environment effective gradient flow gap bound) . Consider environment-effective gradient flow EGF env p under both GD and RL optimizers. Under the Assumptions 5.3,5.4, 5.11, and 5.12, we bound environment-effective gradient flow gap between RL and GD optimizers as follows: 
+
+EGF env p (RL ) − EGF env p (GD ) ≤ Lr + LT −RL TX
+
+> t=1
+> t
+
+X 
+
+> τ=1
+
+ O(ξSτ →τ +1 ) + O(ξEτ −1→τ ) , (17) 
+
+for p = 2 . In (17), Lr and LT −RL are constants and LT −RL = ηRL  
+
+> √LV
+> T
+
+, for constant LV and ηRL .
+
+ξSr→r+1 and ξEr−1→r are environment-transfer generalization energy and environment-based semantic shifted energy rates in Def. 5.10. 
+
+We defer the proofs of Corollary 5.7, Corollary 5.8, and Theorems 5.13 and 5.14 to Appendix E. 
+
+Discussion. Theorem 5.14 provides the central theoretical foundation for the gradient flow behavior of our RL-guided optimization method. Specifically, it shows that the RL-based correction enhances gradient flow effectiveness compared to standard gradient descent. This improvement arises from the aggregated contributions of environment-transfer generalization energy drift and environment-specific semantic shift energy drift across all environments. 
+
+## 6 Conclusion 
+
+We propose a novel RL-guided optimization framework for OOD detection in dynamic environments. Our RL-based detector is structured based on a TD-trained value function and lower FPR award. Our theoretical analysis explains that (i) the RL value gradient aligns with future-domain improvement, (ii) RL-guided detector tightens the model-change generalization error and implies a lower semantic-OOD FPR, (iii) RL-guided optimizer improves OOD rejection, (iv) our RL-based training optimal decreases the domain-specific loss function, and finally (v) RL-guided training mechanism improves the effective gradient flow over environment change and training steps. 
+
+Limitation and Future Work . An intriguing direction for future work would be to relax some of the assumptions. Besides implementation of our RL optimizer for OOD detection on standard OOD benchmarks, an ideal RL pipeline for domain generalization and OOD rejection in open-world to automatically identify unsafe OOD examples would be an important next step for our work. 
+
+Societal Impact. Unlike controlled environments, social sector data in real-world is messy, constantly changing, and inherently complex. Without OOD detection, models may make overconfident, incorrect, or discriminatory predictions when facing these unknown scenarios. For example, a model 9trained on successful healing surgical wounds (ID) for cancer patients fails to accurately diagnose rare severe adverse wound events such as excessive necrosis resulting in major amputation (OOD). 
+
+Acknowledgement. Salimeh Sekeh has been partially supported by NSF CAREER CCF-2451457 and Xin Zhang is supported in part by NSF grant IIS-2449864. The findings are those of the authors only and do not represent any position of these funding bodies. 
+
+## References 
+
+[1] Ekin Akyürek, Dale Schuurmans, Jacob Andreas, Tengyu Ma, and Denny Zhou. What learning algorithm is in-context learning? investigations with linear models. arXiv preprint arXiv:2211.15661 , 2022. [2] Marcin Andrychowicz, Misha Denil, Sergio Gomez, Matthew W Hoffman, David Pfau, Tom Schaul, Brendan Shillingford, and Nando De Freitas. Learning to learn by gradient descent by gradient descent. Advances in neural information processing systems , 29, 2016. [3] Haoyue Bai, Gregory Canal, Xuefeng Du, Jeongyeol Kwon, Robert D Nowak, and Yixuan Li. Feed two birds with one scone: Exploiting wild data for both out-of-distribution generalization and detection. In International Conference on Machine Learning , pages 1454–1471. PMLR, 2023. [4] David Duvenaud, Jackson Wang, Jorn Jacobsen, Kevin Swersky, Mohammad Norouzi, and Will Grathwohl. Your classifier is secretly an energy based model and you should treat it like one. 
+
+ICLR 2020 , 2020. [5] Mehrdad Farajtabar, Navid Azizan, Alex Mott, and Ang Li. Orthogonal gradient descent for continual learning. In International conference on artificial intelligence and statistics , pages 3762–3773. PMLR, 2020. [6] Chelsea Finn, Pieter Abbeel, and Sergey Levine. Model-agnostic meta-learning for fast adap-tation of deep networks. In International conference on machine learning , pages 1126–1135. PMLR, 2017. [7] Dan Hendrycks and Kevin Gimpel. A baseline for detecting misclassified and out-of-distribution examples in neural networks. arXiv preprint arXiv:1610.02136 , 2016. [8] Dan Hendrycks, Mantas Mazeika, and Thomas Dietterich. Deep anomaly detection with outlier exposure. arXiv preprint arXiv:1812.04606 , 2018. [9] James Kirkpatrick, Razvan Pascanu, Neil Rabinowitz, Joel Veness, Guillaume Desjardins, Andrei A Rusu, Kieran Milan, John Quan, Tiago Ramalho, Agnieszka Grabska-Barwinska, et al. Overcoming catastrophic forgetting in neural networks. Proceedings of the national academy of sciences , 114(13):3521–3526, 2017. [10] Michael Laskin, Luyu Wang, Junhyuk Oh, Emilio Parisotto, Stephen Spencer, Richie Steiger-wald, DJ Strouse, Steven Hansen, Angelos Filos, Ethan Brooks, et al. In-context reinforcement learning with algorithm distillation. arXiv preprint arXiv:2210.14215 , 2022. [11] Kimin Lee, Kibok Lee, Honglak Lee, and Jinwoo Shin. A simple unified framework for detecting out-of-distribution samples and adversarial attacks. Advances in neural information processing systems , 31, 2018. [12] Shiyu Liang, Yixuan Li, and R Srikant. Enhancing the reliability of out-of-distribution image detection in neural networks. In International Conference on Learning Representations , 2018. [13] Weitang Liu, Xiaoyun Wang, John Owens, and Yixuan Li. Energy-based out-of-distribution detection. Advances in neural information processing systems , 33:21464–21475, 2020. [14] David Lopez-Paz and Marc’Aurelio Ranzato. Gradient episodic memory for continual learning. 
+
+Advances in neural information processing systems , 30, 2017. 10 [15] Luke Metz, Niru Maheswaranathan, Jeremy Nixon, Daniel Freeman, and Jascha Sohl-Dickstein. Understanding and correcting pathologies in the training of learned optimizers. In International Conference on Machine Learning , pages 4556–4565. PMLR, 2019. [16] Aditi Naiknaware, Sanchit Singh, and Salimeh Sekeh. Temp-scone: A novel out-of-distribution detection and domain generalization framework for wild data with temporal shift. In To be submitted to NeurIPS Workshop on Reliable ML from Unreliable Data , 2025. [17] Shuaicheng Niu, Jiaxiang Wu, Yifan Zhang, Yaofo Chen, Shijian Zheng, Peilin Zhao, and Mingkui Tan. Efficient test-time model adaptation without forgetting. In International confer-ence on machine learning , pages 16888–16905. PMLR, 2022. [18] Yiyou Sun, Chuan Guo, and Yixuan Li. React: Out-of-distribution detection with rectified activations. Advances in neural information processing systems , 34:144–157, 2021. [19] Yu Sun, Xiaolong Wang, Zhuang Liu, John Miller, Alexei Efros, and Moritz Hardt. Test-time training with self-supervision for generalization under distribution shifts. In International conference on machine learning , pages 9229–9248. PMLR, 2020. [20] Jihoon Tack, Sangwoo Mo, Jongheon Jeong, and Jinwoo Shin. Csi: Novelty detection via contrastive learning on distributionally shifted instances. Advances in neural information processing systems , 33:11839–11852, 2020. [21] Dequan Wang, Evan Shelhamer, Shaoteng Liu, Bruno Olshausen, and Trevor Darrell. Tent: Fully test-time adaptation by entropy minimization. arXiv preprint arXiv:2006.10726 , 2020. [22] Qingyang Zhang, Qiuxuan Feng, Joey Tianyi Zhou, Yatao Bian, Qinghua Hu, and Changqing Zhang. The best of both worlds: On the dilemma of out-of-distribution detection. Advances in Neural Information Processing Systems , 37:69716–69746, 2024. 11 Appendix A Algorithm 
+
+Algorithm 1 summarizes the overall training procedure. The outer loop indexes the evolving environ-ment, while the inner loop performs detector adaptation within each environment. At each outer step 
+
+t, we first calibrate the threshold τt from the current ID batch. We then sample labeled ID data and unlabeled wild data, construct the pseudo semantic-OOD partition using the current detector, and compute the OOD-aware objective. The state is estimated, the value function is updated, and finally the detector parameters are updated using the RL-guided rule. 
+
+Algorithm 1 RL-guided dynamic OOD adaptation  
+
+> 1:
+
+Initialize detector parameters θ0 and value parameters ϕ 
+
+> 2:
+
+for t = 0 , . . . , T − 1 do  
+
+> 3:
+
+Receive data stream from current environment P wild  
+
+> t
+> 4:
+
+Sample a reference ID batch and calibrate τt from a fixed percentile of its energy distribution  
+
+> 5:
+
+Set θt, 0 ← θt 
+
+> 6:
+
+for k = 0 , . . . , K − 1 do  
+
+> 7:
+
+Sample a batch of labeled ID data and unlabeled wild data from the current environment  
+
+> 8:
+
+Use the current energy detector Eθt,k (·) and threshold τt to form a pseudo semantic-OOD subset and a residual wild subset  
+
+> 9:
+
+Compute the OOD-aware loss LOW (θt,k ) 
+
+> 10:
+
+Estimate the state st,k from current batch statistics  
+
+> 11:
+
+Compute the reward rt,k  
+
+> 12:
+
+Update value parameters ϕ by minimizing the squared TD error.  
+
+> 13:
+
+Update detector parameters using eq. (6)  
+
+> 14:
+
+end for  
+
+> 15:
+
+Set θt+1 ← θt,K  
+
+> 16:
+
+end for 
+
+We update the value network before the detector within each inner step so that the detector update uses the most recent estimate of the value function while avoiding a same-step circular dependency between 
+
+ϕ and θ. Relative to standard gradient descent, the additional computation in our method comes from evaluating ∇θ Vϕ(st,k ), which requires one forward-backward pass through the lightweight value network and differentiation through the state statistics. Since st,k is low-dimensional and the value network is shallow, this overhead is modest compared with the detector update itself. 
+
+## B Extended Related Work 
+
+Static OOD detection. A large body of work studies OOD detection under a fixed deployment distribution. Post-hoc scoring methods assign anomaly scores using maximum softmax probabil-ity [ 7], input perturbation [ 12 ], Mahalanobis distance [ 11 ], and energy-based scores [ 13 ]. Additional improvements exploit feature clipping [18] and contrastive learning [20]. Training-time approaches further improve separation between ID and OOD samples through outlier exposure [ 8 ]. These methods are designed for static settings and do not address how OOD detectors should evolve under non-stationary environments. In contrast, our work studies how optimization dynamics affect OOD robustness over time. 
+
+Test-time adaptation. Test-time adaptation (TTA) methods update model parameters using unlabeled test data at deployment. Tent [ 21 ] minimizes prediction entropy through batch normalization, while EATA [ 17 ] improves stability via sample selection and regularization. Related approaches also explore calibration and adaptation strategies under distribution shift through similar objectives [ 21 , 17 ]. While these methods improve robustness to non-stationarity, they optimize instantaneous objectives and do not explicitly model how current updates affect future-domain OOD performance. Our framework instead introduces a temporally-aware objective that explicitly accounts for the long-term impact of each update. 
+
+Wild-data and open-world OOD detection. Recent work explores OOD detection using unlabeled data that mixes ID and OOD samples. Outlier Exposure [ 8] demonstrates that auxiliary outlier data 12 can improve detection performance, while SCONE [ 3] shows that wild data can simultaneously benefit OOD detection and generalization. These approaches operate in a batch setting where each update is independent. In contrast, we consider a temporal setting in which data distributions evolve over time, and we analyze how the trajectory of updates influences long-run OOD robustness. 
+
+Continual and online adaptation under distribution shift. A related line of work studies model adaptation under non-stationary environments, including test-time training with self supervision [ 19 ], entropy-based adaptation [ 21 ], and stability-aware updates [ 17 ]. These methods address online distribution shift by improving predictive performance at each step, but they do not explicitly analyze how optimization updates influence future-domain OOD detection behavior. Our work complements this literature by providing a theoretical analysis of optimization dynamics and their role in temporal robustness. 
+
+Continual learning and forgetting. Continual learning methods [ 9, 14 , 5] study how models retain knowledge across sequential tasks. Our temporal error decomposition is structurally related to the stability-plasticity trade-off in this literature. However, our focus differs in two key aspects: i) 
+
+we study OOD detection rather than classification accuracy, and ii) we analyze how optimization dynamics shape energy-based decision boundaries under evolving distributions. 
+
+RL for optimization and meta-learning. RL and meta-learning have been used to design learned optimizers and adaptive update rules [ 2, 15 ]. Algorithm Distillation [ 10 ] and MAML [ 6] learn update strategies or initializations that generalize across tasks. Unlike these general-purpose approaches, our framework introduces a task-structured value function tied specifically to semantic-OOD false positive rate. This structure enables a direct connection between optimization dynamics and OOD detection performance, allowing us to derive explicit theoretical guarantees on future-domain robustness. 
+
+Energy-based OOD theory. Energy-based formulations interpret classifiers as defining energy functions that separate ID and OOD samples [ 13 , 4]. Prior work provides theoretical perspectives on OOD detection under distribution shift by analyzing the role of energy functions and classifier geometry [ 13 ]. Our work builds on this foundation and extends it to the dynamic setting , providing, to our knowledge, the first optimization-theoretic analysis connecting update dynamics to temporal OOD robustness through energy separation. 
+
+## C Assumption Discussion 
+
+Our analysis relies on a combination of standard regularity conditions and problem-specific structural assumptions. Assumptions 4.2, 4.8, and 4.9 are typical in first-order optimization analyses: they ensure that the loss and energy functions are locally smooth, gradients remain bounded, and the energy landscape provides a non-degenerate signal for semantic-OOD samples. These conditions are generally satisfied along the training trajectory under small step sizes and well-behaved model parameterizations. The remaining assumptions characterize the dynamic OOD and training-related settings: Assumptions 4.3 and 4.4 connect the value function to OOD detection behavior, ensuring that improvements in semantic-OOD energy translate into lower FPR. Assumption 4.5 captures a structural tension between classification and OOD separation, which we show is realizable in practical models (Sec. 4.4). Finally, Assumptions 4.6 and 4.7 define a gradual-drift regime in which the environment evolves at a comparable scale to the RL correction, allowing one-step improvements to accumulate over time rather than being dominated by distributional changes. Assumptions 5.3-5.5, controls the optimization updates and training drifts by applying smooth gradient, bounding the stochastic changes of parameters, and slow gradient of energy function under semantic-shifted distribution. Assumptions 5.11 and 5.12 characterize energy drift under environment changes, ensuring that both environment-transfer generalization and environment-based semantic shift energies evolve gradually over time. 
+
+## D Proofs for Section 4 
+
+In this section, we provide detailed proofs of the main theoretical results in Section 4. Throughout, we use the same notation as in the main text. In particular, θt,k denotes the detector parameter at 13 outer step t and inner step k, and for the purpose of analysis we use the semantic-drift summary as a reduced state representation, 
+
+zt,k := Ex∼P sem  
+
+> t+1
+
+[Eθt,k (x)] − Ex∼P sem  
+
+> t
+
+[Eθt,k (x)] . (18) In the proofs below, we use zt,k and st,k interchangeably. 
+
+D.1 Proof of Lemma 4.10 
+
+Proof. Fix an outer step t and an inner step k, and write θ := θt,k for brevity. The proof isolates the two components of the state st,k that are relevant to the argument: the semantic-drift coordinate zt,k 
+
+and the FPR FPR t,k . By the chain rule, 
+
+∇θ V (st,k ) = ∂V ∂z t,k 
+
+∇θ zt,k + ∂V ∂FPR t,k 
+
+∇θ FPR t,k . (19) We control the two terms separately. 
+
+Step 1: the semantic-drift component is small. Differentiating Eq. (18) with respect to θ gives 
+
+∇θ zt,k = Ex∼P sem  
+
+> t+1
+
+[∇θ Eθ (x)] − Ex∼P sem  
+
+> t
+
+[∇θ Eθ (x)] .
+
+By Assumption 4.8, ∥∇ θ Eθ (x)∥ ≤ GE uniformly in x. Therefore, using the standard total-variation inequality for bounded vector-valued functions, ∥∇ θ zt,k ∥ ≤ 2GE dTV (P sem  
+
+> t+1
+
+, P sem  
+
+> t
+
+). Applying Assumption 4.6, 
+
+∥∇ θ zt,k ∥ ≤ 2GE ξt = O(ξt). (20) Since the partial derivative ∂V ∂z t,k is uniformly bounded by Assumption 4.4, the semantic-drift contri-bution in Eq. (19) is O(ξt).
+
+Step 2: expression for the FPR gradient. By differentiating the threshold event through the energy score and using the density p(τ ) > 0 at the threshold (Assumption 4.9), we obtain 
+
+∇θ FPR t,k = −p(τ ) Ex∼P sem  
+
+> t
+
+[∇θ Eθ (x)] . (21) 
+
+Step 3: the FPR component has the correct sign. Taking the inner product of Eq. (21) with 
+
+∇θ GErr t+1 (θ) yields 
+
+∇θ GErr t+1 (θ), ∇θ FPR t,k = −p(τ )
+
+D
+
+∇θ GErr t+1 (θ), Ex∼P sem  
+
+> t
+
+[∇θ Eθ (x)] 
+
+E
+
+. (22) Using the definition of future-domain generalization error, ∇θ GErr t+1 (θ) =
+
+Ex′∼P cov  
+
+> t+1
+
+[∇θ LCE (fθ (x′))] . Substituting this into Eq. (22) and applying Fubini’s theorem gives 
+
+∇θ GErr t+1 (θ), ∇θ FPR t,k = −p(τ ) Ex∼P sem  
+
+> t
+
+Ex′∼P cov 
+
+> t+1
+
+h
+
+∇θ LCE (fθ (x′)) , ∇θ Eθ (x)
+
+i
+
+. (23) By Assumption 4.5, Ex′∼P cov 
+
+> t+1
+
+h
+
+∇θ LCE (fθ (x′)) , ∇θ Eθ (x)
+
+i
+
+≤ − ρmin ∥∇ θ Eθ (x)∥. Plugging this into Eq. (23) yields 
+
+∇θ GErr t+1 (θ), ∇θ FPR t,k ≥ p(τ )ρmin Ex∼P sem  
+
+> t
+
+[∥∇ θ Eθ (x)∥]. (24) 
+
+Step 4: combine the two components. Combining Eq. (19), Eq. (20), and Eq. (24), and using  
+
+> ∂V ∂FPR t,k
+
+≤ − c < 0 from Assumption 4.4, we obtain 
+
+∇θ GErr t+1 (θ), ∇θ V (st,k ) = ∂V ∂z t,k 
+
+∇θ GErr t+1 (θ), ∇θ zt,k + ∂V ∂FPR t,k 
+
+∇θ GErr t+1 (θ), ∇θ FPR t,k 
+
+≤ O (ξt) − c p (τ )ρmin Ex∼P sem  
+
+> t
+
+[∥∇ θ Eθ (x)∥].
+
+Define κ(θt,k ) := c p (τ ) ρmin Ex∼P sem  
+
+> t
+
+[∥∇ θ Eθt,k (x)∥]. Then ∇θ GErr t+1 (θt,k ), ∇θ V (st,k ) ≤−κ(θt,k ) + O(ξt). This proves the result. 14 D.2 Proof of Lemma 4.11 
+
+Proof. Recall ∆GD  
+
+> t
+
+:= GErr t+1 (θGD  
+
+> t,K
+
+) − GErr t+1 (θt, 0), and ∆RL  
+
+> t
+
+:= GErr t+1 (θRL  
+
+> t,K
+
+) −
+
+GErr t+1 (θt, 0), where both optimizers share the same initialization θt, 0.By Assumption 4.2, GErr t+1 is β-smooth. Expanding around θGD  
+
+> t,K
+
+yields 
+
+∆RL  
+
+> t
+
+≤ ∆GD  
+
+> t
+
++ ∇θ GErr t+1 (θGD  
+
+> t,K
+
+), θ RL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
++ β
+
+2 ∥θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+∥2. (25) We next analyze the parameter gap θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+.
+
+Step 1: parameter-gap decomposition. From the update rules, θGD  
+
+> t,k +1
+
+= θGD  
+
+> t,k
+
+− η∇θ LOW (θGD  
+
+> t,k
+
+), and 
+
+θRL  
+
+> t,k +1
+
+= θRL  
+
+> t,k
+
+− η∇θ LOW (θRL  
+
+> t,k
+
+) + ηRL ∇θ V (st,k ). Subtracting the two recursions and summing over k = 0 , . . . , K − 1 gives 
+
+θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+= ηRL 
+
+> K−1
+
+X
+
+> k=0
+
+∇θ V (st,k ) − η
+
+> K−1
+
+X
+
+> k=0
+
+
+
+∇θ LOW (θRL  
+
+> t,k
+
+) − ∇ θ LOW (θGD  
+
+> t,k
+
+)
+
+
+
+. (26) 
+
+Step 2: recursion bound. Let dk := ∥θRL  
+
+> t,k
+
+− θGD  
+
+> t,k
+
+∥. Since ∇θ LOW is β-Lipschitz by Assumption 4.2, 
+
+dk+1 ≤ (1 + ηβ )dk + ηRL GV . With d0 = 0 , a standard induction yields dk = O(kη RL ). Therefore, 
+
+η PK−1 
+
+> k=0
+
+∇θ LOW (θRL  
+
+> t,k
+
+) − ∇ θ LOW (θGD  
+
+> t,k
+
+) = O(K2η η RL ). Substituting into Eq. (26), 
+
+θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+= ηRL 
+
+> K−1
+
+X
+
+> k=0
+
+∇θ V (st,k ) + O(K2η η RL ). (27) 
+
+Step 3: substitute into the smoothness bound. Plugging Eq. (27) into Eq. (25) gives 
+
+∆RL  
+
+> t
+
+≤ ∆GD  
+
+> t
+
++ ηRL 
+
+> K−1
+
+X
+
+> k=0
+
+∇θ GErr t+1 (θGD  
+
+> t,K
+
+), ∇θ V (st,k ) + O(K2η η RL ),
+
+where the quadratic term is absorbed into the same remainder because ∥θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+∥ = O(Kη RL )
+
+and ηRL ≤ η.It remains to shift the gradient evaluation point from θGD  
+
+> t,K
+
+to θGD  
+
+> t,k
+
+. Specifically, by β-smoothness of GErr t+1 and Assumption 4.8, ⟨∇ θ GErr t+1 (θGD  
+
+> t,K
+
+) − ∇ θ GErr t+1 (θGD  
+
+> t,k
+
+), ∇θ V (st,k )⟩ ≤
+
+β∥θGD  
+
+> t,K
+
+− θGD  
+
+> t,k
+
+∥ GV . Moreover, each GD step moves by at most ηG , so ∥θGD  
+
+> t,K
+
+− θGD  
+
+> t,k
+
+∥ ≤
+
+(K − k)ηG . Multiplying by ηRL and summing over k yields an additional error of order 
+
+ηRL 
+
+PK−1 
+
+> k=0
+
+O(( K − k)η) = O(K2η η RL ), which is absorbed into the remainder. Therefore, 
+
+∆RL  
+
+> t
+
+≤ ∆GD  
+
+> t
+
++ηRL 
+
+PK−1 
+
+> k=0
+
+∇θ GErr t+1 (θGD  
+
+> t,k
+
+), ∇θ V (st,k ) +O(K2η η RL ). Applying Lemma 4.10 at each inner step yields ∆RL  
+
+> t
+
+≤ ∆GD  
+
+> t
+
+− ηRL 
+
+PK−1 
+
+> k=0
+
+κ(θt,k ) + O(K2η η RL ), as claimed. 
+
+D.3 Proof of Lemma 4.12 
+
+Proof. Define the expected semantic-OOD energy at outer step t by ¯Et(θ) := Ex∼P sem  
+
+> t
+
+[Eθ (x)] .Since Eθ (x) is βE -smooth in θ by Assumption 4.9, the expectation ¯Et(θ) is also βE -smooth. Therefore, a first-order expansion around θGD  
+
+> t,K
+
+gives 
+
+¯Et(θRL  
+
+> t,K
+
+) − ¯Et(θGD  
+
+> t,K
+
+) = 
+
+D
+
+Ex∼P sem  
+
+> t
+
+[∇θ EθGD  
+
+> t,K
+
+(x)] , θ RL  
+
+> t,K
+
+− θGD 
+
+> t,K
+
+E
+
++ O(∥θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+∥2).
+
+Using Lemma 4.11, θRL  
+
+> t,K
+
+− θGD  
+
+> t,K
+
+= ηRL 
+
+PK−1 
+
+> k=0
+
+∇θ V (st,k ) + O(K2η η RL ), so, after substituting and shifting the energy-gradient evaluation point from θGD  
+
+> t,K
+
+to θGD  
+
+> t,k
+
+via βE -smoothness, we obtain 
+
+¯Et(θRL  
+
+> t,K
+
+) − ¯Et(θGD  
+
+> t,K
+
+) = ηRL 
+
+> K−1
+
+X
+
+> k=0
+
+D
+
+Ex∼P sem  
+
+> t
+
+[∇θ EθGD  
+
+> t,k
+
+(x)] , ∇θ V (st,k )
+
+E
+
++ O(K2η η RL ). (28) 15 We now lower bound each inner product. As in the proof of Lemma 4.10, decompose ∇θ V (st,k )
+
+into its semantic-drift and FPR components. The semantic-drift component contributes only O(ξt) = 
+
+O(ηRL ) by Assumption 4.6. For the FPR component, ∇θ FPR t,k = −p(τ ) Ex∼P sem  
+
+> t
+
+[∇θ EθGD  
+
+> t,k
+
+(x)] .Hence, 
+
+D
+
+Ex∼P sem  
+
+> t
+
+[∇θ EθGD  
+
+> t,k
+
+(x)] , ∇θ V (st,k )
+
+E
+
+= ∂V ∂FPR t,k 
+
+· (−p(τ )) Ex∼P sem  
+
+> t
+
+[∇θ EθGD  
+
+> t,k
+
+(x)] 2
+
++ O(ηRL ).
+
+(29) Since ∂V ∂FPR t,k ≤ − c < 0, and by Assumption 4.9, Ex∼P sem  
+
+> t
+
+[∇θ EθGD  
+
+> t,k
+
+(x)] ≥ μmin , each term in Eq. (29) is bounded below by c p (τ ) μ2min + O(ηRL ). Summing over k = 0 , . . . , K − 1 in Eq. (28) yields ¯Et(θRL  
+
+> t,K
+
+) − ¯Et(θGD  
+
+> t,K
+
+) ≥ ηRL Kc p (τ ) μ2min − O (K2η η RL ), which is strictly positive for sufficiently small ηRL .Finally, Assumption 4.3 implies that a larger expected semantic-OOD energy yields a lower false positive rate, hence FPR RL  
+
+> t
+
+≤ FPR GD  
+
+> t
+
+.
+
+D.4 Proof of Theorem 4.13 
+
+Proof. Applying Def. 4.1 at each outer step τ and summing from τ = 0 to t, we obtain a telescoping decomposition of the total difference between RL and GD: GErr RL  
+
+> t+1
+
+− GErr GD  
+
+> t+1
+
+= Ptτ =0 (∆ RL  
+
+> τ
+
+−
+
+∆GD  
+
+> τ
+
+) + Ptτ =0 (Env RL  
+
+> τ
+
+− Env GD  
+
+> τ
+
+), where Env □ 
+
+> τ
+
+denotes the environment-change term. 
+
+Step 1: sum the model-change gains. By Lemma 4.11, ∆RL  
+
+> τ
+
+− ∆GD  
+
+> τ
+
+≤ − ηRL 
+
+PK−1 
+
+> k=0
+
+κ(θτ,k ) + 
+
+O(K2η η RL ). Summing over τ = 0 , . . . , t , Ptτ =0 (∆ RL  
+
+> τ
+
+− ∆GD  
+
+> τ
+
+) ≤ − ηRL 
+
+Ptτ =0 
+
+PK−1 
+
+> k=0
+
+κ(θτ,k ) + 
+
+O(tK 2η η RL ). Since κ(θτ,k ) ≥ κmin ,
+
+> t
+
+X 
+
+> τ=0
+
+(∆ RL  
+
+> τ
+
+− ∆GD  
+
+> τ
+
+) ≤ − ηRL κmin (t + 1) K + O(tK 2η η RL ). (30) 
+
+Step 2: bound the accumulated environment drift. Define the outer-step starting-point gap 
+
+δτ := ∥θRL  
+
+> τ, 0
+
+− θGD  
+
+> τ, 0
+
+∥. Iterating the per-window parameter-gap bound from Lemma 4.11 gives 
+
+δτ = O(τ Kη RL ). Since GErr is LG-Lipschitz by Assumption 4.2, the difference between RL and GD in the environment-change term at outer step τ is controlled entirely by the starting-point gap δτ ,giving O(LGδτ ) = O(τ KL GηRL ). Thus, this step uses only the regularity assumption. Summing over τ = 0 , . . . , t yields 
+
+> t
+
+X 
+
+> τ=0
+
+(Env RL  
+
+> τ
+
+− Env GD  
+
+> τ
+
+) = O(t2KL GηRL ). (31) 
+
+Step 3: combine the two contributions. Combining Eq. (30) and Eq. (31), we obtain GErr RL  
+
+> t+1
+
+≤
+
+GErr GD  
+
+> t+1
+
+− ηRL κmin (t + 1) K + O(tK 2η η RL ) + O(t2KL GηRL ).
+
+Step 4: FPR comparison. The FPR bound follows directly from Lemma 4.12. In particular, FPR RL  
+
+> t
+
+≤
+
+FPR GD  
+
+> t
+
+− c p (τ ) μ2min Kη RL + O(K2η η RL ), which proves the theorem. 
+
+## E Proofs for Section 5 
+
+For the purpose of analysis we use the semantic-drift summary as a reduced state representation, 
+
+zt,k := Ex∼P sem  
+
+> t+1
+
+[Eθt,k (x)] − Ex∼P sem  
+
+> t
+
+[Eθt,k (x)] . In the proofs below, we use zt,k and st,k inter-changeably. 
+
+E.1 Proof of Theorem 5.6 
+
+Proof. Recall the Def. 5.1: F OW t := LOW (θRL 
+
+> t, ∗
+
+) − L OW (θGD  
+
+> t, ∗
+
+). Applying second-order Taylor expansion, we approximate LOW (θRL 
+
+> t, ∗
+
+) around θGD  
+
+> t, ∗
+
+by 
+
+LOW (θGD  
+
+> t, ∗
+
+) + ( θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+)⊤∇L OW (θGD  
+
+> t, ∗
+
+) + 12 (θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+)⊤∇2LOW (θGD  
+
+> t, ∗
+
+)( θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+), (32) 16 where, ∇2LOW (θGD  
+
+> t, ∗
+
+) is the Hessian matrix for loss LOW at point θGD  
+
+> t, ∗
+
+. Note that since θGD  
+
+> t, ∗
+
+in an optimizer therefore ∇L OW (θGD  
+
+> t, ∗
+
+) = 0 . This simplifies the approximation of LOW (θRL 
+
+> t, ∗
+
+) in (32) as 
+
+LOW (θRL 
+
+> t, ∗
+
+) ≈ L OW (θGD  
+
+> t, ∗
+
+) + 12 (θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+)⊤∇2LOW (θGD  
+
+> t, ∗
+
+)( θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+).
+
+Equivalently 
+
+F OW t := LOW (θRL 
+
+> t, ∗
+
+) − L OW (θGD  
+
+> t, ∗
+
+) ≈ 12 (θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+)⊤∇2LOW (θGD  
+
+> t, ∗
+
+)( θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+). (33) Let λmax be the maximum eigenvalue of ∇2LOW (θGD  
+
+> t, ∗
+
+). Using (33), we upper-bound F OW t by 
+
+F OW t ≤ 12 λmax ∥θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+∥2. (34) Let θGD  
+
+> t,K
+
+and θRL  
+
+> t,K
+
+denote the parameters after K training steps of standard GD and RL-augmented optimizers, respectively. Going back to the GD update training update in (5) and RL-guided training update in (6): 
+
+θGD  
+
+> t,K
+
+= θGD  
+
+> t,K −1
+
+− η∇θ LOW (θGD 
+
+> t,K −1
+
+), (35) 
+
+θRL  
+
+> t,K
+
+= θRL  
+
+> t,K −1
+
+− η∇θ LOW (θRL 
+
+> t,K −1
+
+) + ηRL ∇θ V (st,K −1). (36) We suppose that after K training steps , GD and RL-guided updates return the optimizers, that is 
+
+θRL  
+
+> t, ∗
+
+= θRL  
+
+> t,K
+
+and θGD  
+
+> t, ∗
+
+= θGD  
+
+> t,K
+
+, when the network is trained K updates (epochs). By utilizing Eq. (35) and Eq. (36) and applying triangle inequality, we have 
+
+∥θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+∥2 ≤∥ θRL  
+
+> t,K −1
+
+− θGD 
+
+> t,K −1
+
+∥2 + η2∥∇ θ LOW (θGD 
+
+> t,K −1
+
+) − ∇ θ LOW (θRL 
+
+> t,K −1
+
+)∥2
+
++ η2
+
+> RL
+
+∥∇ θ V (st,K −1)∥2. (37) Recursively for training updates k = 0 , . . . K , we extend (37) by 
+
+∥θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+∥2 ≤∥ θRL  
+
+> t, 0
+
+− θGD  
+
+> t, 0
+
+∥2 + η2
+
+> K
+
+X
+
+> k=1
+
+∥∇ θ LOW (θGD 
+
+> t,k −1
+
+) − ∇ θ LOW (θRL 
+
+> t,k −1
+
+)∥2
+
++ η2
+
+> RL
+> K
+
+X
+
+> k=1
+
+∥∇ θ V (st,k −1)∥2 (38) Without lose of generality, we assume that the initialization points for GD and RL-guided optimizers are the same meaning that ∥θRL  
+
+> t, 0
+
+− θGD  
+
+> t, 0
+
+∥2 = 0 . This simplifies (38) as follows: 
+
+∥θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+∥2 ≤ η2
+
+> K
+
+X
+
+> k=1
+
+∥∇ θ LOW (θGD 
+
+> t,k −1
+
+) − ∇ θ LOW (θRL 
+
+> t,k −1
+
+)∥2 + η2
+
+> RL
+> K
+
+X
+
+> k=1
+
+∥∇ θ V (st,k −1)∥2.
+
+(39) 
+
+Remark: Note that for environment t, the state is a function of parameter θt, therefore during the training st,k ̸ = st,k ′ for k, k ′ ∈ { 0, 1, . . . K }, i̸ = j.Going back to the proof, next, we extend the term ∥∇ θ V (st,k −1)∥2 in (39): first we add and subtract the term ∇θ V (st,k −2), then use triangle inequality, 
+
+∥∇ θ V (st,k −1)∥2 = ∥∇ θ V (st,k −1) − ∇ θ V (st,k −2) + ∇θ V (st,k −2)∥2
+
+≤ ∥∇ θ V (st,k −1) − ∇ θ V (st,k −2)∥2 + ∥∇ θ V (st,k −2)∥2,
+
+recursively we extend the above inequality for training update k′ = 1 , . . . k − 1 as follows 
+
+∥∇ θ V (st,k −1)∥2 ≤
+
+> k−1
+
+X
+
+> k′=1
+
+∥∇ θ V (st,k ′ ) − ∇ θ V (st,k ′−1)∥2. (40) Note that the gradient of value function is zero at the initialization, i.e. ∇θ V (st, 0) = 0 .17 Next we first apply Assumption 5.3 on value function Vθ and LOW . Hence the bound in (39) is upper-bounded by 
+
+∥θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+∥2 ≤ η2L
+
+> K
+
+X
+
+> k=1
+
+∥θGD  
+
+> t,k −1
+
+− θRL 
+
+> t,k −1
+
+∥2 + η2
+
+> RL
+
+LVKX
+
+> k=1
+> k−1
+
+X
+
+> k′=1
+
+∥st,k ′ − st,k ′−1∥2. (41) Secondly apply Assumption 5.4, meaning that at each training update ∥θGD  
+
+> t,k
+
+−θRL  
+
+> t,k
+
+is within a parameter ball with radius r, B(θ, r ). This yields to the bound below for (41), 
+
+∥θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+∥2 ≤ 4η2L K r 2 + η2
+
+> RL
+
+LVKX
+
+> k=1
+> k−1
+
+X
+
+> k′=1
+
+∥st,k ′ − st,k ′−1∥2 (42) Finally, combining (34) and (42), we derive the our main bound in (13): 
+
+F OW t ≤ 12 λmax 
+
+"
+
+ηK,r + ηRL KX
+
+> k=1
+> k−1
+
+X
+
+> k′=1
+
+∥st,k ′ − st,k ′−1∥2
+
+#
+
+, (43) where ηRL = η2
+
+> RL
+
+LV and ηK,r = 4 η2L K r 2.
+
+E.2 Proof of Corollary 5.7 
+
+Proof. Recall the gradient of value ∇θ V (st,k ) from (19) in Section D.1: 
+
+∇θ V (st,k ) = ∂V ∂z t,k 
+
+∇θ zt,k + ∂V ∂FPR t,k 
+
+∇θ FPR t,k . (44) Next, we recall the following equality from Subsection D.1 and apply Assumption 5.5 
+
+∇θ zt,k = Ex∼P sem  
+
+> t+1
+
+[∇θ Eθ (x)] − Ex∼P sem  
+
+> t
+
+[∇θ Eθ (x)] = O(ξt,k ) (45) From arguments in Lemma 4.10 and Eq. (21), under Assumption 4.9, we have 
+
+∇θ FPR t,k = −p(τ ) · Ex∼P sem  
+
+> t
+
+[∇θ Eθt,k (x)] (46) where p(τ ) > 0 is the density of Eθt (x) evaluated at τ . By plugging (45) and (46) in (44), we have 
+
+∇θ V (st,k ) = O(ξt,k ) − ∂V ∂FPR t,k 
+
+· (ρ(τ )Ex∼P sem  
+
+> t
+
+[∇θ Eθt (x)]) (47) Apply −c ≤ ∂V ∂FPR t,k < 0, then 
+
+∇θ V (st,k ) ≤ O (ξt,k ) + cρ (τ )Ex∼P sem  
+
+> t
+
+[∇θ Eθt,k (x)] (48) Recall (39) from Subsection E.1: under the Assumptions 5.3 and 5.4, we have 
+
+∥θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+∥2 ≤ ηK,r + η2
+
+> RL
+> K
+
+X
+
+> k=1
+
+∥∇ θ V (st,k −1)∥2.
+
+Now apply the upper bound of ∇θ V (st,k ) from (48) 
+
+∥θRL  
+
+> t, ∗
+
+− θGD  
+
+> t, ∗
+
+∥2 ≤ ηK,r + η2
+
+> RL
+> K
+
+X
+
+> k=1
+
+O(ξt,k −1) + cρ (τ )Ex∼P sem  
+
+> t
+
+[∇θ Eθt,k −1 (x)] 
+
+= O(ηK,r ξt) + ¯ ηRL KX
+
+> k=1
+
+∥Ex∼P sem  
+
+> t
+
+[∇θ Eθt,k −1 (x)] ∥2, (49) Where ¯ηRL := c2 η2 
+
+> RL
+
+ρ2(τ ). Note that without lose of generality, we assume that O(ξt,k −1) = 
+
+O(ξt). Combining the inequalities (49) and (34) lead to our main bound (14). 18 E.3 Proof of Corollary 5.8 
+
+Proof. Let us recall (18) from Section D: 
+
+zt,k := Ex∼P sem  
+
+> t+1
+
+[Eθt,k (x)] − Ex∼P sem  
+
+> t
+
+[Eθt,k (x)] . (50) Hence for consecutive training updates k and k − 1, we have 
+
+zt,k − zt,k −1
+
+= Ex∼P sem t+1 
+
+Eθt,k (x) − Ex∼P sem t
+
+Eθt,k (x) − Ex∼P sem t+1 
+
+Eθt,k −1 (x) + Ex∼P sem t
+
+Eθt,k −1 (x)
+
+=
+
+
+
+Ex∼P sem t+1 
+
+Eθt,k (x) − Ex∼P sem t+1 
+
+Eθt,k −1 (x)
+
+
+
+−  Ex∼P sem t
+
+Eθt,k (x) − Ex∼P sem t
+
+Eθt,k −1 (x) 
+
+= Ex∼P sem t+1 
+
+Eθt,k (x) − Eθt,k −1 (x) − Ex∼P sem t
+
+Eθt,k (x) − Eθt,k −1 (x) . (51) Approximate epoch-based energy gradient as ∇(k) 
+
+> θ
+
+Eθt (x) ≈ Eθt,k (x) − Eθt,k −1 (x), therefore the Eq. 51 turns into 
+
+zt,k − zt,k −1 = Ex∼P sem t+1 
+
+h
+
+∇(k) 
+
+> θ
+
+Eθt (x)
+
+i
+
+− Ex∼P sem t
+
+h
+
+∇(k) 
+
+> θ
+
+Eθt (x)
+
+i
+
+(52) On the other hand, by Def. 5.2, we have 
+
+∥zt,k − zt,k −1∥2 = ∥S(k)
+
+> t, ∇
+
+∥2,
+
+where S(k) 
+
+> t, ∇
+
+is the epoch-based energy gradient state. This implies an alternative upper bound for 
+
+F OW t as expressed in (15). 
+
+E.4 Proof of Theorem 5.13 
+
+Proof. We start with the gradient of loss function LG under GD and RL-guided optimizers for environment t and training step k:
+
+GGD t,k := ∇θ LOW (θGD t,k ) and GRL t,k := ∇θ LOW (θRL t,k ) + ηRL ∇θ V (st,k ). (53) Using the triangle inequality, we bound the length of the gradient difference vector between GGD t,k 
+
+and GRL t,k by 
+
+∥GRL t,k − GGD t,k ∥2 = ∥∇ θ LOW (θRL t,k ) + ηRL ∇θ V (st,k ) − ∇ θ LOW (θGD t,k )∥2
+
+≤ ∥∇ θ LOW (θRL t,k ) − ∇ θ LOW (θGD t,k )∥2 + ηRL ∥∇ θ V (st,k )∥2. (54) Next, let us focus on ∥∇ θ V (st,k )∥2 and subtract and add the term ∇θ V (st,k −1):
+
+∥∇ θ V (st,k )∥2 = ∥∇ θ V (st,k ) − ∇ θ V (st,k −1) + ∇θ V (st,k −1)∥2
+
+≤ ∥∇ θ V (st,k ) − ∇ θ V (st,k −1)∥2 + ∥∇ θ V (st,k −1)∥2.
+
+Recursively, the above arguments lead to the following bound: 
+
+∥∇ θ V (st,k )∥2 ≤
+
+> k
+
+X
+
+> k′=1
+
+∥∇ θ V (st,k ′ ) − ∇ θ V (st,k ′−1)∥2 ≤ pLVkX
+
+> k′=1
+
+∥st,k ′ − st,k ′−1∥2, (55) where the second inequality is concluded from Assumption 5.3. Note that ∥∇ θ V (st, 0)∥2 = 0 .Now, we recall 
+
+zt,k := Ex∼P sem  
+
+> t+1
+
+[Eθt,k (x)] − Ex∼P sem  
+
+> t
+
+[Eθt,k (x)] . (56) By Def. 5.2, and similar arguments in Corollary 5.8, we redeem the epoch-based gradient energy state 
+
+∥zt,k ′ − zt,k ′−1∥2 = ∥S(k′) 
+
+> t, ∇
+
+∥2. (57) Plugging (57) in the upper bound (55), we have 
+
+∥∇ θ V (st,k )∥2 ≤ pLVkX
+
+> k′=1
+
+∥S(k′) 
+
+> t, ∇
+
+∥2. (58) 19 Finally, we focus on ∥∇ θ LOW (θRL t,k ) − ∇ θ LOW (θGD t,k )∥2: Using Assumptions 5.3 and 5.4 for LOW ,we bound the difference of the gradient of loss for GD and RL-guided optimizers by 
+
+∥∇ θ LOW (θRL t,k ) − ∇ θ LOW (θGD t,k )∥2 ≤ 2 √L r, (59) where r is the radius of ball B(θ, r ). We refer Def. 5.9, apply inverse triangle inequality on EGF train t,p 
+
+difference between GD and RL-guided optimizers: 
+
+1
+
+K
+
+> K
+
+X
+
+> k=1
+
+∥GRL t,k ∥2 − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+∥GGD t,k ∥2 ≤ 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+∥GRL t,k − GGD t,k ∥2. (60) Sequentially Plugging 58) and (59) in (54) and plugging (54) in (60), we conclude 
+
+1
+
+K
+
+> K
+
+X
+
+> k=1
+
+∥GRL t,k ∥2 − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+∥GGD t,k ∥2 ≤ 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+2√Lr + ηRL 
+
+pLVkX
+
+> k′=1
+
+∥S(k′) 
+
+> t, ∇
+
+∥2
+
+!
+
+≤ 2√Lr + ηRL 
+
+√LV
+
+K
+
+> K
+
+X
+
+> k=1
+> k
+
+X
+
+> k′=1
+
+∥S(k′) 
+
+> t, ∇
+
+∥2, (61) which proves our claim in (16). 
+
+E.5 Proof of Theorem 5.14 
+
+Proof. We start with the gradient of loss function LG under GD and RL-guided optimizers for environment t:
+
+GGD t := ∇θ LOW (θGD t ) and GRL t := ∇θ LOW (θRL t ) + ηRL ∇θ V (st). (62) In addition, recall Def. 5.9, and apply inverse triangle inequality on EGF env t,p difference between GD and RL-guided optimizers: 
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+∥GRL t ∥2 − 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+∥GGD t ∥2 ≤ 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+∥GRL t − GGD t ∥2. (63) Using GGD t and GRL t in (62), we bound the length of GRL t − GGD t by triangle inequality as follows: 
+
+∥GRL t − GGD t ∥2 = ∥∇ θ LOW (θRL t ) + ηRL ∇θ V (st) − ∇ θ LOW (θGD t )∥2
+
+≤ ∥∇ θ LOW (θRL t ) − ∇ θ LOW (θGD t )∥2 + ηRL ∥∇ θ V (st)∥2. (64) Using Assumptions 5.3 and 5.4 for LOW in environment t, we have 
+
+∥∇ θ LOW (θRL t ) − ∇ θ LOW (θGD t )∥2 ≤ 2 √L r, (65) where r in the radius of B(θt, r ) in Assumption 5.4. Next, similar to arguments in Theorem 5.13, we have 
+
+∥∇ θ V (st)∥2 = ∥∇ θ V (st) − ∇ θ V (st−1) + ∇θ V (st−1)∥2
+
+≤ ∥∇ θ V (st) − ∇ θ V (st−1)∥2 + ∥∇ θ V (st−1)∥2 =
+
+> t
+
+X 
+
+> τ=1
+
+∥∇ θ V (sτ ) − ∇ θ V (sτ −1)∥2
+
+≤
+
+> t
+
+X 
+
+> τ=1
+
+pLV ∥sτ − sτ −1∥2 using Assumption 5.4 . (66) Note that ∥∇ θ V (s0)∥2 = 0 . Recall 
+
+zτ := Ex∼P sem   
+
+> τ+1
+
+[Eθτ (x)] − Ex∼P sem  
+
+> τ
+
+[Eθτ (x)] . (67) Hence for two environments τ − 1 and τ :
+
+zτ − zτ −1
+
+= Ex∼P sem τ +1 
+
+Eθτ (x) − Ex∼P sem τ
+
+Eθτ (x) − Ex∼P sem τ
+
+Eθτ −1 (x) + Ex∼P sem τ −1
+
+Eθτ −1 (x)
+
+=
+
+
+
+Ex∼P sem τ +1 
+
+Eθτ (x) − Ex∼P sem τ
+
+Eθτ −1 (x)
+
+−
+
+
+
+Ex∼P sem τ
+
+Eθτ (x) − Ex∼P sem τ −1
+
+Eθτ −1 (x)
+
+= Sτ →τ +1 − Eτ −1→τ , (68) 20 The last equality of (68) is based on Def. 5.10. Applying Assumptions 5.11 and 5.12 
+
+∥zτ − zτ −1∥2 ≤ O (ξSτ →τ +1 ) + O(ξEτ −1→τ ) (69) Going back to (66), substituting (71) in (66) implies 
+
+∥∇ θ V (st)∥2 ≤ pLVtX 
+
+> τ=1
+
+ O(ξsτ →τ +1 ) + O(ξEτ −1→τ ) . (70) Combining (65) and (70) and use them in (64), we have 
+
+∥GRL t − GGD t ∥2 ≤ 2 √L r + ηRL 
+
+pLVtX 
+
+> τ=1
+
+ O(ξsτ →τ +1 ) + O(ξEτ −1→τ ) . (71) Hence by using (71) in (63), we derive the upper bound below: 
+
+1
+
+T
+
+> T
+
+X
+
+> t=1
+
+∥GRL t ∥2 − 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+∥GGD t ∥2 ≤ 2 √L r + ηRL 
+
+√LV
+
+T
+
+> T
+
+X
+
+> t=1
+> t
+
+X 
+
+> τ=1
+
+ O(ξsτ →τ +1 ) + O(ξEτ −1→τ ) ,
+
+(72) which proves the theorem and yield our claim in (17). 21

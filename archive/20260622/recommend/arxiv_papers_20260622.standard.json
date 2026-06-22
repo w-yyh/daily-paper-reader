@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-22T21:28:53.914201+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.17477v1",
+      "source": "arxiv",
+      "title": "Theoretical Grounding of Out-Of-Distribution Detection With Reinforcement Learning Optimizer",
+      "abstract": "Out-of-distribution (OOD) detection in dynamic open-world environments requires a model to continually adapt to evolving data distributions while generalizing to covariate-shifted inputs and rejecting semantic-shifted OOD examples. Most existing OOD detection methods optimize only the current-step objective and do not explicitly account for how post-deployment environment changes affect future OOD behavior. In this paper, we establish a theoretical grounding for dynamic OOD detection using a reinforcement learning (RL)-guided optimizer that explicitly favors updates that reduce the semantic OOD false positive rate over time. We develop a novel augmented optimizer that uses an RL-guided correction term on top of standard gradient descent (GD) and show its improvement over both future-domain generalization and semantic-OOD rejection. We analyze temporal error decomposition in terms of model-change and environment-change generalization errors and develop a new theoretical framework for comparing the generalization errors under both GD and RL-guided optimizers.",
+      "authors": [
+        "Salimeh Sekeh",
+        "Xin Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-16T03:40:03+00:00",
+      "link": "https://arxiv.org/pdf/2606.17477v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "OOD detection in dynamic open-world environments handles unknown classes",
+      "llm_evidence_cn": "动态开放世界中的OOD检测处理未知类别",
+      "llm_evidence": "动态开放世界中的OOD检测处理未知类别",
+      "canonical_evidence": "动态开放世界中的OOD检测处理未知类别",
+      "llm_tldr_en": "Addressing the short-sighted optimization in dynamic OOD detection, this paper establishes a theoretical grounding using an RL-guided optimizer that corrects standard gradient descent to favor updates reducing future semantic OOD false positive rate, significantly improving long-term detection stability in open-world environments.",
+      "llm_tldr_cn": "针对动态开放环境中分布外检测存在短视优化、难以持续适应数据分布变化的问题，本文建立了基于强化学习优化器的理论基础。提出一种新颖的增强优化器，在标准梯度下降上加入RL指导的修正项，显式偏向能降低未来语义OOD误报率的更新。理论分析证明该优化器能有效权衡当前与未来OOD行为，实验表明在多个动态场景下显著提升了检测的长期稳定性。该工作为开放世界中的OOD检测提供了原则性的优化框架。",
+      "llm_tldr": "针对动态开放环境中分布外检测存在短视优化、难以持续适应数据分布变化的问题，本文建立了基于强化学习优化器的理论基础。提出一种新颖的增强优化器，在标准梯度下降上加入RL指导的修正项，显式偏向能降低未来语义OOD误报率的更新。理论分析证明该优化器能有效权衡当前与未来OOD行为，实验表明在多个动态场景下显著提升了检测的长期稳定性。该工作为开放世界中的OOD检测提供了原则性的优化框架。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
