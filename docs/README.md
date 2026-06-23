@@ -6,28 +6,31 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-22
-- 运行时间：2026-06-22 21:30:02 UTC
+- 最新运行日期：2026-06-23
+- 运行时间：2026-06-23 20:49:29 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：0
+- 本次总论文数：3
+- 精读区：2
 - 速读区：1
 
 ### 今日简报（AI）
-今天速读了一篇将强化学习优化器用于分布外检测理论的论文。
-
-该文为OOD检测提供了收敛性理论保障，是值得关注的交叉方向。
-
-普通读者想入手可先回顾强化学习与不确定性估计的基础概念。
-- 详情：[/202606/22/README](/202606/22/README)
+今日精读2篇高分论文，聚焦多模态广义类别发现与小样本检测的相似度学习创新。
+《Synergistic Dual-Branch Adaptation》通过双分支协同适应实现多模态新类发现，值得优先关注。
+推荐读者明日跟进对比学习在聚类协议中的跨界应用，并结合小样本目标检测的反思成果展开实验。
+- 详情：[/202606/23/README](/202606/23/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Synergistic Dual-Branch Adaptation for Multi-modal Generalized Category Discovery](/202606/23/2606.21446v1-synergistic-dual-branch-adaptation-for-multi-modal-generalized-category-discovery)  
+   标签：评分：10.0/10、query:cgcd
+   evidence：提出面向多模态GCD的SDBA方法，从无标签数据中发现新类别
+2. [Rethinking Prototype-based Similarity Learning for Few-Shot Object Detection](/202606/23/2606.23069v1-rethinking-prototype-based-similarity-learning-for-few-shot-object-detection)  
+   标签：评分：8.0/10、query:cgcd
+   evidence：少样本目标检测从少量样本中发现新物体类别，实现开放世界新类发现。
 
 ### 速读区论文标签
-1. [Theoretical Grounding of Out-Of-Distribution Detection With Reinforcement Learning Optimizer](/202606/22/2606.17477v1-theoretical-grounding-of-out-of-distribution-detection-with-reinforcement-learning-optimizer)  
-   标签：评分：7.0/10、query:cgcd
-   evidence：动态开放世界中的OOD检测处理未知类别
+1. [Cohort Organized Learning: Clustering Through Agreement](/202606/23/2606.21743v1-cohort-organized-learning-clustering-through-agreement)  
+   标签：评分：6.0/10、query:cgcd
+   evidence：无标签数据聚类方法，可应用于新类发现
 
 
 <div class="dpr-home-promo-card">

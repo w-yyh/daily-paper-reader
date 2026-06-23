@@ -1,0 +1,131 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-23T20:45:26.167825+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.21446v1",
+      "source": "arxiv",
+      "title": "Synergistic Dual-Branch Adaptation for Multi-modal Generalized Category Discovery",
+      "abstract": "Generalized Category Discovery (GCD) aims to classify old categories and discover new ones from unlabeled data. Recent multi-modal approaches introduce retrieved or synthesized texts into a dual-branch architecture to provide semantic cues complementary to visual features. However, the cross-modal synergy in existing dual-branch methods remains coarse and incomplete: the two modalities are encoded independently with the bias and noise in the derived text left unaddressed during encoding, and existing mutual learning strategies operate only on global class-level anchors, lacking fine-grained relational supervision. To address these limitations, we propose the Synergistic Dual-Branch Adaptation (SDBA) framework, which serves as a plug-and-play enhancement compatible with existing dual-branch methods such as GET and TextGCD. SDBA comprises two components: the cross-modal synergistic adapter inserts lightweight adapters into both branches and further injects visual information into the text adapter at each encoder layer to enhance text feature learning during encoding; the neighborhood mutual learning module enforces consistent local neighborhood distributions between the two branches via bidirectional KL divergence, providing fine-grained relational supervision for both old and new classes. Extensive experiments on six benchmarks demonstrate state-of-the-art performance, and consistent improvements on different baselines validate the broad scalability of the proposed framework.",
+      "authors": [
+        "Yuxun Qu",
+        "Minyu Zhou",
+        "Yongqiang Tang",
+        "Chenyang Zhang",
+        "Wensheng Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-19T14:06:22+00:00",
+      "link": "https://arxiv.org/pdf/2606.21446v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "proposes SDBA for multi-modal GCD, discovering novel categories from unlabeled data",
+      "llm_evidence_cn": "提出面向多模态GCD的SDBA方法，从无标签数据中发现新类别",
+      "llm_evidence": "提出面向多模态GCD的SDBA方法，从无标签数据中发现新类别",
+      "canonical_evidence": "提出面向多模态GCD的SDBA方法，从无标签数据中发现新类别",
+      "llm_tldr_en": "Proposes SDBA, a plug-and-play framework for multi-modal generalized category discovery that addresses cross-modal synergy limitations via synergistic fine-grained mutual learning.",
+      "llm_tldr_cn": "针对多模态广义类别发现中跨模态协同不充分的问题，提出协同双分支适应框架，通过去偏文本编码和细粒度关系监督实现协同学习，在无标签数据中同时分类旧类别和发现新类别。SDBA作为即插即用模块有效解决了文本噪声和粗粒度对齐缺陷，实验结果表明其性能优越，推动了开放世界类别发现研究。",
+      "llm_tldr": "针对多模态广义类别发现中跨模态协同不充分的问题，提出协同双分支适应框架，通过去偏文本编码和细粒度关系监督实现协同学习，在无标签数据中同时分类旧类别和发现新类别。SDBA作为即插即用模块有效解决了文本噪声和粗粒度对齐缺陷，实验结果表明其性能优越，推动了开放世界类别发现研究。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.23069v1",
+      "source": "arxiv",
+      "title": "Rethinking Prototype-based Similarity Learning for Few-Shot Object Detection",
+      "abstract": "Few-shot object detection aims to detect novel object categories from only a few labeled examples, avoiding costly large-scale annotation. Recent prototype-based similarity learning approaches enable training-free adaptation by matching query features with class prototypes. However, they suffer from two fundamental limitations: (i) class confusion arising from inter-class similarity margin collapse, and (ii) insufficient visual cues for precise localization, as similarity scores capture only class-level semantic affinity while providing limited spatial information. To address these issues, we introduce two complementary components. Text-Anchored Semantic Mask (TSMa) leverages class-level text features as semantic anchors to identify semantically aligned channels through channel-wise interaction between visual and text features. By suppressing style-induced spurious responses and emphasizing class-intrinsic signals, TSMa enlarges inter-class similarity margins and mitigates class confusion. We further propose Stage-Aligned Hierarchical Autoregressive Regression (SHARe), which reformulates localization as a hierarchical autoregressive process that progressively refines bounding boxes across multiple stages. SHARe leverages the layer-wise characteristics of ViT representations by aligning feature abstraction levels with regression stages: deeper layers guide early coarse localization, while shallower layers rich in edge and texture cues refine spatial details in later stages. Experiments on COCO demonstrate a new state of the art, outperforming the previous best by +10.1 nAP, with extensive analysis validating each component. The code is available at https://github.com/VisualScienceLab-KHU/ReSet.",
+      "authors": [
+        "KunHo Heo",
+        "Seungjae kim",
+        "Wongyu Lee",
+        "SuYeon Kim",
+        "MyeongAh Cho"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-22T09:18:00+00:00",
+      "link": "https://arxiv.org/pdf/2606.23069v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Few-shot object detection discovers novel object categories from few examples, enabling open world novel class discovery.",
+      "llm_evidence_cn": "少样本目标检测从少量样本中发现新物体类别，实现开放世界新类发现。",
+      "llm_evidence": "少样本目标检测从少量样本中发现新物体类别，实现开放世界新类发现。",
+      "canonical_evidence": "少样本目标检测从少量样本中发现新物体类别，实现开放世界新类发现。",
+      "llm_tldr_en": "Improves prototype-based similarity learning for few-shot object detection by introducing text-anchored semantic masks and spatial-aware enhancements to reduce class confusion and improve localization of novel object categories.",
+      "llm_tldr_cn": "针对少样本目标检测中基于原型相似性学习存在的类别混淆和定位不精确问题，提出文本锚定语义掩码来增强类别区分能力，并结合空间信息提升定位精度，在多个基准上显著提升了对新类别的检测性能，为开放世界新类发现提供了有效的少样本学习方案。",
+      "llm_tldr": "针对少样本目标检测中基于原型相似性学习存在的类别混淆和定位不精确问题，提出文本锚定语义掩码来增强类别区分能力，并结合空间信息提升定位精度，在多个基准上显著提升了对新类别的检测性能，为开放世界新类发现提供了有效的少样本学习方案。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.21743v1",
+      "source": "arxiv",
+      "title": "Cohort Organized Learning: Clustering Through Agreement",
+      "abstract": "In this article we describe Cohort Organized Learning (CoOL), a method for clustering data without explicit distance or similarity computations. Herein, we will describe CoOL, derive the gradients determined by expectation maximization to train the networks, show how to monitor convergence during training and evaluate the clusters after training, and discuss a series of examples and use cases. We also discuss CoOL's limitations and future prospects on related tasks. Because CoOL uses neural networks to estimate the clusters, it can be used to cluster any data that can be made compatible and we illustrate this on vector data and images.",
+      "authors": [
+        "Finn Henry O'Shea",
+        "Maria Elena Monzani"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.AI"
+      ],
+      "published": "2026-06-19T21:00:06+00:00",
+      "link": "https://arxiv.org/pdf/2606.21743v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "clustering method for unlabeled data without distance computations, applicable to novel class discovery",
+      "llm_evidence_cn": "无标签数据聚类方法，可应用于新类发现",
+      "llm_evidence": "无标签数据聚类方法，可应用于新类发现",
+      "canonical_evidence": "无标签数据聚类方法，可应用于新类发现",
+      "llm_tldr_en": "Introduces Cohort Organized Learning (CoOL), a neural clustering method that avoids explicit distance computations and uses expectation maximization to assign clusters, demonstrated on vector and image data.",
+      "llm_tldr_cn": "该论文针对传统聚类方法依赖显式距离或相似度计算的问题，提出Cohort Organized Learning (CoOL) 方法，通过神经网络和期望最大化进行无显式相似度的聚类，无需预定义相似度。实验表明该方法适用于向量数据和图像等多种数据类型，能有效发现数据中的群组结构，为开放世界中无标记数据的类别发现提供了可迁移的聚类工具。",
+      "llm_tldr": "该论文针对传统聚类方法依赖显式距离或相似度计算的问题，提出Cohort Organized Learning (CoOL) 方法，通过神经网络和期望最大化进行无显式相似度的聚类，无需预定义相似度。实验表明该方法适用于向量数据和图像等多种数据类型，能有效发现数据中的群组结构，为开放世界中无标记数据的类别发现提供了可迁移的聚类工具。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

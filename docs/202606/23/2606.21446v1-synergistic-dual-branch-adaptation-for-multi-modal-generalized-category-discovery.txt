@@ -1,0 +1,765 @@
+Title: Synergistic Dual-Branch Adaptation for Multi-modal Generalized Category Discovery
+
+URL Source: https://arxiv.org/pdf/2606.21446v1
+
+Published Time: Tue, 23 Jun 2026 01:08:13 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+> JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 1
+
+# Synergistic Dual-Branch Adaptation for Multi-modal Generalized Category Discovery 
+
+Yuxun Qu †, Minyu Zhou †, Yongqiang Tang, Chenyang Zhang and Wensheng Zhang 
+
+Abstract —Generalized Category Discovery (GCD) aims to classify old categories and discover new ones from unlabeled data. Recent multi-modal approaches introduce retrieved or syn-thesized texts into a dual-branch architecture to provide semantic cues complementary to visual features. However, the cross-modal synergy in existing dual-branch methods remains coarse and incomplete: the two modalities are encoded independently with the bias and noise in the derived text left unaddressed during encoding, and existing mutual learning strategies operate only on global class-level anchors, lacking fine-grained relational super-vision. To address these limitations, we propose the Synergistic Dual-Branch Adaptation (SDBA) framework, which serves as a plug-and-play enhancement compatible with existing dual-branch methods such as GET and TextGCD. SDBA comprises two components: the cross-modal synergistic adapter inserts lightweight adapters into both branches and further injects visual information into the text adapter at each encoder layer to enhance text feature learning during encoding; the neighborhood mutual learning module enforces consistent local neighborhood distribu-tions between the two branches via bidirectional KL divergence, providing fine-grained relational supervision for both old and new classes. Extensive experiments on six benchmarks demonstrate state-of-the-art performance, and consistent improvements on different baselines validate the broad scalability of the proposed framework. 
+
+Index Terms —Generalized Category Discovery, Semi-Supervised Learning, Open-World Learning, Multi-Modal Learning 
+
+I. I NTRODUCTION 
+
+In real-world image classification, Semi-Supervised Learn-ing (SSL) [1], [2] effectively reduces annotation cost by exploiting unlabeled images. However, SSL assumes a closed-world setting where the unlabeled data shares the same label space as the labeled set [3], limiting its applicability when new categories continuously emerge. To relax this constraint, Generalized Category Discovery (GCD) [4] assumes that the unlabeled dataset contains new categories absent from the labeled set. The goal of GCD is not only to classify old  
+
+> †
+
+These authors contributed equally to this work. Yuxun Qu and Minyu Zhou are with the College of Computer Science, Nankai University, Tianjin 300350, China. (e-mail: quyuxun97@gmail.com, minyu.zhou@mail.nankai.edu.cn) Yongqiang Tang and Chenyang Zhang are with the State Key Lab-oratory of Multimodal Artificial Intelligence Systems, Institute of Au-tomation, Chinese Academy of Sciences, Beijing 101408, China. (e-mail: yongqiang.tang@ia.ac.cn, chenyang.zhang@ia.ac.cn) Wensheng Zhang is with the College of Computer Science, Nankai Uni-versity, Tianjin 300350, China, and also with the State Key Laboratory of Multimodal Artificial Intelligence Systems, Institute of Automation, Chi-nese Academy of Sciences, Beijing 101408, China. (e-mail: zhangwenshen-gia@hotmail.com). Visual     
+
+> Branch
+> Text
+> Branch
+> Image
+> Text
+> (a)
+> Text Synthesis
+> / Retrieval
+> Mutual Learning
+> GCD Loss
+> Noise / Semantic Deviation
+> GCD Loss
+> Image
+> Text
+> Text Synthesis
+> / Retrieval
+> Noise / Semantic Deviation
+> Enhanced
+> Text Branch
+> Visual
+> Injection
+> (a)
+> Visual
+> Branch
+> ×
+> GCD Loss GCD Loss
+> Visual feature Noisy Text feature Visual feature Fused feature
+> (b)
+> Mutual Learning
+> Global
+> Anchor
+> Local
+> Neighborhood
+> Structure
+> Global
+> Anchor
+> Local
+> Neighborhood
+> Structure
+
+Fig. 1: Motivation. (a) Conventional dual-branch methods en-code the two modalities independently and rely on global class anchors in mutual learning, leaving the bias and noise in the retrieved or synthesized texts propagating through the cross-modal loss and degrading the learning of both branches. (b) The proposed SDBA injects visual class representations into the text adapter and enables neighborhood mutual learning, en-hancing the text branch and promoting mutual reinforcement. categories but also to discover and cluster new categories in the unlabeled data. As a promising direction with broad practical relevance, GCD has attracted growing research interest. While traditional GCD methods rely solely on visual fea-tures [4], [5], the text modality provides discriminative cues that are complementary to visual appearance, motivating the incorporation of multi-modal information into GCD. Recent dual-branch approaches like TextGCD [6] and GET [7] in-troduce multi-modal pre-trained models (e.g., CLIP) into the GCD framework. These methods acquire auxiliary text repre-sentations via retrieval [6], [8] or synthesis [7] in the absence of paired text annotations, and perform intra-modal category discovery within each branch, with cross-modal mutual learn-ing enabling synergy between the two modalities. By virtue of their simplicity and effectiveness, dual-branch methods have become the dominant paradigm for multi-modal GCD. However, as illustrated in Fig. 1, current dual-branch ap-proaches achieve only coarse and incomplete cross-modal synergy throughout the learning pipeline, hindering the full exploitation of cross-modal information in GCD and manifest-ing as two interrelated limitations. (1) Isolated Dual-Branch Encoding. In GCD, since paired image-text supervision is unavailable, text information is often retrieved from a limited 
+
+0000–0000/00$00.00 © 2021 IEEE  
+
+> arXiv:2606.21446v1 [cs.CV] 19 Jun 2026 JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 2
+
+vocabulary or synthesized via an auxiliary generator [6], [7], inevitably introducing bias and noise into the text branch. However, existing methods encode the two modalities sep-arately and only interact through a mutual learning loss, which fails to mitigate such noise during encoding. The noisy supervision signal from the text branch then propagates to the visual branch through the cross-modal loss, degrading the learning of both branches. (2) Insufficient Structural Mutual Learning. Current mutual learning strategies enforce cross-modal consistency at the level of fixed global anchors such as class prototypes or class centers. Each sample is represented by its similarity to these anchors, and the resulting similarity distributions are aligned across modalities. Such anchor-based alignment captures only coarse class-level relations and fails to model the fine-grained local neighborhood structure among samples. This limitation is particularly severe for new-class samples, as their similarity to any fixed anchor tends to be low, rendering the mutual learning signal uninformative. This motivates us to introduce finer-grained constraints to complement the cross-modal interaction. To address these limitations, we propose the Synergistic 
+
+Dual-Branch Adaptation (SDBA) framework, which replaces the conventional independent dual-branch structure with a synergistically coupled architecture comprising two core com-ponents: the Cross-Modal Synergistic Adapter (CMSA) and 
+
+Neighborhood Mutual Learning (NML) . To address the first limitation, CMSA adopts lightweight adapters with frozen backbones for parameter-efficient adaptation, and further in-corporates a visual injection mechanism into the text adapter to mitigate the bias and noise in the derived text. Specifically, the global class representation of the visual branch is fused with the text feature at each encoder layer, enabling layer-wise enhancement of text features with visual context. In addition, NML replaces fixed global anchors with local sample neighborhoods as the basis for cross-modal alignment. For each sample, the neighborhood is constructed from its similar samples in feature space of each modality, and the resulting neighborhood distributions are aligned across branches via bidirectional KL divergence, providing fine-grained relational supervision for both old and new classes. In summary, our contributions are listed as follows.  
+
+> •
+
+We propose the Synergistic Dual-Branch Adaptation (SDBA) framework, which mitigates the coarse and insuf-ficient cross-modal synergy in both encoding and mutual learning through the cross-modal synergistic adapter and the neighborhood mutual learning module.  
+
+> •
+
+We propose the cross-modal synergistic adapter, which injects visual information into the adapter in the text branch to suppress the noise introduced during text ac-quisition.  
+
+> •
+
+We introduce neighborhood mutual learning, which uti-lizes local neighborhood distributions instead of relying on fixed global anchors for cross-modal mutual learning, thereby enabling fine-grained interaction.  
+
+> •
+
+Extensive experiments on six benchmarks demonstrate that our method achieves state-of-the-art performance. Furthermore, the consistent performance gains achieved when integrating our components into the existing dual-branch methods validate the broad scalability of the proposed approach. The rest of the paper is organized as follows. Section II briefly reviews related work. Section III introduces the pre-liminaries. Section IV elaborates on the proposed method. Ex-tensive experiments and analyses are presented in Section V. Finally, Section VI concludes the paper. II. R ELATED WORK 
+
+A. Semi-Supervised Learning 
+
+Semi-supervised learning (SSL) [9]–[13] alleviates the re-liance on costly annotation by exploiting unlabeled data jointly with a small labeled set, and is broadly categorized into two paradigms: consistency regularization and pseudo-labeling. Consistency regularization [3], [14] requires stable predictions under different perturbations or training stages, with repre-sentative works such as Temporal Ensembling [3] and Mean Teacher [14] producing smoother pseudo-supervision via ex-ponential moving average. Pseudo-labeling strategies [15], [16] instead assign hard or soft labels to unlabeled samples and optimize them jointly with the supervised objective. Fix-Match [17] unifies the two paradigms by enforcing consistency between weakly and strongly augmented views, while follow-ups such as MixMatch [18] and FlexMatch [19] further improve performance via mixed interpolation and adaptive thresholding. Despite these advances, mainstream SSL meth-ods still operate under the closed-world assumption, limiting their applicability in open-world settings. 
+
+B. Generalized Category Discovery 
+
+Generalized Category Discovery [4], [20]–[22] extends SSL to an open-world setting where the unlabeled set contains both old and new categories. Early methods [4] rely on contrastive learning with a non-parametric classifier, establishing the basic learning paradigm. SimGCD [5] introduces a parametric classifier with self-distillation, substantially boosting perfor-mance and becoming the dominant baseline. Subsequent works advance along two directions. On the learning objective side, 
+
+μGCD [23] adopts Mean Teacher to produce more stable training targets, and LegoGCD [24] identifies catastrophic forgetting of old classes as a key failure mode of SimGCD and introduces local entropy regularization to preserve old-class knowledge during new-class learning. On the model adaptation side, PromptCAL [25] and SPTNet [26] develop prompt-based strategies to better elicit the pretrained visual knowledge of the backbone. AdaptGCD [27] is the first to introduce adapter tun-ing into GCD, freezing the backbone and inserting lightweight bottleneck modules in parallel with the feed-forward layers for parameter-efficient adaptation, demonstrating a favorable balance between generalization capacity and task adaptability. Despite these advances, all the above methods rely solely on visual features and are limited in their ability to distinguish categories with high inter-class visual similarity. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 3
+
+C. Multi-Modal Generalized Category Discovery 
+
+Since unimodal GCD methods are limited in distinguishing visually similar categories, a line of multi-modal GCD meth-ods incorporates the text modality to provide complementary semantic cues [28]. As class names for unlabeled data are un-available, two strategies are commonly adopted to obtain text: retrieval-based approaches that retrieve descriptive texts from a pre-built corpus, and synthesis-based approaches that generate text embeddings directly from visual features. ClipGCD [8] first introduces text into GCD by retrieving top-k relevant texts from an external corpus via CLIP-based image-text similarity, and concatenating the retrieved text embeddings with visual features for joint semi-supervised clustering. Built upon this retrieval line, TextGCD [6] constructs an LLM-enhanced vi-sual lexicon and adopts a dual-branch framework with cross-modal co-teaching to better leverage the retrieved texts. In parallel, GET [7] explores the synthesis route by introducing a text embedding synthesizer that converts visual features into synthetic text embeddings, removing the dependency on external corpora. However, these dual-branch methods encode the two modalities independently and interact only through a cross-modal loss against fixed global anchors, failing to mitigate the noise in the text branch during encoding and providing only coarse-grained cross-modal supervision, which motivates this work. 
+
+D. Visual-Language Models (VLMs) 
+
+Visual-Language Models aim to align images and text in a shared embedding space, enabling cross-modal understanding and zero-shot generalization. CLIP [29] is the most rep-resentative work, which learns to align visual and textual representations via contrastive learning on large-scale web-crawled image-text pairs. Follow-up works such as SigLIP [30] further improve training efficiency by replacing the softmax-based contrastive loss with a pairwise sigmoid loss. Building on the semantic alignment from CLIP, several methods [31]– [33] query language models to generate class-level textual descriptions as additional classification signals, achieving im-provements in fine-grained and low-shot settings. However, all these methods presuppose the availability of class names at training time, leaving the use of VLMs for generalized category discovery, where new class names are entirely un-available, an open challenge [34]–[37]. III. P RELIMINARIES 
+
+A. Problem Formulation 
+
+In Generalized Category Discovery (GCD), the dataset D
+
+consists of a labeled set Dl = {(xv 
+
+> i
+
+, y i)}Ni=1 and an unlabeled set Du = {xv 
+
+> i
+
+}Mi=1 , where xv 
+
+> i
+
+∈ X denotes the i-th image and yi ∈ Y l is its class label. The label space of Dl is Yl,referred to as known classes (or old classes ). The label space of Du is Yu, which satisfies Yl ⊂ Y u; the subset Yu \ Y l
+
+constitutes the novel classes (or new classes ) that are absent from Dl. The goal is to classify samples in Du belonging to 
+
+Yl and simultaneously discover and cluster those belonging to 
+
+Yu \ Y l.
+
+B. Dual-Branch Framework 
+
+The dual-branch framework [6], [7] is the dominant paradigm in multi-modal generalized category discovery and serves as the foundation of our method. By introducing the text modality as an auxiliary signal, it constructs a dual-stream architecture with three components: text information acquisition, intra-modal category discovery, and cross-modal mutual learning. 
+
+1) Text Information Acquisition. Since ground-truth captions for unlabeled images are unavailable, auxiliary text representa-tions are constructed from visual inputs as xt 
+
+> i
+
+= h(xv 
+
+> i
+
+), where 
+
+h(·) denotes the modality conversion operator. Synthesis-based methods (e.g., GET) build a lightweight mapping network to project visual features into the token embedding space, pro-ducing continuous synthetic text embeddings, while retrieval-based methods (e.g., TextGCD) use cosine-similarity-based retrieval over a pre-built visual lexicon to form discrete text inputs. Both require no ground-truth labels for unlabeled data. 
+
+2) Intra-Modal Category Discovery. Both branches perform intra-modal category discovery following SimGCD [5]. For each branch, the loss combines a representation learning term 
+
+Lrep that integrates self-supervised and supervised contrastive learning, and a classification term Lcls that is implemented as supervised loss and self-distillation loss with mean-entropy regularization. The per-branch loss is denoted as Lvdb = Lvrep +
+
+Lvcls for the visual branch and Ltdb = Ltrep + Ltcls for the text branch, with complete formulations provided in the Appendix. This objective achieves category discovery within each branch. 
+
+3) Cross-Modal Mutual Learning. To bridge the two branches, a cross-modal mutual learning loss Lml is imposed. Taking CICO in GET [7] as an example, Lml computes per-sample similarity vectors sv 
+
+> i
+
+, st 
+
+> i
+
+between the sample features and the old-class prototype matrices Pv, Pt in each modality, and aligns them via KL divergence (see Appendix for full formulation). TextGCD [6] instead exchanges predictions be-tween the two branches via co-teaching, with a multi-modal contrastive loss as an auxiliary objective. Both strategies rely on fixed global anchors (old-class prototypes or class centers), lacking fine-grained characterization of inter-sample relational structure. IV. M ETHODOLOGY 
+
+We propose the synergistic dual-branch adaptation frame-work, illustrated in Fig. 2. Building upon the existing dual-branch paradigm, it introduces two novel components: the cross-modal synergistic adapter and the neighborhood mu-tual learning module. The cross-modal synergistic adapter achieves cross-modal synergy by injecting visual context into the text branch for layer-wise enhancement during encoding; the neighborhood mutual learning strengthens fine-grained cross-modal consistency by enforcing consistent neighborhood distributions between the two branches. 
+
+A. Cross-Modal Synergistic Adapter (CMSA) 
+
+The Cross-Modal Synergistic Adapter (CMSA) consists of two adapter modules tailored to the two modalities. For the visual branch, a basic adapter is inserted in each Transformer JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 4Visual Transformer block  Text Transformer block 
+
+> [CLS]
+> [CLS]
+> MHA
+> MLP
+> Norm
+> Norm
+> ReLU
+> MHA
+> MLP
+> Norm
+> Norm
+> ReLU
+> [CLS]
+> [CLS]
+> Visual block  Text block
+> Cross -Modal
+> Synergistic
+> Adapter
+
+Text 
+
+Synthesis / 
+
+Retrieval 
+
+Text / Text 
+
+Embeddings 
+
+Image   
+
+> Visual block
+> Text block
+> …
+> ……
+> …
+> [CLS]
+> [CLS]
+> Up v
+> Down t
+> Cross Down v
+> Up t
+> Classifier
+> Visual
+> Feature
+> Text
+> Feature
+
+Cross -Modal 
+
+Synergistic Adapter 
+
+Neighborhood Mutual Learning       
+
+> Classifier
+> ℒdb
+> v
+> Visual
+> Logit
+> Text
+> Logit
+> ℒml
+> ℒdb
+> t
+> ℒnml
+> Visual Similarity
+> over 𝓝 vVisual Similarity
+> over 𝓝 t
+> Text Similarity
+> over 𝓝 tText Similarity
+> over 𝓝 v
+> KL
+> KL
+> ★Visual Injection
+> Basic
+> Adapte r
+> Visual
+> Injectio n
+> Adapte r
+
+Fig. 2: Framework overview of SDBA for multi-modal generalized category discovery. SDBA consists of two components: (i) a cross-modal synergistic adapter that inserts adapters into both branches and injects visual class representations into the text adapter in a layer-by-layer manner; and (ii) neighborhood mutual learning that enforces consistency between visual and text neighborhood distributions via bidirectional KL divergence. Here, N v and N t denote the visual and text neighborhood sets. block. For the text branch, the basic adapter is enhanced with a visual injection mechanism that fuses the visual class representation into the low-dimensional bottleneck of the text adapter at each block. By injecting reliable visual context, the text branch is continuously guided during encoding, which mitigates the noise in the derived text and achieves deep cross-modal synergy. Notably, since the injection operates only from visual to text, the visual branch remains fully independent at inference. 
+
+1) Basic Adapter in the Visual Branch. Following the architecture of AdaptFormer [38], we introduce a lightweight bottleneck module in parallel with the frozen Feed-Forward Network (FFN) of each Transformer block. Eq. (1) describes the forward process of FFN layer in the l-th visual Transformer block after inserting the adapter. 
+
+xv 
+
+> l+1 ,i
+
+= MLP(LN( exv
+
+> l,i
+
+)) + exv 
+
+> l,i
+
++ ∆ xv
+
+> l,i
+
+, (1) where exv 
+
+> l,i
+
+is the input visual feature after the self-attention layer, xv 
+
+> l+1 ,i
+
+is the output feature of the l-th visual Transformer block, LN( ·) denotes layer normalization, MLP( ·) is the original frozen FFN, and ∆xv 
+
+> l,i
+
+is the adapter residual. The adapter residual ∆xv 
+
+> l,i
+
+is computed via a bottleneck structure, consisting of a down-projection followed by a nonlinearity and an up-projection, as shown in Eq. (2). 
+
+hv 
+
+> l,i
+
+= ReLU( exv
+
+> l,i
+
+Wvdown  
+
+> ⊤
+
++ bvdown ),
+
+∆xv 
+
+> l,i
+
+= s · (hv
+
+> l,i
+
+Wvup  
+
+> ⊤
+
++ bvup ), (2) where hv 
+
+> l,i
+
+∈ R ˆdv is the intermediate bottleneck feature, 
+
+Wvdown ∈ R ˆdv ×dv and Wvup ∈ Rdv × ˆdv are learnable pro-jection matrices, bvdown and bvup are the corresponding bias terms, s is a scaling factor, and ˆdv < d v is the visual bottleneck dimension. Following the LoRA-style initialization, Wvdown is initialized with a Gaussian distribution while Wvup and bvup 
+
+are initialized to zero, so that the adapter residual ∆xv 
+
+> l,i
+
+is zero at the start of training. This preserves the pre-trained feature space at initialization and guarantees the stability of the SimGCD self-distillation process. 
+
+2) Visual Injection Adapter in the Text Branch. For the text branch, we augment the basic adapter with a visual injec-tion mechanism to bridge the cross-modal gap and enhance text representations with visual information. Specifically, we extract the [CLS] token cv 
+
+> l,i
+
+∈ Rdv for i-th sample from the l-th layer of the visual encoder as the guidance signal. To enable parameter-efficient and stable cross-modal fusion without directly modifying the high-dimensional feature space, the cross-modal association is established within the low-dimensional bottleneck space, as shown in Eq. (3). 
+
+ht 
+
+> l,i
+
+= ReLU 
+
+
+
+˜xt
+
+> l,i
+
+Wt⊤ 
+
+> down
+
++ btdown 
+
+| {z }
+
+> text feature projection
+
++ sctx cv
+
+> l,i
+
+W⊤
+
+> cross
+
+| {z }
+
+> visual guidance injection
+
+
+
+,
+
+(3) where ht 
+
+> l,i
+
+∈ R ˆdt is the fused bottleneck feature combining text and visual information, ext 
+
+> l,i
+
+is the input text feature after the self-attention layer, Wtdown ∈ R ˆdt×dt is a learnable down-projection matrix, Wcross ∈ R ˆdt×dv is a learnable cross-projection matrix that maps the visual guidance into the text bottleneck space, sctx is a scalar controlling the injection strength, and ˆdt < d t is the text bottleneck dimension. The visual injection adapter residual is then obtained via Eq. (4). 
+
+∆xt 
+
+> l,i
+
+= s ·
+
+
+
+ht
+
+> l,i
+
+Wtup  
+
+> ⊤
+
++ btup 
+
+
+
+, (4) JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 5
+
+where Wtup ∈ Rdt× ˆdt is a learnable up-projection matrix. The adapter parameters follow the same LoRA-style initialization as the visual branch. Through this layer-wise injection mech-anism, the text branch progressively absorbs discriminative visual context across Transformer layers, achieving deep cross-modal synergy during encoding while keeping the visual branch fully independent for inference. 
+
+B. Neighborhood Mutual Learning (NML) 
+
+We propose Neighborhood Mutual Learning (NML), which exchanges information between modalities via local neighbor-hood structures instead of fixed global anchors. Specifically, NML first constructs modality-specific neighborhoods for each sample, and then exchanges their neighborhood distributions between the visual and text branches, enforcing consistency via bidirectional KL divergence. 
+
+1) Neighborhood Set Construction. We denote the batch feature matrices of the visual branch and the enhanced text branch as Zv ∈ R|B|× dv and Zt ∈ R|B|× dt , respectively, where each row is the ℓ2-normalized feature of the sam-ple. The corresponding pairwise cosine similarity matrices are computed as Sv = Zv(Zv)⊤ and St = Zt(Zt)⊤. To avoid trivial self-matching, we mask diagonal entries of the similarity matrices. The visual neighborhood index set N v 
+
+> i
+
+of the i-th sample, which defines its local neighborhood in the visual feature space, is constructed by selecting the Knei most similar samples, as formulated in Eq. (5). 
+
+N v 
+
+> i
+
+= j | Sv 
+
+> ij
+
+∈ Top -K(Sv
+
+> i, :
+
+, K nei ) . (5) For the text neighborhood index set N t 
+
+> i
+
+, it is defined analo-gously over St.
+
+2) Bidirectional Neighborhood Distribution Mutual Learn-ing. For the i-th sample, the neighborhood distribution qv
+
+> i
+
+over N v 
+
+> i
+
+quantifies the relative similarity to each neighbor in the visual feature space, where τnei is a temperature hyper-parameter, as shown in Eq. (6). 
+
+qv 
+
+> i
+
+(j) = exp( Sv 
+
+> ij
+
+/τ nei )
+
+P 
+
+> k∈N v
+> i
+
+exp( Sv
+
+> ik
+
+/τ nei ) , j ∈ N v 
+
+> i
+
+. (6) To encourage the enhanced text branch to preserve the same inter-sample relational structure as the visual branch, a corre-sponding distribution qt 
+
+> i
+
+is computed using the text similarity matrix St over the same index set N v 
+
+> i
+
+, as shown in Eq. (7). 
+
+qt 
+
+> i
+
+(j) = exp( St 
+
+> ij
+
+/τ nei )
+
+P 
+
+> k∈N v
+> i
+
+exp( St
+
+> ik
+
+/τ nei ) , j ∈ N v 
+
+> i
+
+. (7) The visual-to-text mutual learning loss is defined as the KL divergence between qv 
+
+> i
+
+and qt 
+
+> i
+
+, as shown in Eq. (8). 
+
+Lv2t = 1
+
+|B| 
+
+X
+
+> i∈B
+
+DKL (qv 
+
+> i
+
+∥qt 
+
+> i
+
+). (8) Symmetrically, the text-to-visual loss Lt2v is obtained by constructing the neighborhood N t 
+
+> i
+
+over St instead of Sv and reversing the KL direction, following the same formulation as Eqs. (6)–(8). The total NML loss is formulated in Eq. (9). 
+
+Lnml = Lv2t + Lt2v . (9) By replacing fixed global anchors with sample-adaptive local neighborhoods, NML enables fine-grained cross-modal infor-mation exchange and provides richer relational supervision across all samples regardless of their distance to any class center. 
+
+3) Overall Objective. The full SDBA framework is jointly optimized by integrating the intra-modal losses of both branches, the cross-modal mutual learning loss from the base-line, and the NML loss: 
+
+Ltotal = Lvdb + Ltdb + Lml + λnml Lnml , (10) where the first three terms inherit directly from the base-line framework (Sec. III-B), and λnml is a balancing hyper-parameter. By inserting CMSA and NML into the baseline pipeline, SDBA functions as a plug-and-play enhancement compatible with existing dual-branch methods. V. E XPERIMENTS 
+
+A. Experimental Setup 1) Datasets. We evaluate the proposed framework on six datasets across two benchmarks. The Semantic Shift Bench-mark (SSB) comprises three fine-grained datasets: CUB-200, Aircraft, and Stanford Cars, which are particularly challenging due to high inter-class visual similarity. The Generic Image Recognition Benchmark includes CIFAR-10, CIFAR-100 [42], and ImageNet-100 [43]. Following the standard GCD proto-col [4], a subset of classes is designated as old classes (80% for CIFAR-100 and 50% for all other datasets). Among the images of old classes, 50% are used as the labeled set Dl,while the remaining old-class images and all new-class images form the unlabeled set Du. Dataset statistics are provided in Table I. 
+
+2) Implementation Details. We use the CLIP [29] pre-trained model as the backbone, with the visual branch employing the ViT-B/16 [49] visual encoder and the text branch em-ploying the corresponding CLIP text encoder. Unless oth-erwise specified, all experiments are conducted under the GET-based framework. SDBA is integrated into the respective baseline following the staged training strategy described in the Appendix B. For all datasets, adapters are inserted from layer 3 to the final layer, following common practice in adapter-based tuning. The key hyperparameters are listed in the TABLE I: Statistics of the benchmark datasets used in our experiments.                             
+
+> Benchmark Dataset Labeled Unlabeled # Images # Classes # Images # Classes
+> Semantic Shift Benchmark CUB-200 [39] 1.5K 100 4.5K 200 Aircraft [40] 1.7K 50 5.0K 100 Stanford Cars [41] 2.0K 98 6.1K 196 Generic Image Recognition Benchmark CIFAR-10 [42] 12.5K 537.5K 10 CIFAR-100 [42] 20.0K 80 30.0K 100 ImageNet-100 [43] 31.9K 50 95.3K 100 JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 6
+
+TABLE II: Evaluation results (%) on the semantic shift benchmark (SSB) and the generic image recognition benchmark. 
+
+The best results are highlighted in bold and the second-best are underlined. “ −” indicates results not reported in the original paper.                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+> Method Backbone Semantic Shift Benchmark Generic Image Recognition Benchmark
+> CUB-200 Stanford Cars Aircraft CIFAR-10 CIFAR-100 ImageNet-100
+> All Old New All Old New All Old New All Old New All Old New All Old New
+> k-means [44] DINO 34.3 38.9 32.1 12.8 10.6 13.8 16.0 14.4 16.8 83.6 85.7 82.5 52.0 52.2 50.8 72.7 75.5 71.3 RS+ [45] DINO 33.3 51.6 24.2 28.3 61.8 12.1 26.9 36.4 22.2 46.8 19.2 60.5 58.2 77.6 19.3 37.1 61.6 24.8 UNO+ [46] DINO 35.1 49.0 28.1 35.5 70.5 18.6 40.3 56.4 32.2 68.6 98.3 53.8 69.5 80.6 47.2 70.3 95.0 57.9 ORCA [47] DINO 35.3 45.6 30.2 23.5 50.1 10.7 22.0 31.8 17.1 81.8 86.2 79.6 69.0 77.4 52.0 73.5 92.6 63.9 GCD [4] DINO 51.3 56.6 48.7 39.0 57.6 29.9 45.0 41.1 46.9 91.5 97.9 88.2 73.0 76.2 66.5 74.1 89.8 66.3 DCCL [48] DINO 63.5 60.8 64.9 43.1 55.7 36.2 ---96.3 96.5 96.9 75.3 76.8 70.2 80.5 90.5 76.2 PromptCAL [25] DINO 62.9 64.4 62.1 50.2 70.1 40.6 52.2 52.2 52.3 97.9 96.6 98.5 81.2 84.2 75.3 83.1 92.7 78.3 SimGCD [5] DINO 60.3 65.6 57.7 53.8 71.9 45.0 54.2 59.1 51.8 97.1 95.1 98.1 80.1 81.2 77.8 83.0 93.1 77.9
+> μGCD [23] DINO 65.7 68.0 64.6 56.5 68.1 50.9 53.8 55.4 53.0 ---------LegoGCD [24] DINO 63.8 71.9 59.8 57.3 75.7 48.4 55.0 61.5 51.7 97.1 94.3 98.5 81.8 81.4 82.5 86.3 94.5 82.1 AdaptGCD [27] DINO 68.8 74.5 65.9 62.7 80.6 54.0 57.9 65.2 54.3 97.9 95.5 99.0 84.0 86.2 79.7 86.4 94.9 82.1 PartGCD [22] DINO 68.6 68.9 68.4 65.6 79.5 58.9 59.4 63.5 57.4 97.3 95.7 98.1 82.4 84.1 79.0 85.8 94.4 81.5 SADA [21] DINO 69.0 69.1 68.9 65.5 79.7 58.8 55.6 59.2 53.8 ---83.7 84.6 82.0 87.1 93.9 83.7 ClipGCD [8] CLIP 62.8 77.1 55.7 70.6 88.2 62.2 50.0 56.6 46.5 96.6 97.2 96.4 85.2 85.0 85.6 84.0 95.5 78.2 GCD-CLIP [4] CLIP 57.6 65.2 53.8 65.1 75.9 59.8 45.3 44.4 45.8 94.0 97.3 92.3 74.8 79.8 64.6 75.8 87.3 70.0 SimGCD-CLIP [5] CLIP 71.7 76.5 69.4 70.0 83.4 63.5 54.3 58.4 52.2 97.0 94.2 98.4 81.1 85.0 73.3 90.8 95.5 88.5 GET [7] CLIP 77.0 78.1 76.4 78.5 86.8 74.5 58.9 59.6 58.5 97.2 94.6 98.5 82.1 85.5 75.5 91.7 95.7 89.7 TextGCD [6] CLIP 76.6 80.6 74.7 86.9 87.4 86.7 ---98.2 98.0 98.6 85.7 86.3 84.6 88.0 92.4 85.2
+> SDBA + GET CLIP 79.4 81.6 78.3 80.5 87.8 77.0 67.1 71.2 65.1 98.3 97.5 98.7 86.1 89.0 80.3 91.9 96.0 90.0 SDBA + TextGCD CLIP 77.6 78.0 77.4 87.6 92.6 85.1 ---98.5 98.3 98.6 87.1 87.9 85.4 ---
+> †TextGCD does not provide the retrieval lexicon for Aircraft, and ImageNet-100 experiments with TextGCD are omitted due to the substantial computational cost; results are therefore not reported.
+
+Appendix C. The number of trainable parameters introduced by SDBA is comparable to that of the GET baseline, with detailed parameter counts and a fairness analysis provided in the Appendix D. In addition, following the architectural design of the underlying baseline, the GET-based variant shares a classification head across the two branches and reports the visual-branch prediction results at inference, while the TextGCD-based variant uses separate heads and reports the fused prediction result. 
+
+3) Evaluation. Following [4], we adopt clustering accuracy as the evaluation metric, measured separately over old classes, new classes, and all classes. For sample xv 
+
+> i
+
+with ground truth label yi and predicted cluster assignment ˆyi, the metrics acc old ,
+
+acc new , and acc all are computed as: 
+
+acc old = 1
+
+|D u,old |
+
+> |D u,old |
+
+X
+
+> i=1
+
+1(yi = Permute(ˆ yi)) 
+
+acc new = 1
+
+|D u,new | 
+
+> |D u,new |
+
+X
+
+> i=1
+
+1(yi = Permute(ˆ yi)) 
+
+acc all = 1
+
+|D u|
+
+> |D u|
+
+X
+
+> i=1
+
+1(yi = Permute(ˆ yi)) 
+
+(11) where Du,old and Du,new denote the old-class and new-class subsets of the unlabeled set Du, and Permute( ·) denotes the optimal assignment between predicted cluster indices and ground truth labels via Hungarian matching. 
+
+B. Comparison with State-of-the-Art 
+
+We compare SDBA against a wide range of unimodal GCD methods, including k-means [44], RS+ [45], UNO+ [46], and DINO-based baselines such as ORCA [47], GCD [4], DCCL [48], SimGCD [5], PromptCAL [25], μGCD [23], LegoGCD [24], AdaptGCD [27], SADA [21], and PartGCD [22]. Beyond these unimodal benchmarks, we further con-sider CLIP-based variants (e.g., SimGCD-CLIP [5], GCD-CLIP [4]) and state-of-the-art multi-modal paradigms, includ-ing ClipGCD [8], GET [7], and TextGCD [6]. These extensive comparisons establish a solid foundation for evaluating the effectiveness of our proposed framework. 
+
+1) Evaluation on the Semantic Shift Benchmark. The seman-tic shift benchmark datasets are particularly challenging owing to subtle inter-class visual differences. As shown in Table II, SDBA consistently outperforms existing approaches across all tasks. By incorporating complementary modality information, it surpasses unimodal DINO-based methods; simultaneously, its superior cross-modal synergy enables it to outperform CLIP-based variants and existing multi-modal dual-branch frameworks. Specifically, SDBA + GET achieves significant gains of 2.4%, 2.0%, and 8.2% on the “All” metric for JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 7
+
+TABLE III: Ablation study of SDBA components on Aircraft and CIFAR-100. “Basic Adapter” refers to inserting standard adapters into both branches independently; “Visual Injection” refers to upgrading the text branch adapter to the Visual Injection Adapter of CMSA.                                                                              
+
+> ID CMSA NML
+> Aircraft CIFAR-100
+> Basic Adapter Visual Injection Visual Text Visual Text All Old New All Old New All Old New All Old New
+> (1) %%%58.4 59.3 58.0 46.5 53.1 43.2 82.1 85.7 75.0 77.3 81.8 68.1
+> (2) !%%62.4 68.1 59.5 49.5 54.6 46.9 83.8 89.2 73.0 75.9 81.5 64.7
+> (3) !!%64.9 71.3 61.7 64.9 71.1 61.8 86.0 89.0 79.9 86.0 89.0 79.9
+> (4) !!!67.1 71.2 65.1 67.1 71.2 65.0 86.1 89.0 80.3 86.1 89.1 80.1
+> †As the original paper does not report the complete per-branch performance, the GET baseline (ID (1) ) corresponds to our reproduced results.
+
+CUB-200, SCars, and Aircraft, respectively. The improvement on these datasets validates that visual injection effectively suppresses the noise inherent in synthesized text embeddings, thereby enabling deeper cross-modal synergy between the two branches. SDBA + TextGCD also yields stable gains, confirm-ing the scalability of our framework across both synthesis-based and retrieval-based text paradigms. 
+
+2) Evaluation on the Generic Image Recognition Bench-mark. As shown in Table II, SDBA yields stable performance gains on generic benchmarks. Specifically, SDBA + GET improves the “All” accuracy over GET by 1.1%, 4.0%, and 0.2% on CIFAR-10, CIFAR-100, and ImageNet-100, respec-tively. These results demonstrate that the proposed framework effectively optimizes the joint representation space through cross-modal synergy. In conclusion, across varying datasets, SDBA maintains consistent effectiveness. 
+
+C. Ablation Study 
+
+Ablation experiments are conducted on Aircraft and CIFAR-100 using GET as the base framework, with results reported in Table III. Extended ablation results on some other datasets are provided in the Appendix D. 
+
+1) Effect of Cross-Modal Synergistic Adapter. Introducing the basic adapter (ID (2) ) generally improves the perfor-mance over the baseline (ID (1) ), laying a stronger fea-ture foundation for subsequent cross-modal interaction. Upon further introducing visual injection (ID (3) ), performance improves substantially, particularly on Aircraft, where the text branch accuracy achieves a large gain and the performance gap between the two branches is markedly reduced. This is consistent with the motivation of CMSA: the text branch suffers from the bias and noise in the derived texts or text embeddings when encoded independently, and visual injection mitigates this during encoding. Fig. 3 further illustrates this effect. Without visual injection, the visual branch converges to a significantly higher level than the text branch, with a persistent gap throughout training. With visual injection, both branches rise synchronously and converge at a comparable level, confirming that visual injection effectively enhances text branch learning and enables overall reinforcement. 
+
+2) Effect of Neighborhood Mutual Learning. Building on CMSA, the introduction of NML (ID (4) ) yields further gains 30 40 50 60           
+
+> Accuracy (%)
+> w/o Visual Injection
+> Visual Text
+> 025 50 75 100 125 150 175 200
+> Epochs
+> 30 40 50 60
+> Accuracy (%)
+> w/ Visual Injection
+> Visual Text
+
+Fig. 3: Training accuracy curves of the visual and text branches on Aircraft, without visual injection (top) and with visual injection (bottom). in overall accuracy across both datasets, with improvements more pronounced on new-class recognition. NML replaces fixed global anchors with local sample neighborhoods, en-abling the model to capture fine-grained inter-sample relational structure that global anchors fail to reflect. In contrast, the baseline GET employs CICO, which is driven by old-class prototypes and thus provides limited supervision for new-class samples. By alleviating this bias toward old classes, NML leads to more substantial performance gains on new categories. 
+
+D. Analysis Experiments 1) Sensitivity to Visual Injection Intensity. The parameter 
+
+sctx controls the injection strength of visual context into the text branch. We conduct sensitivity analysis on Aircraft and SCars over different values of sctx , as illustrated in Fig. 4. As sctx increases, performance on both branches initially improves, confirming that visual context injection effectively JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 80.0 0.2 0.4 0.6            
+
+> 0.750
+> 0.775
+> 0.800
+> 0.825
+> 0.850
+> 0.875
+> Accuracy
+> Scars - Visual Modality
+> 0.0 0.2 0.4 0.6
+> 0.72
+> 0.74
+> 0.76
+> 0.78
+> 0.80
+> 0.82
+> 0.84
+> Scars - Text Modality
+> 0.00 0.25 0.50 0.75 1.00
+> sctx
+> 0.600
+> 0.625
+> 0.650
+> 0.675
+> 0.700
+> 0.725
+> Accuracy
+> Aircraft - Visual Modality
+> 0.00 0.25 0.50 0.75 1.00
+> sctx
+> 0.50
+> 0.55
+> 0.60
+> 0.65
+> 0.70
+> Aircraft - Text Modality
+> All
+> Old
+> New
+
+Fig. 4: Accuracy of the visual and text branches on the All, Old, and New classes with different sctx , evaluated on SCars (top row) and Aircraft (bottom row). enhances the discriminative quality of both branches. However, once sctx exceeds an optimal threshold (approximately 0.5 for Aircraft and 0.3 for SCars), performance declines for both branches. This indicates that excessive visual injection overwhelms the semantic information from the text branch, degrading the overall performance. 
+
+2) Impact of Neighborhood Size. The neighborhood size 
+
+Knei determines the scope of the local constraint in NML. We study the effect of Knei on Aircraft and SCars with values ranging over 5, 10, 20, 30, and 40, as shown in Table IV. Performance first increases then decreases on both datasets. A small Knei (e.g., 5) is insufficient to capture the local relational structure, limiting alignment effectiveness. Conversely, an ex-cessively large Knei incorporates semantically distant samples into the neighborhood, introducing noisy relational signals that degrade the quality of the neighborhood distribution. The optimal Knei is 30 for Aircraft and 20 for SCars. 
+
+3) Impact of NML Loss Weight. λnml controls the strength of the neighborhood consistency constraint. We study different values of λnml on Aircraft and SCars, with results reported in Table V. On both datasets, performance first increases then decreases as λnml grows, with optimal values of 1for Aircraft and 0.1 for SCars. When λnml is too small, the neighborhood constraint is too weak to provide effective relational supervision across modalities. Conversely, an ex-cessively large λnml enforces excessive consistency between the two branches, reducing the complementarity of the two modalities and leading to performance degradation. 
+
+4) Comparison of Different Fusion Strategies. To validate the design of CMSA, we compare it against three alternative fusion baselines: Cross Attention, which fuses the last-layer TABLE IV: Effect of neighborhood size Knei on the visual and text branch clustering accuracy (All/Old/New) on Aircraft and SCars.                                                                    
+
+> Dataset Knei
+> Visual Branch Text Branch All Old New All Old New
+> Aircraft 564.8 70.8 61.8 64.7 70.6 61.7 10 66.4 74.1 62.6 66.2 73.8 62.3 20 65.3 70.7 62.6 65.2 70.8 62.4 30 67.1 71.2 65.1 67.1 71.2 65.0
+> 40 65.7 72.2 62.5 65.7 72.2 62.5 SCars 579.8 86.4 76.7 77.6 82.9 75.0 10 79.9 86.3 76.8 77.7 82.9 75.2 20 80.5 87.8 77.0 78.2 84.3 75.3
+> 30 80.2 87.7 76.6 78.0 84.2 75.0 40 79.9 87.0 76.4 77.3 84.8 73.7
+
+TABLE V: Effect of NML loss weight λnml on the visual and text branch clustering accuracy (All/Old/New) on Aircraft and SCars.                                                        
+
+> Dataset λnml
+> Visual Branch Text Branch All Old New All Old New
+> Aircraft 0.25 64.3 70.8 61.1 64.6 72.7 60.6 0.5 64.9 72.5 61.1 64.5 72.3 60.6 167.1 71.2 65.1 67.1 71.2 65.0
+> 267.0 71.4 64.8 67.0 71.4 64.8 SCars 0.05 80.0 85.2 77.5 77.7 82.8 75.2 0.1 80.5 87.8 77.0 78.2 84.3 75.3
+> 0.2 79.2 85.9 75.9 77.1 84.4 73.6 0.4 78.5 87.1 74.3 77.1 85.6 73.0
+
+visual tokens into the last-layer text tokens via a cross attention mechanism; Concat Linear, which concatenates visual and text features followed by a linear projection; and CoCoOp [50], which dynamically generates instance-conditioned prompts from visual features. Results on Aircraft are reported in Table VI. CMSA consistently outperforms all three baselines, benefiting from its preservation of the pre-trained feature space at initialization, which better accommodates the self-distillation paradigm of SimGCD. This complements the find-ing in GET [7] that naive fusion underperforms dual-branch learning, while well-designed fusion like CMSA still brings further gains. 
+
+5) Feature Space Visualization. To more intuitively assess the impact of visual injection on the features of both branches, t-SNE visualization is conducted on the Aircraft dataset as shown in Fig. 5. Without the injection mechanism (top row), the text branch features exhibit dispersed and overlapping distributions. This phenomenon is primarily attributed to the fact that the text representations are generated from derivation processes, where inherent noise and semantic shifts lead to a lack of clear category boundaries, thereby failing to pro-vide sufficient discriminative information. After introducing the cross-modal synergistic adapter (bottom row), the text JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 9
+
+TABLE VI: Comparison of fusion strategies on Aircraft. NML is excluded from all settings for fair comparison.                                     
+
+> Method Visual Branch Text Branch All Old New All Old New
+> Cross Attention 56.0 59.4 54.3 56.0 59.4 54.3 Concat Linear 57.5 61.3 55.6 57.4 61.9 55.1 CoCoOp 59.9 62.4 58.6 60.2 62.2 59.1
+> Ours (CMSA) 64.9 71.3 61.7 64.9 71.1 61.8 (b) Text Branch (w/o Visual Information Injection)
+> (d) Text Branch (w/ Visual Information Injection)
+> (a) Visual Branch (w/o Visual Information Injection)
+> (c) Visual Branch (w/ Visual Information Injection)
+
+Fig. 5: t-SNE visualization of visual and text branch features on Aircraft: (a)(b) without visual injection; (c)(d) with visual injection. The samples on old classes are denoted in blue and the samples on new classes in red. branch features form more compact clusters with distinct boundaries, which in turn promotes the joint improvement of both branches. This confirms the effectiveness of visual injection. 
+
+6) Scalability with Unknown Number of Categories. In practical open-world scenarios, the true number of categories is often unknown. A common strategy involves using off-the-shelf methods to estimate the category count for initial-izing the parametric classifiers. Following this paradigm, the category estimation strategy from GET is adopted, yielding 212 classes for CUB-200 and 220 for Stanford Cars [7]. Table VII compares the performance under both known and estimated category count settings. Although both GET and SDBA suffer performance degradation under estimation bias, SDBA consistently maintains its performance advantage over GET across both datasets, demonstrating its robustness in realistic scenarios. 
+
+7) Impact of Visual Injection Source. The visual injection mechanism in CMSA uses the [CLS] token of the visual branch as the guidance signal. We compare this design against using no visual injection (None) and using the mean of all patch tokens excluding the [CLS] token (Mean) on Aircraft, with results reported in Table VIII. The [CLS] 
+
+token consistently yields the best performance, while the TABLE VII: Performance comparison on CUB-200 and Stan-ford Cars under known and estimated category counts ( C).                                        
+
+> Method Known CCUB-200 Stanford Cars All Old New All Old New
+> GET !77.0 78.1 76.4 78.5 86.8 74.5 SDBA !79.4 81.6 78.3 80.5 87.8 77.0
+> GET %(w/ Est.) 75.6 75.9 75.5 76.8 87.6 71.6 SDBA %(w/ Est.) 76.7 82.7 73.6 78.2 85.5 74.6
+
+mean of patch tokens aggregates local spatial features that are less semantically compact, resulting in noisier injection and inferior performance. TABLE VIII: Comparison of visual injection sources on Aircraft. NML is excluded for fair comparison.                           
+
+> Dataset Source Visual Branch Text Branch All Old New All Old New
+> Aircraft None 62.4 68.1 59.5 49.5 54.6 46.9 Mean 63.0 71.6 58.7 63.4 71.3 59.5 CLS 64.9 71.3 61.7 64.9 71.1 61.8
+
+VI. C ONCLUSION 
+
+This paper addresses multi-modal generalized category dis-covery from the perspective of cross-modal synergy. Existing dual-branch methods process the two branches in isolation and rely on fixed global anchors, which leaves text-derivation noise unaddressed and yields only coarse-grained cross-modal supervision. To address these limitations, we proposed SDBA, which consists of CMSA that injects visual context into the text adapter to continuously enhance text feature learning during encoding, and NML that complements existing cross-modal mutual learning by aligning local sample neighborhoods across branches, providing fine-grained relational supervision. Comprehensive evaluations on six datasets confirm the ef-fectiveness of our method, and the stable gains obtained on both GET and TextGCD substantiate its scalability as a plug-and-play module. Future directions include exploring finer cross-modal interaction at the local region or token level, and incorporating adaptive fusion weights conditioned on sample difficulty or modality confidence. VII. A CKNOWLEDGEMENT 
+
+This work was supported by the National Key R&D Pro-gram of China (Grant 2022YFF0903300) and the National Natural Science Foundation of China (U22B2048, 62476274, 62206293). Yongqiang Tang is the corresponding author. REFERENCES [1] Y. Jia, G. Lu, H. Liu, and J. Hou, “Semi-supervised subspace clustering via tensor low-rank representation,” IEEE Trans. Circuits Syst. Video Technol. , vol. 33, no. 7, pp. 3455–3461, 2023. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 10 
+
+[2] M. Li, R. Wu, H. Liu, J. Yu, X. Yang, B. Han, and T. Liu, “Instant: Semi-supervised learning with instance-dependent thresholds,” in Proc. Adv. Neural Inf. Process. Syst. , 2023. [3] S. Laine and T. Aila, “Temporal ensembling for semi-supervised learn-ing,” in Proc. Int. Conf. Learn. Represent. , 2017. [4] S. Vaze, K. Han, A. Vedaldi, and A. Zisserman, “Generalized category discovery,” in Proc. IEEE Conf. Comput. Vis. Pattern Recog. , 2022, pp. 7482–7491. [5] X. Wen, B. Zhao, and X. Qi, “Parametric classification for generalized category discovery: A baseline study,” in Proc. IEEE Int. Conf. Comput. Vis , 2023, pp. 16 544–16 554. [6] H. Zheng, N. Pu, W. Li, N. Sebe, and Z. Zhong, “Textual knowledge matters: Cross-modality co-teaching for generalized visual class discov-ery,” in Proc. Eur. Conf. Comput. Vis. , vol. 15110, 2024, pp. 41–58. [7] E. Wang, Z. Peng, Z. Xie, F. Yang, X. Liu, and M. Cheng, “GET: unlocking the multi-modal potential of CLIP for generalized category discovery,” in Proc. Conf. Comput. Vis. Pattern Recog. , 2025, pp. 20 296–20 306. [8] R. Ouldnoughi, C. Kuo, and Z. Kira, “CLIP-GCD: simple language guided generalized category discovery,” arXiv , vol. abs/2305.10420, 2023. [9] Z. Chen, K. Wang, X. Wang, P. Peng, E. Izquierdo, and L. Lin, “Deep co-space: Sample mining across feature transformation for semi-supervised learning,” IEEE Trans. Circuits Syst. Video Technol. , vol. 28, no. 10, pp. 2667–2678, 2018. [10] Y. Tang, J. Liu, J. Nan, and W. Zhang, “Noise-robust semi-supervised learning via consistency regularization on augmented graphs,” IEEE Trans. Circuits Syst. Video Technol. , vol. 33, no. 11, pp. 6920–6933, 2023. [11] K. Hu, X. Chen, Z. Chen, Y. Zhang, and X. Gao, “Multi-perspective pseudo-label generation and confidence-weighted training for semi-supervised semantic segmentation,” IEEE Trans. Multimedia , vol. 27, pp. 300–311, 2025. [12] X. Wang, Y. Wang, Y. Wang, A. Huang, and J. Liu, “Trusted semi-supervised multi-view classification with contrastive learning,” IEEE Trans. Multimedia , vol. 26, pp. 8268–8278, 2024. [13] Y. Zhang, D. Zhang, X. Wang, J. Yang, Y. Wang, Y. Wu, J. Liu, and H. Gao, “Semi-supervised contrastive learning with similarity co-calibration,” IEEE Trans. Multimedia , vol. 25, pp. 1749–1759, 2023. [14] A. Tarvainen and H. Valpola, “Mean teachers are better role mod-els: Weight-averaged consistency targets improve semi-supervised deep learning results,” in Proc. Adv. Neural Inf. Process. Syst. , 2017, pp. 1195–1204. [15] E. Arazo, D. Ortego, P. Albert, N. E. O’Connor, and K. McGuinness, “Pseudo-labeling and confirmation bias in deep semi-supervised learn-ing,” in Proc. Int. Joint Conf. Neural Netw. , 2020, pp. 1–8. [16] M. N. Rizve, K. Duarte, Y. S. Rawat, and M. Shah, “In defense of pseudo-labeling: An uncertainty-aware pseudo-label selection frame-work for semi-supervised learning,” in Proc. Int. Conf. Learn. Repre-sent. , 2021. [17] K. Sohn, D. Berthelot, N. Carlini, Z. Zhang, H. Zhang, C. Raffel, E. D. Cubuk, A. Kurakin, and C. Li, “Fixmatch: Simplifying semi-supervised learning with consistency and confidence,” in Proc. Adv. Neural Inf. Process. Syst. , 2020. [18] D. Berthelot, N. Carlini, I. J. Goodfellow, N. Papernot, A. Oliver, and C. Raffel, “Mixmatch: A holistic approach to semi-supervised learning,” in Proc. Adv. Neural Inf. Process. Syst. , 2019, pp. 5050–5060. [19] B. Zhang, Y. Wang, W. Hou, H. Wu, J. Wang, M. Okumura, and T. Shi-nozaki, “Flexmatch: Boosting semi-supervised learning with curriculum pseudo labeling,” in Proc. Adv. Neural Inf. Process. Syst. , 2021, pp. 18 408–18 419. [20] A. Fathalizadeh and R. Razavi-Far, “Proxy-anchor and evt-driven con-tinual learning method for generalized category discovery,” Trans. Mach. Learn. Res. , vol. 2026, 2026. [21] Z. Peng, E. Wang, F. Yang, X. Liu, and M.-M. Cheng, “Sharpness-aware dynamic anchor selection for generalized category discovery,” 
+
+IEEE Trans. Multimedia , vol. 28, pp. 3613–3624, 2026. [22] E. Wang, Z. Peng, Z. Xie, H. Lu, F. Yang, and X. Liu, “Learning part knowledge to facilitate category understanding for fine-grained generalized category discovery,” IEEE Trans. Multimedia , 2026, early Access. [23] S. Vaze, A. Vedaldi, and A. Zisserman, “No representation rules them all in category discovery,” in Proc. Adv. Neural Inf. Process. Syst. , 2023. [24] X. Cao, X. Zheng, G. Wang, W. Yu, Y. Shen, K. Li, Y. Lu, and Y. Tian, “Solving the catastrophic forgetting problem in generalized category discovery,” in Proc. IEEE Conf. Comput. Vis. Pattern Recog. IEEE, 2024, pp. 16 880–16 889. [25] S. Zhang, S. H. Khan, Z. Shen, M. Naseer, G. Chen, and F. S. Khan, “Promptcal: Contrastive affinity learning via auxiliary prompts for generalized novel category discovery,” in Proc. IEEE Conf. Comput. Vis. Pattern Recog. , 2023, pp. 3479–3488. [26] H. Wang, S. Vaze, and K. Han, “SPTNet: An efficient alternative frame-work for generalized category discovery with spatial prompt tuning,” in 
+
+Proc. Int. Conf. Learn. Represent. , 2024. [27] Y. Qu, Y. Tang, C. Zhang, and W. Zhang, “Adaptgcd: Multi-expert adapter tuning for generalized category discovery,” IEEE Trans. Circuits Syst. Video Technol. , vol. 36, no. 2, pp. 2344–2357, 2026. [28] Y. Su, R. Zhou, S. Huang, X. Li, T. Wang, Z. Wang, and M. Xu, “Multimodal generalized category discovery,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. Workshops , 2025, pp. 1634–1643. [29] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark, G. Krueger, and I. Sutskever, “Learning transferable visual models from natural language supervi-sion,” in Proc. Int. Conf. Mach. Learn. , vol. 139, 2021, pp. 8748–8763. [30] X. Zhai, B. Mustafa, A. Kolesnikov, and L. Beyer, “Sigmoid loss for language image pre-training,” in Proc. ICCV , 2023, pp. 11 975–11 986. [31] S. Menon and C. Vondrick, “Visual classification via description from large language models,” arxiv , vol. arxiv/2210.07183, 2022. [32] Z. Novack, J. McAuley, Z. Lipton, and S. Garg, “Chils: Zero-shot image classification with hierarchical label sets,” in Proc. Int. Conf. Mach. Learn. , vol. 202, 2023, pp. 1–18. [33] Y. Yang, A. Panagopoulou, S. Zhou, D. Jin, C. Callison-Burch, and M. Yatskar, “Language in a bottle: Language model guided concept bot-tlenecks for interpretable image classification,” in Proc. Conf. Comput. Vis. Pattern Recognit. , 2023, pp. 19 187–19 197. [34] P. Gao, S. Geng, R. Zhang, T. Ma, R. Fang, Y. Zhang, H. Li, and Y. Qiao, “CLIP-Adapter: Better vision-language models with feature adapters,” 
+
+Int. J. Comput. Vis. , vol. 132, no. 2, pp. 581–595, 2024. [35] H. Yao, R. Zhang, and C. Xu, “Visual-language prompt tuning with knowledge-guided context optimization,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , 2023, pp. 6757–6767. [36] J. Zhang, J. Huang, S. Jin, and S. Lu, “Vision-language models for vision tasks: A survey,” IEEE Trans. Pattern Anal. Mach. Intell. , vol. 46, no. 8, pp. 5625–5644, 2024. [37] X. Wang, G. Xu, Z. Luo, Z. Li et al. , “Dual modality prompt tuning for vision-language pre-trained model,” IEEE Trans. Multim. , vol. 26, pp. 2518–2531, 2024. [38] S. Chen, C. Ge, Z. Tong, J. Wang, Y. Song, J. Wang, and P. Luo, “Adapt-Former: Adapting vision transformers for scalable visual recognition,” in Adv. Neural Inf. Process. Syst. , vol. 35, 2022, pp. 16 664–16 678. [39] P. Welinder, S. Branson, T. Mita, C. Wah, F. Schroff, S. Belongie, and P. Perona, “Caltech-ucsd birds 200,” 2010. [40] S. Maji, E. Rahtu, J. Kannala, M. B. Blaschko, and A. Vedaldi, “Fine-grained visual classification of aircraft,” arXiv , vol. abs/1306.5151, 2013. [41] J. Krause, M. Stark, J. Deng, and L. Fei-Fei, “3d object representations for fine-grained categorization,” in Int. Conf. Comput. Vis. workshops ,2013, pp. 554–561. [42] A. Krizhevsky, G. Hinton et al. , “Learning multiple layers of features from tiny images,” 2009. [43] Y. Tian, D. Krishnan, and P. Isola, “Contrastive multiview coding,” in 
+
+Proc. Eur. Conf. Comput. Vis. , vol. 12356, 2020, pp. 776–794. [44] D. Arthur and S. Vassilvitskii, “k-means++: the advantages of careful seeding,” in ACM-SIAM Symp. Discrete Algorithms. , 2007, pp. 1027– 1035. [45] K. Han, S. Rebuffi, S. Ehrhardt, A. Vedaldi, and A. Zisserman, “Au-tonovel: Automatically discovering and learning novel visual categories,” 
+
+IEEE Trans. Pattern Anal. Mach. Intell. , vol. 44, no. 10, pp. 6767–6781, 2022. [46] E. Fini, E. Sangineto, S. Lathuili` ere, Z. Zhong, M. Nabi, and E. Ricci, “A unified objective for novel class discovery,” in Proc. IEEE Int. Conf. Comput. Vis , 2021, pp. 9264–9272. [47] K. Cao, M. Brbic, and J. Leskovec, “Open-world semi-supervised learning,” in Proc. Int. Conf. Learn. Represent. , 2022. [48] N. Pu, Z. Zhong, and N. Sebe, “Dynamic conceptional contrastive learning for generalized category discovery,” in Proc. IEEE Conf. Comput. Vis. Pattern Recog. , 2023, pp. 7579–7588. [49] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, J. Uszkoreit, and N. Houlsby, “An image is worth 16x16 words: Transformers for image recognition at scale,” in Proc. Int. Conf. Learn. Represent. , 2021. [50] K. Zhou, J. Yang, C. C. Loy, and Z. Liu, “Conditional prompt learn-ing for vision-language models,” in Proc. Conf. Comput. Vis. Pattern Recognit. , 2022, pp. 16 816–16 825.

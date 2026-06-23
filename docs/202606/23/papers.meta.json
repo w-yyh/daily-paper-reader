@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-23",
+  "date": "2026-06-23",
+  "generated_at": "2026-06-23T20:49:34",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/23/2606.21446v1-synergistic-dual-branch-adaptation-for-multi-modal-generalized-category-discovery",
+      "section": "deep",
+      "title_en": "Synergistic Dual-Branch Adaptation for Multi-modal Generalized Category Discovery",
+      "authors": "Yuxun Qu, Minyu Zhou, Yongqiang Tang, Chenyang Zhang, Wensheng Zhang",
+      "date": "2026-06-19",
+      "pdf": "https://arxiv.org/pdf/2606.21446v1",
+      "score": "10.0",
+      "evidence": "提出面向多模态GCD的SDBA方法，从无标签数据中发现新类别",
+      "tldr": "针对多模态广义类别发现中双分支方法跨模态协同粗糙、文本分支存在偏差噪声且互学习缺乏细粒度关系监督的问题，提出了协同双分支适应框架SDBA。该方法通过跨模态协同适配器将视觉信息注入文本编码，以及邻域互学习模块强制局部邻域分布一致，实现了更精细的跨模态协同。在六个基准上取得最优性能，并在多个基线模型上持续提升，验证了其可作为即插即用增强，具有广泛的可扩展性。",
+      "tags": "query:cgcd",
+      "abstract_en": "Generalized Category Discovery (GCD) aims to classify old categories and discover new ones from unlabeled data. Recent multi-modal approaches introduce retrieved or synthesized texts into a dual-branch architecture to provide semantic cues complementary to visual features. However, the cross-modal synergy in existing dual-branch methods remains coarse and incomplete: the two modalities are encoded independently with the bias and noise in the derived text left unaddressed during encoding, and existing mutual learning strategies operate only on global class-level anchors, lacking fine-grained relational supervision. To address these limitations, we propose the Synergistic Dual-Branch Adaptation (SDBA) framework, which serves as a plug-and-play enhancement compatible with existing dual-branch methods such as GET and TextGCD. SDBA comprises two components: the cross-modal synergistic adapter inserts lightweight adapters into both branches and further injects visual information into the text adapter at each encoder layer to enhance text feature learning during encoding; the neighborhood mutual learning module enforces consistent local neighborhood distributions between the two branches via bidirectional KL divergence, providing fine-grained relational supervision for both old and new classes. Extensive experiments on six benchmarks demonstrate state-of-the-art performance, and consistent improvements on different baselines validate the broad scalability of the proposed framework.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/23/2606.23069v1-rethinking-prototype-based-similarity-learning-for-few-shot-object-detection",
+      "section": "deep",
+      "title_en": "Rethinking Prototype-based Similarity Learning for Few-Shot Object Detection",
+      "authors": "KunHo Heo, Seungjae kim, Wongyu Lee, SuYeon Kim, MyeongAh Cho",
+      "date": "2026-06-22",
+      "pdf": "https://arxiv.org/pdf/2606.23069v1",
+      "score": "8.0",
+      "evidence": "少样本目标检测从少量样本中发现新物体类别，实现开放世界新类发现。",
+      "tldr": "在少样本目标检测任务中，现有基于原型的相似性学习方法面临类别间相似性边界崩溃导致的类别混淆和缺乏空间信息造成的定位不准两大挑战。本文重新思考该范式，引入文本锚定语义掩码（TSMa），利用类别文本特征作为语义锚点，通过通道交互强化类别本质信号、抑制风格伪响应，扩大类间边界；并提出阶段对齐层次自回归回归（SHARe），将边界框回归建模为从粗到细的层次自回归过程，利用ViT不同层特征逐步优化定位。在COCO基准上，该方法以10.1 nAP的显著提升达到新最优性能，为少样本检测提供了有效思路。",
+      "tags": "query:cgcd",
+      "abstract_en": "Few-shot object detection aims to detect novel object categories from only a few labeled examples, avoiding costly large-scale annotation. Recent prototype-based similarity learning approaches enable training-free adaptation by matching query features with class prototypes. However, they suffer from two fundamental limitations: (i) class confusion arising from inter-class similarity margin collapse, and (ii) insufficient visual cues for precise localization, as similarity scores capture only class-level semantic affinity while providing limited spatial information. To address these issues, we introduce two complementary components. Text-Anchored Semantic Mask (TSMa) leverages class-level text features as semantic anchors to identify semantically aligned channels through channel-wise interaction between visual and text features. By suppressing style-induced spurious responses and emphasizing class-intrinsic signals, TSMa enlarges inter-class similarity margins and mitigates class confusion. We further propose Stage-Aligned Hierarchical Autoregressive Regression (SHARe), which reformulates localization as a hierarchical autoregressive process that progressively refines bounding boxes across multiple stages. SHARe leverages the layer-wise characteristics of ViT representations by aligning feature abstraction levels with regression stages: deeper layers guide early coarse localization, while shallower layers rich in edge and texture cues refine spatial details in later stages. Experiments on COCO demonstrate a new state of the art, outperforming the previous best by +10.1 nAP, with extensive analysis validating each component. The code is available at https://github.com/VisualScienceLab-KHU/ReSet.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/23/2606.21743v1-cohort-organized-learning-clustering-through-agreement",
+      "section": "quick",
+      "title_en": "Cohort Organized Learning: Clustering Through Agreement",
+      "authors": "Finn Henry O'Shea, Maria Elena Monzani",
+      "date": "2026-06-19",
+      "pdf": "https://arxiv.org/pdf/2606.21743v1",
+      "score": "6.0",
+      "evidence": "无标签数据聚类方法，可应用于新类发现",
+      "tldr": "在许多聚类任务中，数据点间的距离或相似度计算是不可或缺的，但这限制了可处理的数据类型。Cohort Organized Learning (CoOL) 提出一种新颖的聚类方法，利用神经网络直接估计聚类分配，基于期望最大化推导梯度进行训练，无需显式距离或相似度计算，可在训练中监控收敛并在训练后评估聚类质量。实验表明，CoOL能够成功聚类向量和图像等多种数据。该方法为难以定义距离或相似度的高维复杂数据提供了灵活的聚类解决方案，拓展了聚类技术的应用边界。",
+      "tags": "query:cgcd",
+      "abstract_en": "In this article we describe Cohort Organized Learning (CoOL), a method for clustering data without explicit distance or similarity computations. Herein, we will describe CoOL, derive the gradients determined by expectation maximization to train the networks, show how to monitor convergence during training and evaluate the clusters after training, and discuss a series of examples and use cases. We also discuss CoOL's limitations and future prospects on related tasks. Because CoOL uses neural networks to estimate the clusters, it can be used to cluster any data that can be made compatible and we illustrate this on vector data and images.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
