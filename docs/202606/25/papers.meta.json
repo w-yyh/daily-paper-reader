@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-25",
+  "date": "2026-06-25",
+  "generated_at": "2026-06-25T21:52:39",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/25/2606.23758v2-exploring-dualistic-meta-learning-to-enhance-domain-generalization-in-open-set-scenarios",
+      "section": "deep",
+      "title_en": "Exploring Dualistic Meta-Learning to Enhance Domain Generalization in Open Set Scenarios",
+      "authors": "Xiran Wang, Jian Zhang, Lei Qi, Yang Gao, Yinghuan Shi",
+      "date": "2026-06-22",
+      "pdf": "https://arxiv.org/pdf/2606.23758v2",
+      "score": "9.0",
+      "evidence": "通过双元元学习识别未知域中的未知类别以提升开放集域泛化",
+      "tldr": "开放集域泛化中，训练一对多分类器时正负样本不平衡导致决策边界偏斜，已知类常被误拒。本文提出双元学习与联合域类匹配策略MEDIC，通过域间和类间任务的隐式梯度匹配，搜索兼顾域不变和类平衡的决策边界。实验表明MEDIC在开放集场景中超越现有方法，同时保持封闭集泛化竞争力，有效缓解了过拒问题。该工作为开放世界域泛化提供了平衡域类的新范式。",
+      "tags": "query:cgcd",
+      "abstract_en": "Domain generalization learns from multiple source domains to generalize to unseen target domains. However, it often neglects the realistic case of label mismatch between source and target. Open set domain generalization is then proposed to recognize unseen classes in unseen domains. A simple approach trains one-vs-all classifiers to separate each class and detect outliers as unknown. Yet, the imbalance between few positive samples and many negative samples skews the decision boundary towards the positive ones, leading the model to over-reject out-of-distribution data, even from known classes in unseen domains. In this paper, we propose a novel meta-learning stategy called dualistic MEta-learning with joint DomaIn-Class matching (MEDIC), which considers implicit gradient matching towards inter-domain and inter-class task splits simultaneously to find optimal boundaries balanced for both domains and classes. Experimental results show that MEDIC not only outperforms prior methods in open set scenarios, but also maintains competitive close set generalization ability.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/25/2606.21979v1-toward-open-set-speaker-attribute-prediction-with-keyword-appended-llm-embeddings",
+      "section": "deep",
+      "title_en": "Toward Open-Set Speaker Attribute Prediction with Keyword-Appended LLM Embeddings",
+      "authors": "Byoungjun So, Jaejun Lee, Kyogu Lee",
+      "date": "2026-06-20",
+      "pdf": "https://arxiv.org/pdf/2606.21979v1",
+      "score": "8.0",
+      "evidence": "开放集说话人属性预测与零样本泛化直接处理开放世界未知类别",
+      "tldr": "传统说话人属性预测依赖固定类别标签，语义匮乏且缺乏零样本泛化能力。本研究提出基于大语言模型（LLM）嵌入的开放集预测框架，通过关键词追加策略构建紧凑判别流形，并采用top-k负样本损失强化决策边界，实现跨模态对齐。在LibriTTS-P数据集上，该方法全面超越闭集基准，并能有效泛化至训练中未见过的同义词，证明其开放集能力。几何分析表明，所提策略正则化嵌入空间，平衡了语义内聚与预测清晰度。该工作为语音属性预测提供了语义丰富、通用性强的开放集范式，对语音交互与个性化服务具有重要价值。",
+      "tags": "query:cgcd",
+      "abstract_en": "Understanding speaker attributes is crucial for voice-related applications, yet conventional approaches rely on fixed categorical labels, lacking semantic richness and zero-shot generalizability. We propose a novel framework for open-set speaker attribute prediction leveraging Large Language Model (LLM) embeddings to represent attributes in a continuous semantic space. To bridge the cross-modal gap, we introduce a keyword-appending strategy that structures broad semantic representations into a compact, discriminative manifold. Furthermore, we employ a top-k negative loss to establish robust decision boundaries in crowded semantic regions. Experimental results on LibriTTS-P demonstrate that our method outperforms closed-set benchmarks and generalizes effectively to unseen synonyms. Geometric analysis suggests that our strategies regularize the embedding manifold, balancing semantic cohesion with predictive clarity.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/25/2606.21048v1-event-ontology-expansion-via-llm-based-conceptualization",
+      "section": "quick",
+      "title_en": "Event Ontology Expansion via LLM-Based Conceptualization",
+      "authors": "Weicheng Ren, Zixuan Li, Long Bai, Xiaolong Jin, Jiafeng Guo, Xueqi Cheng",
+      "date": "2026-06-19",
+      "pdf": "https://arxiv.org/pdf/2606.21048v1",
+      "score": "7.0",
+      "evidence": "从数据中发现新事件类型并聚类到本体中，类似于开放世界新类发现",
+      "tldr": "事件本体扩展需从数据发现新事件类型并归入本体，但现有方法依赖触发词语境表示，易混淆概念语义与表层变化，导致聚类不稳和层次扩展不可靠。本文提出ConceptE框架，通过LLM为事件触发词生成概念名称和描述，联合编码概念与触发词信息，构建概念增强表示以对齐本体推理。实验表明，ConceptE在事件聚类和层次扩展上分别提升BCubed-F1最高12.37%和Taxo_F1最高6.48%。该方法为事件本体扩展提供了概念化驱动的新范式。",
+      "tags": "query:cgcd",
+      "abstract_en": "Event ontology expansion aims to discover emerging event types from data and extend them to appropriate positions in the existing event ontology.. Existing methods typically cluster contextualized trigger representations and attach induced clusters to the ontology based on instance-level similarity. However, ontology expansion requires concept-level semantics that characterize event types, whereas contextualized trigger representations often conflate these semantics with surface contextual variation, leading to unstable clustering and unreliable hierarchy expansion. To address this issue, we propose ConceptE, a conceptualization-enhanced framework for event ontology expansion. ConceptE first derives concept-level semantics by prompting an LLM with the sentence and event trigger, producing a concise concept name and a natural-language description. It then jointly encodes these semantics with trigger information to build concept-enhanced representations aligned with ontology-level reasoning. This representation design supports more coherent event clustering, more reliable hierarchy expansion, and ontology-consistent type naming. Experiments on ACE, ERE, and MAVEN demonstrate that ConceptE consistently outperforms state-of-the-art approaches across all subtasks of event ontology expansion. In particular, it achieves improvements of up to 12.37\\% in BCubed-F1 for event clustering and 6.48\\% in Taxo\\_F1 for hierarchy expansion, demonstrating the effectiveness of the proposed ConceptE method.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

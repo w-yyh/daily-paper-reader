@@ -1,0 +1,133 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-25T21:50:13.666173+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.23758v2",
+      "source": "arxiv",
+      "title": "Exploring Dualistic Meta-Learning to Enhance Domain Generalization in Open Set Scenarios",
+      "abstract": "Domain generalization learns from multiple source domains to generalize to unseen target domains. However, it often neglects the realistic case of label mismatch between source and target. Open set domain generalization is then proposed to recognize unseen classes in unseen domains. A simple approach trains one-vs-all classifiers to separate each class and detect outliers as unknown. Yet, the imbalance between few positive samples and many negative samples skews the decision boundary towards the positive ones, leading the model to over-reject out-of-distribution data, even from known classes in unseen domains. In this paper, we propose a novel meta-learning stategy called dualistic MEta-learning with joint DomaIn-Class matching (MEDIC), which considers implicit gradient matching towards inter-domain and inter-class task splits simultaneously to find optimal boundaries balanced for both domains and classes. Experimental results show that MEDIC not only outperforms prior methods in open set scenarios, but also maintains competitive close set generalization ability.",
+      "authors": [
+        "Xiran Wang",
+        "Jian Zhang",
+        "Lei Qi",
+        "Yang Gao",
+        "Yinghuan Shi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-22T08:58:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.23758v2",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "recognize unseen classes in unseen domains via dualistic meta-learning for open set domain generalization",
+      "llm_evidence_cn": "通过双元元学习识别未知域中的未知类别以提升开放集域泛化",
+      "llm_evidence": "通过双元元学习识别未知域中的未知类别以提升开放集域泛化",
+      "canonical_evidence": "通过双元元学习识别未知域中的未知类别以提升开放集域泛化",
+      "llm_tldr_en": "Proposes a dualistic meta-learning strategy (MEDIC) for open set domain generalization to recognize unseen classes in unseen domains by jointly matching domains and classes, addressing over-rejection of known classes.",
+      "llm_tldr_cn": "针对开放集域泛化中未知类别识别问题，提出双元元学习策略MEDIC，通过联合域-类匹配训练，解决现有方法因单类对比不平衡导致新域中已知类被误判为未知的问题。在多个基准数据集上验证，MEDIC显著降低了已知类的过度拒绝率，提升了未见域未见类的识别性能。该工作为解决开放世界下未知类别发现提供了有效的泛化框架。",
+      "llm_tldr": "针对开放集域泛化中未知类别识别问题，提出双元元学习策略MEDIC，通过联合域-类匹配训练，解决现有方法因单类对比不平衡导致新域中已知类被误判为未知的问题。在多个基准数据集上验证，MEDIC显著降低了已知类的过度拒绝率，提升了未见域未见类的识别性能。该工作为解决开放世界下未知类别发现提供了有效的泛化框架。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.21979v1",
+      "source": "arxiv",
+      "title": "Toward Open-Set Speaker Attribute Prediction with Keyword-Appended LLM Embeddings",
+      "abstract": "Understanding speaker attributes is crucial for voice-related applications, yet conventional approaches rely on fixed categorical labels, lacking semantic richness and zero-shot generalizability. We propose a novel framework for open-set speaker attribute prediction leveraging Large Language Model (LLM) embeddings to represent attributes in a continuous semantic space. To bridge the cross-modal gap, we introduce a keyword-appending strategy that structures broad semantic representations into a compact, discriminative manifold. Furthermore, we employ a top-k negative loss to establish robust decision boundaries in crowded semantic regions. Experimental results on LibriTTS-P demonstrate that our method outperforms closed-set benchmarks and generalizes effectively to unseen synonyms. Geometric analysis suggests that our strategies regularize the embedding manifold, balancing semantic cohesion with predictive clarity.",
+      "authors": [
+        "Byoungjun So",
+        "Jaejun Lee",
+        "Kyogu Lee"
+      ],
+      "primary_category": "cs.SD",
+      "categories": [
+        "cs.SD"
+      ],
+      "published": "2026-06-20T10:20:24+00:00",
+      "link": "https://arxiv.org/pdf/2606.21979v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "open-set speaker attribute prediction with zero-shot generalizability directly handles unknown classes in open world",
+      "llm_evidence_cn": "开放集说话人属性预测与零样本泛化直接处理开放世界未知类别",
+      "llm_evidence": "开放集说话人属性预测与零样本泛化直接处理开放世界未知类别",
+      "canonical_evidence": "开放集说话人属性预测与零样本泛化直接处理开放世界未知类别",
+      "llm_tldr_en": "Proposes using LLM embeddings with keyword appending and top-k negative loss for open-set speaker attribute prediction, enabling zero-shot generalization to unseen attributes.",
+      "llm_tldr_cn": "该论文针对传统说话人属性预测依赖固定标签、缺乏语义丰富性和零样本泛化能力的问题，提出利用大语言模型嵌入结合关键词附加策略和top-k负样本损失，在连续语义空间中实现开放集属性预测。实验表明，方法在LibriTTS-P数据集上超越闭集基准，并展现出对未知属性的泛化能力，为开放世界中的未知类别发现提供了新思路。",
+      "llm_tldr": "该论文针对传统说话人属性预测依赖固定标签、缺乏语义丰富性和零样本泛化能力的问题，提出利用大语言模型嵌入结合关键词附加策略和top-k负样本损失，在连续语义空间中实现开放集属性预测。实验表明，方法在LibriTTS-P数据集上超越闭集基准，并展现出对未知属性的泛化能力，为开放世界中的未知类别发现提供了新思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.21048v1",
+      "source": "arxiv",
+      "title": "Event Ontology Expansion via LLM-Based Conceptualization",
+      "abstract": "Event ontology expansion aims to discover emerging event types from data and extend them to appropriate positions in the existing event ontology.. Existing methods typically cluster contextualized trigger representations and attach induced clusters to the ontology based on instance-level similarity. However, ontology expansion requires concept-level semantics that characterize event types, whereas contextualized trigger representations often conflate these semantics with surface contextual variation, leading to unstable clustering and unreliable hierarchy expansion. To address this issue, we propose ConceptE, a conceptualization-enhanced framework for event ontology expansion. ConceptE first derives concept-level semantics by prompting an LLM with the sentence and event trigger, producing a concise concept name and a natural-language description. It then jointly encodes these semantics with trigger information to build concept-enhanced representations aligned with ontology-level reasoning. This representation design supports more coherent event clustering, more reliable hierarchy expansion, and ontology-consistent type naming. Experiments on ACE, ERE, and MAVEN demonstrate that ConceptE consistently outperforms state-of-the-art approaches across all subtasks of event ontology expansion. In particular, it achieves improvements of up to 12.37\\% in BCubed-F1 for event clustering and 6.48\\% in Taxo\\_F1 for hierarchy expansion, demonstrating the effectiveness of the proposed ConceptE method.",
+      "authors": [
+        "Weicheng Ren",
+        "Zixuan Li",
+        "Long Bai",
+        "Xiaolong Jin",
+        "Jiafeng Guo",
+        "Xueqi Cheng"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-19T02:28:17+00:00",
+      "link": "https://arxiv.org/pdf/2606.21048v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "discovers novel event types from data and clusters them into ontology, analogous to novel class discovery in open world",
+      "llm_evidence_cn": "从数据中发现新事件类型并聚类到本体中，类似于开放世界新类发现",
+      "llm_evidence": "从数据中发现新事件类型并聚类到本体中，类似于开放世界新类发现",
+      "canonical_evidence": "从数据中发现新事件类型并聚类到本体中，类似于开放世界新类发现",
+      "llm_tldr_en": "Proposes ConceptE, a framework for event ontology expansion that uses LLM-based conceptualization to derive concept-level semantics for stable clustering and reliable hierarchy attachment, outperforming instance-level clustering methods.",
+      "llm_tldr_cn": "针对事件本体扩展中实例级表示混杂上下文信息导致聚类不稳的问题，提出ConceptE框架，利用LLM从句子和事件触发词中抽取概念级语义，提升新事件类型发现的准确率与层次扩展的可靠性。",
+      "llm_tldr": "针对事件本体扩展中实例级表示混杂上下文信息导致聚类不稳的问题，提出ConceptE框架，利用LLM从句子和事件触发词中抽取概念级语义，提升新事件类型发现的准确率与层次扩展的可靠性。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
