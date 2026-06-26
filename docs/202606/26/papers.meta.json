@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-26",
+  "date": "2026-06-26",
+  "generated_at": "2026-06-26T21:52:13",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/26/2606.24094v1-universal-guideline-driven-image-clustering-via-a-hybrid-llm-agent",
+      "section": "deep",
+      "title_en": "Universal Guideline-Driven Image Clustering via a Hybrid LLM Agent",
+      "authors": "Wenliang Zhong, Rob Barton, Lucas Goncalves, Kushal Kumar, Feng Jiang, Hehuan Ma, Yuzhi Guo, Vidit Bansal, Karim Bouyarmane, Junzhou Huang",
+      "date": "2026-06-23",
+      "pdf": "https://arxiv.org/pdf/2606.24094v1",
+      "score": "9.0",
+      "evidence": "一种通用图像聚类框架，利用LLM引导发现新类别，无需任务特定训练，直接实现广义类别发现。",
+      "tldr": "本文提出指南驱动的图像聚类代理框架，统一了从通用到细粒度、从全局到局部标准的多种聚类场景。通过生成式概念代理建模生成指南感知的嵌入，并引入基于最小生成树的LLM遍历实现自动聚类发现，无需任务特定训练。框架有效填补了不同聚类任务间的鸿沟，实验在多项基准上显著超越现有方法，尤其对未标注数据中未知类别的发现具有重要价值，为解决开放世界未知类别聚类提供了通用方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Unifying image clustering across different clustering scenarios remains challenging due to fundamental gaps among tasks. We introduce a Guideline-Driven Image Clustering Agent, the first universal framework that bridges these gaps through textual guidelines. To incorporate complex guidelines without task-specific training, we propose Generative Concept Proxy Modeling, which generates guideline-aware embeddings via concept proxy extraction. For scenarios requiring automatic cluster discovery, we introduce LLM Traversal based on Minimum Spanning Tree that selectively applies LLM reasoning for complex semantic judgments. Our method generalizes across diverse clustering scenarios spanning from general to fine-grained categorization, from global to local criteria, and from balanced to long-tail distributions. Our framework consistently outperforms specialized methods across diverse clustering tasks.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/26/2606.23758v1-exploring-dualistic-meta-learning-to-enhance-domain-generalization-in-open-set-scenarios",
+      "section": "deep",
+      "title_en": "Exploring Dualistic Meta-Learning to Enhance Domain Generalization in Open Set Scenarios",
+      "authors": "Xiran Wang, Jian Zhang, Lei Qi, Yang Gao, Yinghuan Shi",
+      "date": "2026-06-22",
+      "pdf": "https://arxiv.org/pdf/2606.23758v1",
+      "score": "8.0",
+      "evidence": "通过开放集域泛化和元学习处理带有未知类别的开放世界场景。",
+      "tldr": "本文解决开放集域泛化问题，旨在识别未见过域中的未见过类别。提出双元元学习策略，通过联合域-类别匹配的元学习框架，优化一类对多类分类器，有效缓解正负样本不平衡导致的过度拒绝问题，在多个基准上实现了对未见过域中未知类别的鲁棒识别。方法通过设计双元任务分布，让模型学习同时泛化域和类别漂移，在Office-Home和DomainNet等数据集上显著超越了现有方法。",
+      "tags": "query:cgcd",
+      "abstract_en": "Domain generalization learns from multiple source domains to generalize to unseen target domains. However, it often neglects the realistic case of label mismatch between source and target. Open set domain generalization is then proposed to recognize unseen classes in unseen domains. A simple approach trains one-vs-all classifiers to separate each class and detect outliers as unknown. Yet, the imbalance between few positive samples and many negative samples skews the decision boundary towards the positive ones, leading the model to over-reject out-of-distribution data, even from known classes in unseen domains. In this paper, we propose a novel meta-learning stategy called dualistic MEta-learning with joint DomaIn-Class matching (MEDIC), which considers implicit gradient matching towards inter-domain and inter-class task splits simultaneously to find optimal boundaries balanced for both domains and classes. Experimental results show that MEDIC not only outperforms prior methods in open set scenarios, but also maintains competitive close set generalization ability.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/26/2606.26973v1-geometric-gradient-rectification-for-safe-open-set-semi-supervised-learning",
+      "section": "quick",
+      "title_en": "Geometric Gradient Rectification for Safe Open-Set Semi-Supervised Learning",
+      "authors": "Jiahe Chen, Qian Shao, Qiyuan Chen, Jiaying He, Jintai Chen, Jian Wu, Hongxia Xu",
+      "date": "2026-06-25",
+      "pdf": "https://arxiv.org/pdf/2606.26973v1",
+      "score": "7.0",
+      "evidence": "处理包含未知类别的无标签数据的开放集半监督学习",
+      "tldr": "开放集半监督学习中，现有方法要么过滤可疑样本，可能丢弃有用的困难样本；要么以软加权利用无标签数据，当伪标签错误时引入与监督学习冲突的辅助梯度。本文提出几何梯度纠正框架GGR，将监督梯度作为锚点，把冲突辅助梯度投影到梯度空间中的可接受区域，在消除梯度冲突的同时保留正交的有用表示信号。在CIFAR和ImageNet基准上，GGR显著提升了代表性开放集半监督基线在闭集准确率和开集鲁棒性上的表现。该方法无需修改模型，即插即用，推动了半监督学习中的安全梯度控制。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-set semi-supervised learning aims to leverage unlabeled data that may contain out-of-distribution outliers while maintaining performance on in-distribution classes. Existing methods mainly follow two paradigms: filtering suspicious samples or incorporating unlabeled objectives with soft weighting. We argue that both face a common trade-off: aggressive filtering can discard informative but hard ID samples, whereas utilization can introduce auxiliary gradients that conflict with supervised learning when pseudo labels are wrong. We therefore shift the focus from sample selection to gradient-level control. We propose \\textit{Geometric Gradient Rectification} (GGR), a plug-in framework that uses the supervised gradient as an anchor and projects conflicting auxiliary gradients onto an admissible region in gradient space. This makes the applied auxiliary update first-order non-opposing within the rectified coordinate block while preserving orthogonal components that may still carry useful representation signals. We further extend GGR with subspace-aware rectification to stabilize the anchor under noisy mini-batch gradients. Experiments on CIFAR and ImageNet benchmarks show that GGR improves representative OSSL baselines in most settings and yields gains in both closed-set generalization and open-set robustness. Code will be available at https://github.com/JiaheChen2002/GGR.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

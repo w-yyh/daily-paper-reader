@@ -1,0 +1,142 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-26T21:47:28.610648+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.24094v1",
+      "source": "arxiv",
+      "title": "Universal Guideline-Driven Image Clustering via a Hybrid LLM Agent",
+      "abstract": "Unifying image clustering across different clustering scenarios remains challenging due to fundamental gaps among tasks. We introduce a Guideline-Driven Image Clustering Agent, the first universal framework that bridges these gaps through textual guidelines. To incorporate complex guidelines without task-specific training, we propose Generative Concept Proxy Modeling, which generates guideline-aware embeddings via concept proxy extraction. For scenarios requiring automatic cluster discovery, we introduce LLM Traversal based on Minimum Spanning Tree that selectively applies LLM reasoning for complex semantic judgments. Our method generalizes across diverse clustering scenarios spanning from general to fine-grained categorization, from global to local criteria, and from balanced to long-tail distributions. Our framework consistently outperforms specialized methods across diverse clustering tasks.",
+      "authors": [
+        "Wenliang Zhong",
+        "Rob Barton",
+        "Lucas Goncalves",
+        "Kushal Kumar",
+        "Feng Jiang",
+        "Hehuan Ma",
+        "Yuzhi Guo",
+        "Vidit Bansal",
+        "Karim Bouyarmane",
+        "Junzhou Huang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-23T03:20:09+00:00",
+      "link": "https://arxiv.org/pdf/2606.24094v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "A universal image clustering framework that uses LLM-guided discovery of novel categories without task-specific training, directly enabling generalized category discovery.",
+      "llm_evidence_cn": "一种通用图像聚类框架，利用LLM引导发现新类别，无需任务特定训练，直接实现广义类别发现。",
+      "llm_evidence": "一种通用图像聚类框架，利用LLM引导发现新类别，无需任务特定训练，直接实现广义类别发现。",
+      "canonical_evidence": "一种通用图像聚类框架，利用LLM引导发现新类别，无需任务特定训练，直接实现广义类别发现。",
+      "llm_tldr_en": "The paper proposes a Guideline-Driven Image Clustering Agent, unifying various clustering tasks via textual guidelines, using generative concept proxies and LLM traversal for automatic cluster discovery, applicable to generalized category discovery in open-world settings.",
+      "llm_tldr_cn": "本文提出指南驱动的图像聚类代理框架，统一了从通用到细粒度、从全局到局部标准的多种聚类场景。通过生成式概念代理建模生成指南感知的嵌入，并引入基于最小生成树的LLM遍历实现自动聚类发现，无需任务特定训练。框架有效填补了不同聚类任务间的鸿沟，实验在多项基准上显著超越现有方法，尤其对未标注数据中未知类别的发现具有重要价值，为解决开放世界未知类别聚类提供了通用方案。",
+      "llm_tldr": "本文提出指南驱动的图像聚类代理框架，统一了从通用到细粒度、从全局到局部标准的多种聚类场景。通过生成式概念代理建模生成指南感知的嵌入，并引入基于最小生成树的LLM遍历实现自动聚类发现，无需任务特定训练。框架有效填补了不同聚类任务间的鸿沟，实验在多项基准上显著超越现有方法，尤其对未标注数据中未知类别的发现具有重要价值，为解决开放世界未知类别聚类提供了通用方案。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.23758v1",
+      "source": "arxiv",
+      "title": "Exploring Dualistic Meta-Learning to Enhance Domain Generalization in Open Set Scenarios",
+      "abstract": "Domain generalization learns from multiple source domains to generalize to unseen target domains. However, it often neglects the realistic case of label mismatch between source and target. Open set domain generalization is then proposed to recognize unseen classes in unseen domains. A simple approach trains one-vs-all classifiers to separate each class and detect outliers as unknown. Yet, the imbalance between few positive samples and many negative samples skews the decision boundary towards the positive ones, leading the model to over-reject out-of-distribution data, even from known classes in unseen domains. In this paper, we propose a novel meta-learning stategy called dualistic MEta-learning with joint DomaIn-Class matching (MEDIC), which considers implicit gradient matching towards inter-domain and inter-class task splits simultaneously to find optimal boundaries balanced for both domains and classes. Experimental results show that MEDIC not only outperforms prior methods in open set scenarios, but also maintains competitive close set generalization ability.",
+      "authors": [
+        "Xiran Wang",
+        "Jian Zhang",
+        "Lei Qi",
+        "Yang Gao",
+        "Yinghuan Shi"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-22T08:58:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.23758v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Handles open-world scenarios with unknown classes via open set domain generalization and meta-learning.",
+      "llm_evidence_cn": "通过开放集域泛化和元学习处理带有未知类别的开放世界场景。",
+      "llm_evidence": "通过开放集域泛化和元学习处理带有未知类别的开放世界场景。",
+      "canonical_evidence": "通过开放集域泛化和元学习处理带有未知类别的开放世界场景。",
+      "llm_tldr_en": "The paper addresses open set domain generalization to recognize unseen classes in unseen domains, proposing a dualistic meta-learning strategy that jointly matches domains and classes, improving generalization and reducing false rejection of known classes.",
+      "llm_tldr_cn": "本文解决开放集域泛化问题，旨在识别未见过域中的未见过类别。提出双元元学习策略，通过联合域-类别匹配的元学习框架，优化一类对多类分类器，有效缓解正负样本不平衡导致的过度拒绝问题，在多个基准上实现了对未见过域中未知类别的鲁棒识别。方法通过设计双元任务分布，让模型学习同时泛化域和类别漂移，在Office-Home和DomainNet等数据集上显著超越了现有方法。",
+      "llm_tldr": "本文解决开放集域泛化问题，旨在识别未见过域中的未见过类别。提出双元元学习策略，通过联合域-类别匹配的元学习框架，优化一类对多类分类器，有效缓解正负样本不平衡导致的过度拒绝问题，在多个基准上实现了对未见过域中未知类别的鲁棒识别。方法通过设计双元任务分布，让模型学习同时泛化域和类别漂移，在Office-Home和DomainNet等数据集上显著超越了现有方法。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.26973v1",
+      "source": "arxiv",
+      "title": "Geometric Gradient Rectification for Safe Open-Set Semi-Supervised Learning",
+      "abstract": "Open-set semi-supervised learning aims to leverage unlabeled data that may contain out-of-distribution outliers while maintaining performance on in-distribution classes. Existing methods mainly follow two paradigms: filtering suspicious samples or incorporating unlabeled objectives with soft weighting. We argue that both face a common trade-off: aggressive filtering can discard informative but hard ID samples, whereas utilization can introduce auxiliary gradients that conflict with supervised learning when pseudo labels are wrong. We therefore shift the focus from sample selection to gradient-level control. We propose \\textit{Geometric Gradient Rectification} (GGR), a plug-in framework that uses the supervised gradient as an anchor and projects conflicting auxiliary gradients onto an admissible region in gradient space. This makes the applied auxiliary update first-order non-opposing within the rectified coordinate block while preserving orthogonal components that may still carry useful representation signals. We further extend GGR with subspace-aware rectification to stabilize the anchor under noisy mini-batch gradients. Experiments on CIFAR and ImageNet benchmarks show that GGR improves representative OSSL baselines in most settings and yields gains in both closed-set generalization and open-set robustness. Code will be available at https://github.com/JiaheChen2002/GGR.",
+      "authors": [
+        "Jiahe Chen",
+        "Qian Shao",
+        "Qiyuan Chen",
+        "Jiaying He",
+        "Jintai Chen",
+        "Jian Wu",
+        "Hongxia Xu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-25T12:45:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.26973v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Open-set semi-supervised learning that handles unlabeled data with unknown classes",
+      "llm_evidence_cn": "处理包含未知类别的无标签数据的开放集半监督学习",
+      "llm_evidence": "处理包含未知类别的无标签数据的开放集半监督学习",
+      "canonical_evidence": "处理包含未知类别的无标签数据的开放集半监督学习",
+      "llm_tldr_en": "This paper proposes Geometric Gradient Rectification (GGR), a gradient-level control method to safely exploit unlabeled data with out-of-distribution samples in open-set SSL, projecting conflicting gradients to maintain safety.",
+      "llm_tldr_cn": "本文针对开放集半监督学习中无标签数据可能包含分布外异常的问题，提出几何梯度校正(GGR)方法，以有监督梯度为锚点，将有冲突的无标签梯度投影到安全锥内，即插即用，在多个基准上同时提升安全性与分类准确率。",
+      "llm_tldr": "本文针对开放集半监督学习中无标签数据可能包含分布外异常的问题，提出几何梯度校正(GGR)方法，以有监督梯度为锚点，将有冲突的无标签梯度投影到安全锥内，即插即用，在多个基准上同时提升安全性与分类准确率。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
