@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-27",
+  "date": "2026-06-27",
+  "generated_at": "2026-06-27T20:01:15",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/27/2606.25347v2-geometry-anchored-transport-framework-for-exemplar-free-class-incremental-learning",
+      "section": "deep",
+      "title_en": "Geometry-Anchored Transport Framework for Exemplar-Free Class-Incremental Learning",
+      "authors": "Hongye Xu, Bartosz Krawczyk",
+      "date": "2026-06-24",
+      "pdf": "https://arxiv.org/pdf/2606.25347v2",
+      "score": "8.0",
+      "evidence": "无样本类增量学习通过传输类别统计处理开放世界中的新类",
+      "tldr": "无样本增量学习中特征空间漂移导致类条件高斯统计量敏感，现有事后传输方法缺乏几何约束易扭曲流形。本文提出几何锚定传输框架，通过马氏对齐回归导出解析锚定以抑制宏观漂移，并引入拓扑感知演化正则化局部退化，将传输约束内嵌于训练。在CIFAR-100等数据集上的实验表明，该框架在严格无样本约束下稳定提升分类性能，无需事后微调。",
+      "tags": "query:cgcd",
+      "abstract_en": "Exemplar-free class-incremental learning (EFCIL) requires stable decision boundaries within a shifting feature space. While maintaining class-conditional Gaussian statistics provides a principled classification strategy, these parametric summaries remain sensitive to anisotropic representation drift. Existing methods often transport these statistics across tasks using a decoupled, post-hoc paradigm: optimizing a backbone without explicit geometric constraints can distort the legacy manifold, limiting the precision of retroactive alignment. In this paper, we formulate feature transport as an endogenous training constraint rather than a separate post-task step, presenting the Geometry-Anchored Transport Framework. First, we derive an Analytic Geometric Anchor via Mahalanobis-aligned regression to mitigate macroscopic anisotropic drift. Second, we introduce a Topology-Aware Evolution objective that regularizes localized manifold degradation while calibrating a residual network against the analytic prior. By coupling manifold evolution with transport constraints during the primary training phase, our framework mitigates evaluation errors without requiring decoupled fine-tuning. Experiments across CIFAR-100, TinyImageNet, and ImageNet-100 demonstrate that the proposed framework consistently improves upon existing post-hoc alternatives under strict exemplar-free constraints.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/27/2606.26986v1-reaore-reasoning-guided-progressive-open-relation-extraction-empowered-by-large-reasoning-models",
+      "section": "deep",
+      "title_en": "ReaORE: Reasoning-Guided Progressive Open Relation Extraction Empowered by Large Reasoning Models",
+      "authors": "Xin Lin, Liang Zhang, Guoqi Ma, Hongyao Tu, Jinsong Su",
+      "date": "2026-06-25",
+      "pdf": "https://arxiv.org/pdf/2606.26986v1",
+      "score": "8.0",
+      "evidence": "通过渐进推理在开放世界文本中发现未见关系类型",
+      "tldr": "开放关系抽取需泛化到未见关系，现有方法或无法生成关系标签，或直接使用大模型但判别力不足，难以区分易混淆关系。ReaORE提出推理引导的渐进式框架，通过关系过滤与关系预测两阶段粗到细推理，利用大型推理模型增强对混淆关系的区分能力。在多个数据集上取得最优性能，验证了推理策略在开放域关系抽取中的有效性。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open Relation Extraction (OpenRE) requires a model to extract unseen relations between head and tail entities from unstructured text for real-world applications. The core challenge of OpenRE lies in achieving reliable generalization to unseen relation types. Current OpenRE approaches either employ clustering techniques, which cannot generate relation labels and suffer from poor generalization, or rely on direct relation label generation via Large Language Models (LLMs), which lack sufficient discriminative capacity to distinguish easily confused relations. To address these limitations, we propose Reasoning-guided progressive OpenRE (ReaORE), a framework for performing relation extraction through coarse-to-fine relation reasoning. Specifically, ReaORE consists of two key stages: (i) relation filtering, which reasons over multiple aspects to understand relations and instances, yielding an initial relation set, and further supplements and filters relations via embedding-based similarity to ensure the target relation is included; (ii) relation prediction, which aims to predict the target relations from the above set via fine-grained comparative reasoning to better distinguish easily confused relations. Extensive experiments on two widely used OpenRE datasets demonstrate that ReaORE outperforms existing baselines.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
