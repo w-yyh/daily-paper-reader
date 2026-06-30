@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-30",
+  "date": "2026-06-30",
+  "generated_at": "2026-06-30T21:42:00",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/30/2606.23069v2-rethinking-prototype-based-similarity-learning-for-few-shot-object-detection",
+      "section": "quick",
+      "title_en": "Rethinking Prototype-based Similarity Learning for Few-Shot Object Detection",
+      "authors": "KunHo Heo, Seungjae kim, Wongyu Lee, SuYeon Kim, MyeongAh Cho",
+      "date": "2026-06-22",
+      "pdf": "https://arxiv.org/pdf/2606.23069v2",
+      "score": "6.0",
+      "evidence": "在开放世界检测场景中从少量样本检测新对象类别。",
+      "tldr": "针对小样本目标检测中原型相似学习存在的类间混淆和定位信息不足问题，本文提出文本锚定语义掩码TSMa和阶段对齐层次自回归回归SHARe。TSMa通过文本-视觉通道交互抑制虚假响应，扩大类间语义边界；SHARe将定位建模为多阶段自回归过程，利用ViT层间特征从粗到细精炼边界框。在COCO数据集上，该方法超越此前最佳结果10.1 nAP，达到新先进水平，为小样本检测提供了有效解决方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Few-shot object detection aims to detect novel object categories from only a few labeled examples, avoiding costly large-scale annotation. Recent prototype-based similarity learning approaches enable training-free adaptation by matching query features with class prototypes. However, they suffer from two fundamental limitations: (i) class confusion arising from inter-class similarity margin collapse, and (ii) insufficient visual cues for precise localization, as similarity scores capture only class-level semantic affinity while providing limited spatial information. To address these issues, we introduce two complementary components. Text-Anchored Semantic Mask (TSMa) leverages class-level text features as semantic anchors to identify semantically aligned channels through channel-wise interaction between visual and text features. By suppressing style-induced spurious responses and emphasizing class-intrinsic signals, TSMa enlarges inter-class similarity margins and mitigates class confusion. We further propose Stage-Aligned Hierarchical Autoregressive Regression (SHARe), which reformulates localization as a hierarchical autoregressive process that progressively refines bounding boxes across multiple stages. SHARe leverages the layer-wise characteristics of ViT representations by aligning feature abstraction levels with regression stages: deeper layers guide early coarse localization, while shallower layers rich in edge and texture cues refine spatial details in later stages. Experiments on COCO demonstrate a new state of the art, outperforming the previous best by +10.1 nAP, with extensive analysis validating each component. The code is available at https://github.com/VisualScienceLab-KHU/ReSet.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

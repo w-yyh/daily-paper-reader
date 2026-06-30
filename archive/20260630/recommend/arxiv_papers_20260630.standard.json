@@ -1,0 +1,56 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-30T21:40:01.594202+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.23069v2",
+      "source": "arxiv",
+      "title": "Rethinking Prototype-based Similarity Learning for Few-Shot Object Detection",
+      "abstract": "Few-shot object detection aims to detect novel object categories from only a few labeled examples, avoiding costly large-scale annotation. Recent prototype-based similarity learning approaches enable training-free adaptation by matching query features with class prototypes. However, they suffer from two fundamental limitations: (i) class confusion arising from inter-class similarity margin collapse, and (ii) insufficient visual cues for precise localization, as similarity scores capture only class-level semantic affinity while providing limited spatial information. To address these issues, we introduce two complementary components. Text-Anchored Semantic Mask (TSMa) leverages class-level text features as semantic anchors to identify semantically aligned channels through channel-wise interaction between visual and text features. By suppressing style-induced spurious responses and emphasizing class-intrinsic signals, TSMa enlarges inter-class similarity margins and mitigates class confusion. We further propose Stage-Aligned Hierarchical Autoregressive Regression (SHARe), which reformulates localization as a hierarchical autoregressive process that progressively refines bounding boxes across multiple stages. SHARe leverages the layer-wise characteristics of ViT representations by aligning feature abstraction levels with regression stages: deeper layers guide early coarse localization, while shallower layers rich in edge and texture cues refine spatial details in later stages. Experiments on COCO demonstrate a new state of the art, outperforming the previous best by +10.1 nAP, with extensive analysis validating each component. The code is available at https://github.com/VisualScienceLab-KHU/ReSet.",
+      "authors": [
+        "KunHo Heo",
+        "Seungjae kim",
+        "Wongyu Lee",
+        "SuYeon Kim",
+        "MyeongAh Cho"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-22T09:18:00+00:00",
+      "link": "https://arxiv.org/pdf/2606.23069v2",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Detects novel object categories from few examples in an open-world detection setting.",
+      "llm_evidence_cn": "在开放世界检测场景中从少量样本检测新对象类别。",
+      "llm_evidence": "在开放世界检测场景中从少量样本检测新对象类别。",
+      "canonical_evidence": "在开放世界检测场景中从少量样本检测新对象类别。",
+      "llm_tldr_en": "Proposes to improve few-shot object detection by using text-anchored semantic masks to reduce class confusion and a correlation-guided localization module to enhance spatial cue extraction, boosting detection of novel classes.",
+      "llm_tldr_cn": "本文针对少样本目标检测中类间混淆和定位信息不足的问题，提出文本锚定语义掩码（TSMa）和关联引导定位模块，前者利用类别文本特征抑制背景与相似类别，后者从关联得分图中提取精确空间位置，从而提升对新类别的检测能力。实验表明该方法在主流少样本检测数据集上均取得领先性能，为开放世界场景中高效发现新类别提供了新路线。",
+      "llm_tldr": "本文针对少样本目标检测中类间混淆和定位信息不足的问题，提出文本锚定语义掩码（TSMa）和关联引导定位模块，前者利用类别文本特征抑制背景与相似类别，后者从关联得分图中提取精确空间位置，从而提升对新类别的检测能力。实验表明该方法在主流少样本检测数据集上均取得领先性能，为开放世界场景中高效发现新类别提供了新路线。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

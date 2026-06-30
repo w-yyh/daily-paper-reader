@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-30 <!--dpr-date:20260630-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/30/2606.23069v2-rethinking-prototype-based-similarity-learning-for-few-shot-object-detection" data-sidebar-item="{&quot;title&quot;: &quot;Rethinking Prototype-based Similarity Learning for Few-Shot Object Detection&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.23069v2-rethinking-prototype-based-similarity-learning-for-few-shot-object-detection&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;在开放世界检测场景中从少量样本检测新对象类别。&quot;}">Rethinking Prototype-based Similarity Learning for Few-Shot Object Detection</a>
   * 2026-06-27 <!--dpr-date:20260627-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/27/2606.25347v2-geometry-anchored-transport-framework-for-exemplar-free-class-incremental-learning" data-sidebar-item="{&quot;title&quot;: &quot;Geometry-Anchored Transport Framework for Exemplar-Free Class-Incremental Learning&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.25347v2-geometry-anchored-transport-framework-for-exemplar-free-class-incremental-learning&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;无样本类增量学习通过传输类别统计处理开放世界中的新类&quot;}">Geometry-Anchored Transport Framework for Exemplar-Free Class-Incremental Learning</a>
