@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-01T21:37:35.114237+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.26829v1",
+      "source": "arxiv",
+      "title": "Identifying the Unknown: Prompt-Free Open Vocabulary Anomaly Recognition for Robot-Object Interaction",
+      "abstract": "Robots operating in real-world environments must in general be able to recognize previously unseen objects. As robotic systems move toward open-world autonomy, there is a growing, yet largely unmet, need for open vocabulary object detectors that are prompt-free and efficient enough for continuous deployment. We present AnomNOVIC, a two-stage known-workspace framework that combines a masked autoencoder (MAE) trained for anomaly detection, with NOVIC, a powerful real-time prompt-free open vocabulary image classifier. The MAE produces generic object-agnostic bounding boxes, allowing NOVIC to classify salient image regions without requiring a predefined candidate class list. We evaluate AnomNOVIC against strong open vocabulary baselines in a tabletop robot-object environment featuring the NICOL humanoid robot, reaching 47.1% AP / 57.5% AP50 for prompt-free recognition, and 59.0% AP / 72.5% AP50 if class candidates are provided. Across additional datasets, including an in-the-wild test set with 48 unique objects, AnomNOVIC reaches up to 82.6% prompt-free detection and classification accuracy. These results significantly surpass all tested open vocabulary baselines, including YOLO-World-v2, OWLv2, and YOLOE.",
+      "authors": [
+        "Philipp Allgeuer",
+        "Jan-Gerrit Habekost",
+        "Stefan Wermter"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-25T10:09:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.26829v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "anomaly recognition for previously unseen objects in open-world setting",
+      "llm_evidence_cn": "开放世界环境中识别未知物体的异常识别方法",
+      "llm_evidence": "开放世界环境中识别未知物体的异常识别方法",
+      "canonical_evidence": "开放世界环境中识别未知物体的异常识别方法",
+      "llm_tldr_en": "This paper presents AnomNOVIC, a framework combining anomaly detection and prompt-free open vocabulary classification to recognize previously unseen objects in open-world robot interaction, without requiring predefined class lists.",
+      "llm_tldr_cn": "针对机器人在开放世界环境中识别未知物体的问题，本文提出AnomNOVIC框架，结合基于掩码自编码器的异常检测生成物体无关的候选框，再利用免提示开放词汇分类器进行识别，无需预定义候选类别。实验表明该方法能有效发现并识别先前未见物体，为开放世界自主系统提供了实用的视觉感知能力。",
+      "llm_tldr": "针对机器人在开放世界环境中识别未知物体的问题，本文提出AnomNOVIC框架，结合基于掩码自编码器的异常检测生成物体无关的候选框，再利用免提示开放词汇分类器进行识别，无需预定义候选类别。实验表明该方法能有效发现并识别先前未见物体，为开放世界自主系统提供了实用的视觉感知能力。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
