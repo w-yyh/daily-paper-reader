@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-02 <!--dpr-date:20260702-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/02/2607.00620v1-identifying-latent-concepts-and-structures-for-generalized-category-discovery" data-sidebar-item="{&quot;title&quot;: &quot;Identifying Latent Concepts and Structures for Generalized Category Discovery&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.00620v1-identifying-latent-concepts-and-structures-for-generalized-category-discovery&quot;, &quot;score&quot;: &quot;10.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;直接处理广义类别发现(GCD)，在开放世界中识别已知类并发现新类&quot;}">Identifying Latent Concepts and Structures for Generalized Category Discovery</a>
   * 2026-07-01 <!--dpr-date:20260701-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/01/2606.26829v1-identifying-the-unknown-prompt-free-open-vocabulary-anomaly-recognition-for-robot-object-interaction" data-sidebar-item="{&quot;title&quot;: &quot;Identifying the Unknown: Prompt-Free Open Vocabulary Anomaly Recognition for Robot-Object Interaction&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.26829v1-identifying-the-unknown-prompt-free-open-vocabulary-anomaly-recognition-for-robot-object-interaction&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;开放世界环境中识别未知物体的异常识别方法&quot;}">Identifying the Unknown: Prompt-Free Open Vocabulary Anomaly Recognition for Robot-Object Interaction</a>

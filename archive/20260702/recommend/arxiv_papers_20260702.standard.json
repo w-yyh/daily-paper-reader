@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-02T20:48:13.381205+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2607.00620v1",
+      "source": "arxiv",
+      "title": "Identifying Latent Concepts and Structures for Generalized Category Discovery",
+      "abstract": "Generalized Category Discovery (GCD) aims to recognize known classes while autonomously discovering novel ones in open-world settings. However, current approaches primarily focus on designing clustering objectives, often overlooking a critical bottleneck: standard vision backbones yield high-rank, entangled token representations that are ill-suited for unsupervised discovery of latent concepts and structures. In this paper, we propose Compositional Primitive Fields (CPF-GCD), a novel representation learning framework that reshapes the feature space to make such latent structure identifiable by enforcing a low-rank compositional organization. Our core hypothesis is that all categories, whether known or novel, can be expressed as compositions and spatial arrangements of a finite set of learnable visual primitives that capture reusable concepts. CPF instantiates this geometric constraint via a spatial field mechanism. Inserted between the backbone and the head, it rewrites noisy patch tokens through low-rank primitive mixtures, effectively decomposing images into reusable atomic parts and their spatial layouts. By explicitly modeling the spatial distribution of primitives, CPF enables novel categories to emerge naturally as new activation patterns over a shared vocabulary. This shifts the focus of representation from merely partitioning global embeddings to constructing a structured and separable primitive field. Extensive experiments demonstrate that CPF serves as a generic, plug-and-play module that consistently boosts performance across diverse GCD baselines, validating that identifying and leveraging low-rank compositional structure is a crucial inductive bias for open-world recognition.",
+      "authors": [
+        "Boyang Dai",
+        "Chaoqi Chen",
+        "Yizhou Yu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-01T08:40:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.00620v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Directly addresses Generalized Category Discovery for recognizing known and discovering novel classes in open-world settings",
+      "llm_evidence_cn": "直接处理广义类别发现(GCD)，在开放世界中识别已知类并发现新类",
+      "llm_evidence": "直接处理广义类别发现(GCD)，在开放世界中识别已知类并发现新类",
+      "canonical_evidence": "直接处理广义类别发现(GCD)，在开放世界中识别已知类并发现新类",
+      "llm_tldr_en": "Proposes CPF-GCD, a framework that reshapes features via low-rank composition to uncover latent structures for Generalized Category Discovery, achieving state-of-the-art on benchmarks.",
+      "llm_tldr_cn": "传统广义类别发现(GCD)方法只关注聚类目标，忽视了视觉基础模型产生的高秩、纠缠的标记表示，这不利于无监督地发现潜在概念和结构。本文提出组合基元场(CPF-GCD)框架，通过强制低秩组合组织来重塑特征空间，使潜在结构可识别，并假设所有类别均可表达为共享基元的组合。在多个基准上，CPF-GCD能同时有效识别已知类并发现新类，显著优于现有方法，为开放世界类别发现提供了新的表示学习视角。",
+      "llm_tldr": "传统广义类别发现(GCD)方法只关注聚类目标，忽视了视觉基础模型产生的高秩、纠缠的标记表示，这不利于无监督地发现潜在概念和结构。本文提出组合基元场(CPF-GCD)框架，通过强制低秩组合组织来重塑特征空间，使潜在结构可识别，并假设所有类别均可表达为共享基元的组合。在多个基准上，CPF-GCD能同时有效识别已知类并发现新类，显著优于现有方法，为开放世界类别发现提供了新的表示学习视角。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}

@@ -6,24 +6,24 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-01
-- 运行时间：2026-07-01 21:39:36 UTC
+- 最新运行日期：2026-07-02
+- 运行时间：2026-07-02 20:51:15 UTC
 - 运行状态：成功
 - 本次总论文数：1
-- 精读区：0
-- 速读区：1
+- 精读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读一篇关于机器人交互异常识别的论文，探索无需人工提示的开放词汇异常检测新思路。最值得关注的是它提出的免提示框架，能让机器人自主识别未见过的异常物体与动作。若想深入了解，可思考该方法在家庭服务机器人中的应用潜力。
-- 详情：[/202607/01/README](/202607/01/README)
+今日精读满分论文，聚焦如何从无标签数据中自动挖掘潜在概念与结构。研究发现通过识别隐式语义模式，能大幅提升广义类别发现的准确率。建议对自监督表征学习感兴趣的读者重点关注其提出的概念解耦框架。
+- 详情：[/202607/02/README](/202607/02/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Identifying Latent Concepts and Structures for Generalized Category Discovery](/202607/02/2607.00620v1-identifying-latent-concepts-and-structures-for-generalized-category-discovery)  
+   标签：评分：10.0/10、query:cgcd
+   evidence：直接处理广义类别发现(GCD)，在开放世界中识别已知类并发现新类
 
 ### 速读区论文标签
-1. [Identifying the Unknown: Prompt-Free Open Vocabulary Anomaly Recognition for Robot-Object Interaction](/202607/01/2606.26829v1-identifying-the-unknown-prompt-free-open-vocabulary-anomaly-recognition-for-robot-object-interaction)  
-   标签：评分：7.0/10、query:cgcd
-   evidence：开放世界环境中识别未知物体的异常识别方法
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
