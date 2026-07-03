@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-03 <!--dpr-date:20260703-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/03/2606.31275v1-climb-centroid-based-hierarchical-memory-for-online-continual-self-supervised-learning" data-sidebar-item="{&quot;title&quot;: &quot;CLIMB: Centroid-Based Hierarchical Memory for Online Continual Self-Supervised Learning&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.31275v1-climb-centroid-based-hierarchical-memory-for-online-continual-self-supervised-learning&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;基于质心的记忆将相似图像分组用于对比学习，可用于新类聚类&quot;}">CLIMB: Centroid-Based Hierarchical Memory for Online Continual Self-Supervised Learning</a>
   * 2026-07-02 <!--dpr-date:20260702-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/02/2607.00620v1-identifying-latent-concepts-and-structures-for-generalized-category-discovery" data-sidebar-item="{&quot;title&quot;: &quot;Identifying Latent Concepts and Structures for Generalized Category Discovery&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.00620v1-identifying-latent-concepts-and-structures-for-generalized-category-discovery&quot;, &quot;score&quot;: &quot;10.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;直接处理广义类别发现(GCD)，在开放世界中识别已知类并发现新类&quot;}">Identifying Latent Concepts and Structures for Generalized Category Discovery</a>

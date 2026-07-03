@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-03T20:33:06.354175+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.31275v1",
+      "source": "arxiv",
+      "title": "CLIMB: Centroid-Based Hierarchical Memory for Online Continual Self-Supervised Learning",
+      "abstract": "Online Continual Self-Supervised Learning (OCSSL) aims to learn representations from a continuous stream of unlabeled data, without knowledge of task boundaries and under memory constraints. Existing methods rely either on replay buffers that exploit latent space structure, or on regularization alone. We present CLIMB (Continual Learning with Intelligent Memory Bank), which combines both simultaneously. Our method introduces a hierarchical centroid-based memory, bounded in total number of stored images, combined with knowledge distillation on replayed examples to limit representation drift. The memory groups similar images into centroids, providing hard-to-discriminate examples for contrastive learning while covering the diversity of observed distributions. Experiments on Split CIFAR-100 and Split ImageNet-100, on standard benchmarks from the state-of-the-art as well as a new protocol with irregular task distributions show that CLIMB outperforms state-of-the-art OCSSL methods.",
+      "authors": [
+        "Julien Lefebvre",
+        "Stefan Duffner",
+        "Mathieu Lefort"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-30T07:47:58+00:00",
+      "link": "https://arxiv.org/pdf/2606.31275v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "centroid-based memory groups similar images for contrastive learning, applicable to novel class clustering",
+      "llm_evidence_cn": "基于质心的记忆将相似图像分组用于对比学习，可用于新类聚类",
+      "llm_evidence": "基于质心的记忆将相似图像分组用于对比学习，可用于新类聚类",
+      "canonical_evidence": "基于质心的记忆将相似图像分组用于对比学习，可用于新类聚类",
+      "llm_tldr_en": "CLIMB proposes a hierarchical centroid-based memory for online continual self-supervised learning, combining replay and regularization to group similar images and provide hard examples for contrastive learning, which can aid in clustering novel categories in an open-world setting.",
+      "llm_tldr_cn": "CLIMB提出一种层次化质心记忆方法，用于在线持续自监督学习，通过存储有限数量图像并分组相似样本，为对比学习提供难例，从而在不遗忘旧知识的同时有效适应新数据流；该方法可辅助开放世界中的新类别发现与聚类。",
+      "llm_tldr": "CLIMB提出一种层次化质心记忆方法，用于在线持续自监督学习，通过存储有限数量图像并分组相似样本，为对比学习提供难例，从而在不遗忘旧知识的同时有效适应新数据流；该方法可辅助开放世界中的新类别发现与聚类。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "novel category discovery in open world setting using contrastive clustering",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

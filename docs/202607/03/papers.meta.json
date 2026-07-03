@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-03",
+  "date": "2026-07-03",
+  "generated_at": "2026-07-03T20:35:30",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/03/2606.31275v1-climb-centroid-based-hierarchical-memory-for-online-continual-self-supervised-learning",
+      "section": "quick",
+      "title_en": "CLIMB: Centroid-Based Hierarchical Memory for Online Continual Self-Supervised Learning",
+      "authors": "Julien Lefebvre, Stefan Duffner, Mathieu Lefort",
+      "date": "2026-06-30",
+      "pdf": "https://arxiv.org/pdf/2606.31275v1",
+      "score": "6.0",
+      "evidence": "基于质心的记忆将相似图像分组用于对比学习，可用于新类聚类",
+      "tldr": "在线持续自监督学习（OCSSL）需从无标签数据流中学习，面临记忆限制与任务边界未知的挑战。CLIMB方法引入基于层次质心的记忆库，通过知识蒸馏在重放样本上限制表示漂移，同时为对比学习提供难区分样本。在 Split CIFAR-100 与 Split ImageNet-100 及新不规则任务协议下，该方法均超越现有 OCSSL 最优方法。该工作证明了记忆重放与正则化协同的有效性，为在线持续学习提供了鲁棒框架。",
+      "tags": "query:cgcd",
+      "abstract_en": "Online Continual Self-Supervised Learning (OCSSL) aims to learn representations from a continuous stream of unlabeled data, without knowledge of task boundaries and under memory constraints. Existing methods rely either on replay buffers that exploit latent space structure, or on regularization alone. We present CLIMB (Continual Learning with Intelligent Memory Bank), which combines both simultaneously. Our method introduces a hierarchical centroid-based memory, bounded in total number of stored images, combined with knowledge distillation on replayed examples to limit representation drift. The memory groups similar images into centroids, providing hard-to-discriminate examples for contrastive learning while covering the diversity of observed distributions. Experiments on Split CIFAR-100 and Split ImageNet-100, on standard benchmarks from the state-of-the-art as well as a new protocol with irregular task distributions show that CLIMB outperforms state-of-the-art OCSSL methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

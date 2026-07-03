@@ -6,24 +6,24 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-02
-- 运行时间：2026-07-02 20:51:15 UTC
+- 最新运行日期：2026-07-03
+- 运行时间：2026-07-03 20:35:24 UTC
 - 运行状态：成功
 - 本次总论文数：1
-- 精读区：1
-- 速读区：0
+- 精读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-今日精读满分论文，聚焦如何从无标签数据中自动挖掘潜在概念与结构。研究发现通过识别隐式语义模式，能大幅提升广义类别发现的准确率。建议对自监督表征学习感兴趣的读者重点关注其提出的概念解耦框架。
-- 详情：[/202607/02/README](/202607/02/README)
+今日速读一篇关于在线持续自监督学习的新论文《CLIMB》，提出了一种基于质心的层级记忆方法。该方法通过动态维护分层记忆库，试图缓解在线学习中灾难性遗忘与表示崩塌问题。对自监督持续学习感兴趣的读者，可进一步关注其层级记忆如何平衡新旧知识。
+- 详情：[/202607/03/README](/202607/03/README)
 
 ### 精读区论文标签
-1. [Identifying Latent Concepts and Structures for Generalized Category Discovery](/202607/02/2607.00620v1-identifying-latent-concepts-and-structures-for-generalized-category-discovery)  
-   标签：评分：10.0/10、query:cgcd
-   evidence：直接处理广义类别发现(GCD)，在开放世界中识别已知类并发现新类
+- 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [CLIMB: Centroid-Based Hierarchical Memory for Online Continual Self-Supervised Learning](/202607/03/2606.31275v1-climb-centroid-based-hierarchical-memory-for-online-continual-self-supervised-learning)  
+   标签：评分：6.0/10、query:cgcd
+   evidence：基于质心的记忆将相似图像分组用于对比学习，可用于新类聚类
 
 
 <div class="dpr-home-promo-card">
