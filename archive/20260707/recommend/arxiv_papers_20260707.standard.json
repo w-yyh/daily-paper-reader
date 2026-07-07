@@ -1,0 +1,129 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-07T21:13:47.638518+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2607.03004v1",
+      "source": "arxiv",
+      "title": "REAL-OW: Rehearsal-free Open World Object Detection with Low-Rank Adaptation and Dual-Stage Objectness Modeling",
+      "abstract": "Open-World Object Detection (OWOD) requires detectors to identify previously unseen objects as unknown and incrementally incorporate them into the set of known categories, while preserving previously acquired knowledge. Existing frameworks rely heavily on exemplar replay to mitigate catastrophic forgetting, but in some real applications, storing raw data conflicts with data access restrictions and leads to data exposure risks, while incurring significant memory overhead. In this paper, we propose REAL-OW, a novel rehearsal-free framework that decouples incremental knowledge through a collaborative adapter architecture based on Low-Rank Adaptation (LoRA). Specifically, we deploy General Adapters (GAs) in the backbone to enable the significance-aware refinement of cross-task universal representations, while Specific Adapters (SAs) in the decoder provide orthogonal storage for task-specific expertise. To resolve representation drift in objectness modeling under rehearsal-free constraints, we introduce Dual-Stage Objectness Modeling (DSOM), which alternates between feature aggregation and boundary consolidation to stabilize objectness distributions while maintaining the separation between known and unknown categories. Furthermore, DSOM is supported by a Calibrated Gaussian Negative Log-Likelihood (CG-NLL) distance tailored for the dispersed feature distributions inherent in rehearsal-free settings. Extensive evaluations demonstrate that REAL-OW achieves state-of-the-art performance, surpassing existing exemplar replay methods in both detection precision and unknown discovery. Our approach establishes a new baseline for rehearsal-free OWOD.",
+      "authors": [
+        "Huazhong Zhang",
+        "Xiaowen Fu",
+        "Yang Zhang",
+        "Linlin Shen",
+        "Jinbao Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-03T06:38:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.03004v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Open-World Object Detection identifies unknown objects and incorporates them as novel classes",
+      "llm_evidence_cn": "开放世界目标检测识别未知物体并将其作为新类纳入",
+      "llm_evidence": "开放世界目标检测识别未知物体并将其作为新类纳入",
+      "canonical_evidence": "开放世界目标检测识别未知物体并将其作为新类纳入",
+      "llm_tldr_en": "REAL-OW proposes a rehearsal-free OWOD framework using LoRA adapters and dual-stage objectness modeling to incrementally learn novel classes without storing raw data, addressing privacy and memory issues.",
+      "llm_tldr_cn": "开放世界目标检测要求识别未知物体并逐步将其作为新类别学习，但现有方法依赖示例重放，带来隐私与内存隐患。REAL-OW提出基于LoRA适配器的无重放框架，通过解耦增量知识并采用双阶段目标建模来发现新类，在保持高性能的同时无需存储原始数据，为受限场景下的开放世界学习提供了可扩展范式。",
+      "llm_tldr": "开放世界目标检测要求识别未知物体并逐步将其作为新类别学习，但现有方法依赖示例重放，带来隐私与内存隐患。REAL-OW提出基于LoRA适配器的无重放框架，通过解耦增量知识并采用双阶段目标建模来发现新类，在保持高性能的同时无需存储原始数据，为受限场景下的开放世界学习提供了可扩展范式。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04548v1",
+      "source": "arxiv",
+      "title": "Explainable Novel Category Discovery in Semantic Concept Space",
+      "abstract": "Novel category discovery aims to identify unseen classes from unlabeled data by transferring knowledge from labeled categories, but most existing methods perform discovery in opaque latent feature spaces. As a result, they may separate novel categories accurately while providing little insight into what semantic evidence defines each discovered group. We propose xNCD, an explainable novel category discovery framework that performs both representation-based discovery and pseudo-label assignment directly in a structured semantic concept space. Instead of clustering arbitrary deep features, xNCD learns a label-free concept representation by aligning visual features with vision-language similarity priors from pretrained multimodal models, and then applies a unified labeled-and-unlabeled self-labeling objective over concept-space logits. This design makes each discovered category explainable by construction through stable concept signatures and instance-level concept evidence. Theoretically, we show that routing discovery through a semantic concept bottleneck induces a strict restriction of the feature-space hypothesis class, excluding a large family of unconstrained decision rules and biasing induced partitions toward semantically interpretable concept coordinates. Experiments on CIFAR-10, CIFAR-100, and CUB-200 demonstrate that xNCD preserves strong discovery performance while providing intrinsic explanations. Under task-agnostic evaluation, xNCD achieves 92.63% overall accuracy on CIFAR-10, close to UNO's 93.4%, and improves CIFAR-100 overall accuracy from 73.2% to 76.45%, while being the only compared method that provides human-readable cluster- and instance-level explanations.",
+      "authors": [
+        "Ifrat Ikhtear Uddin",
+        "Yang Zhou",
+        "KC Santosh",
+        "Longwei Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-05T23:36:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.04548v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "explainable novel category discovery framework for unseen classes",
+      "llm_evidence_cn": "用于发现未见类别的可解释新类发现框架",
+      "llm_evidence": "用于发现未见类别的可解释新类发现框架",
+      "canonical_evidence": "用于发现未见类别的可解释新类发现框架",
+      "llm_tldr_en": "Introduces xNCD, which discovers novel categories in a structured semantic concept space by aligning visual features with vision-language priors, enabling explainable pseudo-label assignment and outperforming latent space methods while providing semantic evidence.",
+      "llm_tldr_cn": "针对现有新类发现方法在隐空间中进行聚类而缺乏可解释性的问题，本文提出xNCD框架，通过将视觉特征与预训练多模态模型中的视觉-语言相似性先验对齐，学习无标签的概念表示，直接在结构化语义概念空间中执行表示发现和伪标签分配。实验表明，该方法不仅能准确分离新类别，还能为每个发现的类提供有意义的语义证据，在可解释性和聚类精度上均优于隐空间方法，推动了可解释新类发现的发展。",
+      "llm_tldr": "针对现有新类发现方法在隐空间中进行聚类而缺乏可解释性的问题，本文提出xNCD框架，通过将视觉特征与预训练多模态模型中的视觉-语言相似性先验对齐，学习无标签的概念表示，直接在结构化语义概念空间中执行表示发现和伪标签分配。实验表明，该方法不仅能准确分离新类别，还能为每个发现的类提供有意义的语义证据，在可解释性和聚类精度上均优于隐空间方法，推动了可解释新类发现的发展。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04984v1",
+      "source": "arxiv",
+      "title": "Virtual Category-Guided Continual Generalized Category Discovery",
+      "abstract": "Continual Generalized Category Discovery (C-GCD) aims to incrementally identify novel categories from sequential unlabeled data while preserving recognition of known classes, which is an essential capability for open-world visual learning. A major bottleneck lies in ambiguous unlabeled samples that cannot be confidently assigned to known classes nor reliably grouped as novel ones, making pseudo-labeling brittle and often biasing learning toward familiar categories. In this work, we introduce Virtual Category-Guided Continual Generalized Category Discovery by adapting Virtual Category Learning (VCL) to the continual setting. Our method identifies uncertain samples and assigns them to temporary virtual categories, enabling safe and informative learning from unlabeled streams without injecting noisy labels, while improving unlabeled data utilization and mitigating prediction bias. To further stabilize discovery across sessions and enhance class separation, we augment VCL with Expanded Neighborhood Contrastive Learning (ENCL), which exploits extended neighborhood relations and an adaptive margin to learn more discriminative and well-separated representations for both old and emerging classes. Extensive experiments on CIFAR-100, Tiny ImageNet, and ImageNet-100 demonstrate that our approach consistently outperforms state-of-the-art methods, establishing a scalable and effective solution for C-GCD.",
+      "authors": [
+        "Jiahui Xiong",
+        "Qiuxia Lai",
+        "Hongsong Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-06T12:20:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.04984v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Virtual Category-Guided Continual Generalized Category Discovery for open-world novel class discovery",
+      "llm_evidence_cn": "虚拟类别引导的持续广义类别发现，用于开放世界新类发现",
+      "llm_evidence": "虚拟类别引导的持续广义类别发现，用于开放世界新类发现",
+      "canonical_evidence": "虚拟类别引导的持续广义类别发现，用于开放世界新类发现",
+      "llm_tldr_en": "Proposes Virtual Category-Guided Continual Generalized Category Discovery (C-GCD) to incrementally identify novel categories from unlabeled data while retaining known classes, addressing open-world visual learning. It assigns uncertain samples to temporary virtual categories for safe pseudo-labeling, mitigating bias toward known classes and improving novel category discovery.",
+      "llm_tldr_cn": "现有持续广义类别发现方法因伪标签不可靠而偏向已知类，难以有效发现新类。本文提出虚拟类别引导的持续广义类别发现方法，将不确定样本分配给临时虚拟类别，实现从无标签数据中安全地增量式发现新类别。实验表明，该方法能显著缓解偏差，提升开放世界环境下新类别发现的准确性和稳定性，为开放世界视觉学习提供了实用方案。",
+      "llm_tldr": "现有持续广义类别发现方法因伪标签不可靠而偏向已知类，难以有效发现新类。本文提出虚拟类别引导的持续广义类别发现方法，将不确定样本分配给临时虚拟类别，实现从无标签数据中安全地增量式发现新类别。实验表明，该方法能显著缓解偏差，提升开放世界环境下新类别发现的准确性和稳定性，为开放世界视觉学习提供了实用方案。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}

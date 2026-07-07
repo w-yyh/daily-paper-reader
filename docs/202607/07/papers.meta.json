@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-07",
+  "date": "2026-07-07",
+  "generated_at": "2026-07-07T21:17:26",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/07/2607.03004v1-real-ow-rehearsal-free-open-world-object-detection-with-low-rank-adaptation-and-dual-stage-objectness-modeling",
+      "section": "deep",
+      "title_en": "REAL-OW: Rehearsal-free Open World Object Detection with Low-Rank Adaptation and Dual-Stage Objectness Modeling",
+      "authors": "Huazhong Zhang, Xiaowen Fu, Yang Zhang, Linlin Shen, Jinbao Wang",
+      "date": "2026-07-03",
+      "pdf": "https://arxiv.org/pdf/2607.03004v1",
+      "score": "9.0",
+      "evidence": "开放世界目标检测识别未知物体并将其作为新类纳入",
+      "tldr": "开放世界目标检测需要识别未知对象并逐步学习新类别，但现有方法依赖样本回放，存在数据隐私与存储开销问题。本文提出无需回放的REAL-OW框架，通过低秩适配器解耦通用与特定知识，并设计双阶段对象性建模稳定未知与已知分布。实验表明，该方法在检测精度和未知发现上均超越基于回放的方法，为无回放设定建立新基线。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-World Object Detection (OWOD) requires detectors to identify previously unseen objects as unknown and incrementally incorporate them into the set of known categories, while preserving previously acquired knowledge. Existing frameworks rely heavily on exemplar replay to mitigate catastrophic forgetting, but in some real applications, storing raw data conflicts with data access restrictions and leads to data exposure risks, while incurring significant memory overhead. In this paper, we propose REAL-OW, a novel rehearsal-free framework that decouples incremental knowledge through a collaborative adapter architecture based on Low-Rank Adaptation (LoRA). Specifically, we deploy General Adapters (GAs) in the backbone to enable the significance-aware refinement of cross-task universal representations, while Specific Adapters (SAs) in the decoder provide orthogonal storage for task-specific expertise. To resolve representation drift in objectness modeling under rehearsal-free constraints, we introduce Dual-Stage Objectness Modeling (DSOM), which alternates between feature aggregation and boundary consolidation to stabilize objectness distributions while maintaining the separation between known and unknown categories. Furthermore, DSOM is supported by a Calibrated Gaussian Negative Log-Likelihood (CG-NLL) distance tailored for the dispersed feature distributions inherent in rehearsal-free settings. Extensive evaluations demonstrate that REAL-OW achieves state-of-the-art performance, surpassing existing exemplar replay methods in both detection precision and unknown discovery. Our approach establishes a new baseline for rehearsal-free OWOD.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/07/2607.04548v1-explainable-novel-category-discovery-in-semantic-concept-space",
+      "section": "deep",
+      "title_en": "Explainable Novel Category Discovery in Semantic Concept Space",
+      "authors": "Ifrat Ikhtear Uddin, Yang Zhou, KC Santosh, Longwei Wang",
+      "date": "2026-07-05",
+      "pdf": "https://arxiv.org/pdf/2607.04548v1",
+      "score": "9.0",
+      "evidence": "用于发现未见类别的可解释新类发现框架",
+      "tldr": "新类别发现旨在从未标注数据中识别未知类别，但现有方法在潜在特征空间操作，无法提供语义可解释性。xNCD提出在语义概念空间进行发现与伪标签分配，通过将视觉特征与多模态先验对齐学习概念表示，并采用统一自标记目标，使每个类别具有可解释的概念签名。在CIFAR-10/100和CUB-200上，xNCD准确率接近或超越主流方法，并唯一提供可读解释。该工作首次实现端到端可解释类别发现，为透明机器学习提供了新范式。",
+      "tags": "query:cgcd",
+      "abstract_en": "Novel category discovery aims to identify unseen classes from unlabeled data by transferring knowledge from labeled categories, but most existing methods perform discovery in opaque latent feature spaces. As a result, they may separate novel categories accurately while providing little insight into what semantic evidence defines each discovered group. We propose xNCD, an explainable novel category discovery framework that performs both representation-based discovery and pseudo-label assignment directly in a structured semantic concept space. Instead of clustering arbitrary deep features, xNCD learns a label-free concept representation by aligning visual features with vision-language similarity priors from pretrained multimodal models, and then applies a unified labeled-and-unlabeled self-labeling objective over concept-space logits. This design makes each discovered category explainable by construction through stable concept signatures and instance-level concept evidence. Theoretically, we show that routing discovery through a semantic concept bottleneck induces a strict restriction of the feature-space hypothesis class, excluding a large family of unconstrained decision rules and biasing induced partitions toward semantically interpretable concept coordinates. Experiments on CIFAR-10, CIFAR-100, and CUB-200 demonstrate that xNCD preserves strong discovery performance while providing intrinsic explanations. Under task-agnostic evaluation, xNCD achieves 92.63% overall accuracy on CIFAR-10, close to UNO's 93.4%, and improves CIFAR-100 overall accuracy from 73.2% to 76.45%, while being the only compared method that provides human-readable cluster- and instance-level explanations.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/07/2607.04984v1-virtual-category-guided-continual-generalized-category-discovery",
+      "section": "deep",
+      "title_en": "Virtual Category-Guided Continual Generalized Category Discovery",
+      "authors": "Jiahui Xiong, Qiuxia Lai, Hongsong Wang",
+      "date": "2026-07-06",
+      "pdf": "https://arxiv.org/pdf/2607.04984v1",
+      "score": "9.0",
+      "evidence": "虚拟类别引导的持续广义类别发现，用于开放世界新类发现",
+      "tldr": "持续的广义类别发现任务中，因无法可靠地为模糊无标签样本分配伪标签，模型易产生偏向已知类的学习偏差。本文设计虚拟类别引导框架，将不确定样本临时归入虚拟类别以安全学习无标签流，避免噪声标签注入；并利用扩展邻域对比学习强化表征的判别性与分离性。在CIFAR-100、Tiny ImageNet和ImageNet-100上一致超越SOTA，为开放世界持续学习提供了可扩展的有效方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Continual Generalized Category Discovery (C-GCD) aims to incrementally identify novel categories from sequential unlabeled data while preserving recognition of known classes, which is an essential capability for open-world visual learning. A major bottleneck lies in ambiguous unlabeled samples that cannot be confidently assigned to known classes nor reliably grouped as novel ones, making pseudo-labeling brittle and often biasing learning toward familiar categories. In this work, we introduce Virtual Category-Guided Continual Generalized Category Discovery by adapting Virtual Category Learning (VCL) to the continual setting. Our method identifies uncertain samples and assigns them to temporary virtual categories, enabling safe and informative learning from unlabeled streams without injecting noisy labels, while improving unlabeled data utilization and mitigating prediction bias. To further stabilize discovery across sessions and enhance class separation, we augment VCL with Expanded Neighborhood Contrastive Learning (ENCL), which exploits extended neighborhood relations and an adaptive margin to learn more discriminative and well-separated representations for both old and emerging classes. Extensive experiments on CIFAR-100, Tiny ImageNet, and ImageNet-100 demonstrate that our approach consistently outperforms state-of-the-art methods, establishing a scalable and effective solution for C-GCD.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
