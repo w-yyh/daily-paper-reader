@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-09 <!--dpr-date:20260709-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/09/2607.06887v1-converge-to-surprise-evolutionary-self-supervised-image-clustering" data-sidebar-item="{&quot;title&quot;: &quot;Converge to Surprise: Evolutionary Self-supervised Image Clustering&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.06887v1-converge-to-surprise-evolutionary-self-supervised-image-clustering&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;提出自监督图像聚类，无需标记数据即可发现类别，与无监督新类别发现一致。&quot;}">Converge to Surprise: Evolutionary Self-supervised Image Clustering</a>
   * 2026-07-07 <!--dpr-date:20260707-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/07/2607.03004v1-real-ow-rehearsal-free-open-world-object-detection-with-low-rank-adaptation-and-dual-stage-objectness-modeling" data-sidebar-item="{&quot;title&quot;: &quot;REAL-OW: Rehearsal-free Open World Object Detection with Low-Rank Adaptation and Dual-Stage Objectness Modeling&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.03004v1-real-ow-rehearsal-free-open-world-object-detection-with-low-rank-adaptation-and-dual-stage-objectness-modeling&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;开放世界目标检测识别未知物体并将其作为新类纳入&quot;}">REAL-OW: Rehearsal-free Open World Object Detection with Low-Rank Adaptation and Dual-Stage Objectness Modeling</a>

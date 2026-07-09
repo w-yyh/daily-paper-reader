@@ -1,0 +1,53 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-09T21:20:55.461122+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.06887v1",
+      "source": "arxiv",
+      "title": "Converge to Surprise: Evolutionary Self-supervised Image Clustering",
+      "abstract": "Most self-supervised image clustering models, actually almost all deep learning approaches, are based on gradient descent: In order to calculate the loss, every optimization step requires a clearly defined target, whether a contrastive split, a masked patch or entity, an EMA-teacher output, a pseudo-label, or a differentiable information-theoretic functional. We propose a self-supervised framework that drops this requirement for image clustering. Without any prior knowledge, we have to assume that each pixel is i.i.d. according to the Principle of Maximum Entropy. Taking this as our null hypothesis H0, we define a \"surprise score\" that measures how unlikely the model's output representation would be under H0. Maximizing the surprise score forces the deep learning model to reject H0 - equivalently, to discover non-random feature from data. Also, here is our fundamental assumption: a surprise score cannot, in general, be reduced to a per-step loss. Hence, we propose the \"converge-to-surprise\" scheme to optimize our model: an evolution-strategy (ES) outer loop, which directly maximizes the surprise score without needing its gradient, paired with a periodic gradient-descent inner loop, which uses the surprising clusters already discovered by ES as surrogate targets. On standard image benchmarks, our framework achieves new state-of-the-art results in non-parametric self-supervised image clustering - the strictest deep-clustering setting, in which the number of ground-truth classes is not given to the model.",
+      "authors": [
+        "Canlin Zhang",
+        "Xiuwen Liu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-08T01:09:21+00:00",
+      "link": "https://arxiv.org/pdf/2607.06887v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Proposes self-supervised image clustering that discovers categories without labeled data, aligning with unsupervised novel category discovery.",
+      "llm_evidence_cn": "提出自监督图像聚类，无需标记数据即可发现类别，与无监督新类别发现一致。",
+      "llm_evidence": "提出自监督图像聚类，无需标记数据即可发现类别，与无监督新类别发现一致。",
+      "canonical_evidence": "提出自监督图像聚类，无需标记数据即可发现类别，与无监督新类别发现一致。",
+      "llm_tldr_en": "This paper introduces an evolutionary self-supervised clustering framework that maximizes a surprise score instead of using explicit targets, enabling the discovery of distinct clusters from unlabeled images without prior knowledge of categories.",
+      "llm_tldr_cn": "该文提出一种进化自监督聚类框架，通过最大化惊奇分数替代传统目标函数，无需任何先验知识即可从无标签图像中发现具有区分性的聚类。实验证明该方法能有效发现潜在类别结构，为无监督新类别发现提供了无需梯度下降的新思路。",
+      "llm_tldr": "该文提出一种进化自监督聚类框架，通过最大化惊奇分数替代传统目标函数，无需任何先验知识即可从无标签图像中发现具有区分性的聚类。实验证明该方法能有效发现潜在类别结构，为无监督新类别发现提供了无需梯度下降的新思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

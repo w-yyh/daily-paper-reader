@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-09",
+  "date": "2026-07-09",
+  "generated_at": "2026-07-09T21:22:00",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/09/2607.06887v1-converge-to-surprise-evolutionary-self-supervised-image-clustering",
+      "section": "quick",
+      "title_en": "Converge to Surprise: Evolutionary Self-supervised Image Clustering",
+      "authors": "Canlin Zhang, Xiuwen Liu",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.06887v1",
+      "score": "7.0",
+      "evidence": "提出自监督图像聚类，无需标记数据即可发现类别，与无监督新类别发现一致。",
+      "tldr": "现有自监督图像聚类方法依赖梯度下降和明确损失函数，难以处理无法简化为逐步损失的优化目标。我们提出“收敛到惊喜”框架，基于最大熵零假设定义惊喜分数，采用进化策略外循环直接最大化该分数，内循环梯度下降利用发现的聚类作为代用目标进行微调。在标准基准上，该方法在非参数（未给定真实类别数）设定下取得自监督图像聚类新最优结果，证明无需传统损失函数的聚类框架的可行性。",
+      "tags": "query:cgcd",
+      "abstract_en": "Most self-supervised image clustering models, actually almost all deep learning approaches, are based on gradient descent: In order to calculate the loss, every optimization step requires a clearly defined target, whether a contrastive split, a masked patch or entity, an EMA-teacher output, a pseudo-label, or a differentiable information-theoretic functional. We propose a self-supervised framework that drops this requirement for image clustering. Without any prior knowledge, we have to assume that each pixel is i.i.d. according to the Principle of Maximum Entropy. Taking this as our null hypothesis H0, we define a \"surprise score\" that measures how unlikely the model's output representation would be under H0. Maximizing the surprise score forces the deep learning model to reject H0 - equivalently, to discover non-random feature from data. Also, here is our fundamental assumption: a surprise score cannot, in general, be reduced to a per-step loss. Hence, we propose the \"converge-to-surprise\" scheme to optimize our model: an evolution-strategy (ES) outer loop, which directly maximizes the surprise score without needing its gradient, paired with a periodic gradient-descent inner loop, which uses the surprising clusters already discovered by ES as surrogate targets. On standard image benchmarks, our framework achieves new state-of-the-art results in non-parametric self-supervised image clustering - the strictest deep-clustering setting, in which the number of ground-truth classes is not given to the model.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
