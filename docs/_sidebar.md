@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-11 <!--dpr-date:20260711-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/11/2607.07974v1-a-multi-cluster-boundary-learning-method-for-out-of-scope-intent-detection-via-minilm-embedding" data-sidebar-item="{&quot;title&quot;: &quot;A Multi-cluster Boundary Learning Method for Out-of-Scope Intent Detection via MiniLM Embedding&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.07974v1-a-multi-cluster-boundary-learning-method-for-out-of-scope-intent-detection-via-minilm-embedding&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;通过多簇边界学习检测域外意图，处理开放世界对话中的未知类别&quot;}">A Multi-cluster Boundary Learning Method for Out-of-Scope Intent Detection via MiniLM Embedding</a>
   * 2026-07-09 <!--dpr-date:20260709-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/09/2607.06887v1-converge-to-surprise-evolutionary-self-supervised-image-clustering" data-sidebar-item="{&quot;title&quot;: &quot;Converge to Surprise: Evolutionary Self-supervised Image Clustering&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.06887v1-converge-to-surprise-evolutionary-self-supervised-image-clustering&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;提出自监督图像聚类，无需标记数据即可发现类别，与无监督新类别发现一致。&quot;}">Converge to Surprise: Evolutionary Self-supervised Image Clustering</a>

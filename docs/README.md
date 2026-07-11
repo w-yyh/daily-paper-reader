@@ -6,22 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-10
-- 运行时间：2026-07-10 20:53:35 UTC
+- 最新运行日期：2026-07-11
+- 运行时间：2026-07-11 20:05:22 UTC
 - 运行状态：成功
-- 本次总论文数：0
+- 本次总论文数：1
 - 精读区：0
-- 速读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-> 今日无新推荐，系统未产出可展示论文。
-- 详情：[/202607/10/README](/202607/10/README)
+今日速读了一篇用多簇边界学习+MiniLM嵌入提升分布外意图检测的论文。  
+核心结论是：在意图分类中，通过多簇边界建模可更稳健地识别未知意图，MiniLM轻量嵌入也能有效支持该任务。  
+建议关注对话系统安全拒识场景，考虑用轻量MiniLM嵌入快速落地多簇边界方法。
+- 详情：[/202607/11/README](/202607/11/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [A Multi-cluster Boundary Learning Method for Out-of-Scope Intent Detection via MiniLM Embedding](/202607/11/2607.07974v1-a-multi-cluster-boundary-learning-method-for-out-of-scope-intent-detection-via-minilm-embedding)  
+   标签：评分：6.0/10、query:cgcd
+   evidence：通过多簇边界学习检测域外意图，处理开放世界对话中的未知类别
 
 
 <div class="dpr-home-promo-card">
