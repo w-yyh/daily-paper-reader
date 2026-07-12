@@ -1,0 +1,57 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-12T20:23:13.669728+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.07258v1",
+      "source": "arxiv",
+      "title": "FMMVCC: Fuzzy Mamba-based Multi-View Contrastive Clustering for Univariate Time Series",
+      "abstract": "In many realistic scenarios, large volumes of time series data are generated with limited or expensive annotations. This limitation makes supervised learning methods difficult to apply and leads to the use of unsupervised approaches capable of discovering meaningful structures directly from raw data. Clustering therefore plays a crucial role in organizing time series into groups that share similar temporal patterns, enabling exploratory analysis and downstream tasks without requiring manual labeling. However, existing deep clustering methods often struggle to capture long-range temporal dependencies or rely on architectures with high computational cost. This paper introduces FMMVCC, a Mamba-based deep clustering framework for time series that leverages state space sequence modeling to efficiently learn temporal representations with linear complexity. Additionally, it utilizes multi-view self-supervised learning with temporal masking and augmentations. Experimental evaluation in 15 benchmark datasets proves that FMMVCC consistently outperforms state-of-the-art baselines, achieving the best overall performance in 29 of 60 total metric evaluations and the highest average rank in all tested scenarios.",
+      "authors": [
+        "Donato Cerciello",
+        "Leonardo Schiavo",
+        "Angel Panizo-LLedot",
+        "Javier Huertas Tato",
+        "David Camacho"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-08T10:46:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.07258v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "contrastive clustering framework for unsupervised time series grouping",
+      "llm_evidence_cn": "用于无监督时间序列分组的对比聚类框架",
+      "llm_evidence": "用于无监督时间序列分组的对比聚类框架",
+      "canonical_evidence": "用于无监督时间序列分组的对比聚类框架",
+      "llm_tldr_en": "Proposes FMMVCC, a Mamba-based multi-view contrastive clustering method for univariate time series, effectively capturing long-range dependencies and achieving superior clustering performance without labels.",
+      "llm_tldr_cn": "针对时间序列无监督聚类中长程依赖捕捉困难和高计算成本问题，提出基于Mamba的多视图对比聚类框架FMMVCC。该方法利用模糊逻辑和对比学习增强聚类效果，在多个数据集上取得领先性能，为无标签时间序列探索提供了有效工具。",
+      "llm_tldr": "针对时间序列无监督聚类中长程依赖捕捉困难和高计算成本问题，提出基于Mamba的多视图对比聚类框架FMMVCC。该方法利用模糊逻辑和对比学习增强聚类效果，在多个数据集上取得领先性能，为无标签时间序列探索提供了有效工具。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "novel category discovery in open world setting using contrastive clustering",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

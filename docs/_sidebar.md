@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-12 <!--dpr-date:20260712-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/12/2607.07258v1-fmmvcc-fuzzy-mamba-based-multi-view-contrastive-clustering-for-univariate-time-series" data-sidebar-item="{&quot;title&quot;: &quot;FMMVCC: Fuzzy Mamba-based Multi-View Contrastive Clustering for Univariate Time Series&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.07258v1-fmmvcc-fuzzy-mamba-based-multi-view-contrastive-clustering-for-univariate-time-series&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;用于无监督时间序列分组的对比聚类框架&quot;}">FMMVCC: Fuzzy Mamba-based Multi-View Contrastive Clustering for Univariate Time Series</a>
   * 2026-07-11 <!--dpr-date:20260711-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/11/2607.07974v1-a-multi-cluster-boundary-learning-method-for-out-of-scope-intent-detection-via-minilm-embedding" data-sidebar-item="{&quot;title&quot;: &quot;A Multi-cluster Boundary Learning Method for Out-of-Scope Intent Detection via MiniLM Embedding&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.07974v1-a-multi-cluster-boundary-learning-method-for-out-of-scope-intent-detection-via-minilm-embedding&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;通过多簇边界学习检测域外意图，处理开放世界对话中的未知类别&quot;}">A Multi-cluster Boundary Learning Method for Out-of-Scope Intent Detection via MiniLM Embedding</a>

@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-12",
+  "date": "2026-07-12",
+  "generated_at": "2026-07-12T20:24:50",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/12/2607.07258v1-fmmvcc-fuzzy-mamba-based-multi-view-contrastive-clustering-for-univariate-time-series",
+      "section": "quick",
+      "title_en": "FMMVCC: Fuzzy Mamba-based Multi-View Contrastive Clustering for Univariate Time Series",
+      "authors": "Donato Cerciello, Leonardo Schiavo, Angel Panizo-LLedot, Javier Huertas Tato, David Camacho",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.07258v1",
+      "score": "7.0",
+      "evidence": "用于无监督时间序列分组的对比聚类框架",
+      "tldr": "时间序列数据标注稀缺，传统深度聚类方法难捕获长程依赖且计算成本高。提出FMMVCC，基于Mamba状态空间模型，结合多视图对比学习与时序掩码增强，实现线性复杂度时序表示学习。在15个基准上，60项评估中29项最优，平均排名最高。为无监督时间序列聚类提供了高效且高性能的解决方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "In many realistic scenarios, large volumes of time series data are generated with limited or expensive annotations. This limitation makes supervised learning methods difficult to apply and leads to the use of unsupervised approaches capable of discovering meaningful structures directly from raw data. Clustering therefore plays a crucial role in organizing time series into groups that share similar temporal patterns, enabling exploratory analysis and downstream tasks without requiring manual labeling. However, existing deep clustering methods often struggle to capture long-range temporal dependencies or rely on architectures with high computational cost. This paper introduces FMMVCC, a Mamba-based deep clustering framework for time series that leverages state space sequence modeling to efficiently learn temporal representations with linear complexity. Additionally, it utilizes multi-view self-supervised learning with temporal masking and augmentations. Experimental evaluation in 15 benchmark datasets proves that FMMVCC consistently outperforms state-of-the-art baselines, achieving the best overall performance in 29 of 60 total metric evaluations and the highest average rank in all tested scenarios.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
