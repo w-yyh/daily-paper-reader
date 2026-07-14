@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-14",
+  "date": "2026-07-14",
+  "generated_at": "2026-07-14T21:19:32",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/14/2607.08541v1-vocadet-sample-driven-open-vocabulary-object-detection-and-segmentation-via-visual-tokenization-and-vector-database-retrieval",
+      "section": "quick",
+      "title_en": "VocaDet: Sample-Driven Open-Vocabulary Object Detection and Segmentation via Visual Tokenization and Vector Database Retrieval",
+      "authors": "ZhiXin Sun",
+      "date": "2026-07-09",
+      "pdf": "https://arxiv.org/pdf/2607.08541v1",
+      "score": "7.0",
+      "evidence": "开放词汇检测发现新类别",
+      "tldr": "针对现有开放词汇检测依赖文本提示或少量示例、难以扩展的问题，本文提出VocaDet框架，通过将连续视觉表示转化为离散标记并利用向量数据库检索，从用户提供的正负样本中学习新对象概念，无需重新训练模型。实验表明该方法能够高效识别大规模对象库中的任意目标，为开放世界目标发现提供了可扩展的解决方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-vocabulary object detection and segmentation aim to recognize arbitrary objects beyond predefined categories. Although recent vision-language and reference-based approaches have significantly advanced this field, they often rely on text prompts, limited visual examples, or expensive feature matching procedures, making them difficult to scale to large and continuously expanding object repositories. In this work, we propose VocaDet, a sample-driven open-vocabulary object detection and segmentation framework that learns object concepts directly from user-provided positive and negative sample collections without model retraining. The key idea is to transform continuous visual representations into discrete visual vocabularies and perform efficient retrieval-based recognition through a scalable vector database. Specifically, we employ DINOv3 as the visual feature extractor and apply agglomerative clustering with adaptive clustering sensitivity to generate multi-granularity visual tokens. These visual tokens, together with position-debiased representations and spatial topology information, are stored as expandable object memories in a vector database. During inference, query images are converted into visual tokens and efficiently matched against the stored object memories for object localization and segmentation. Furthermore, a background filtering mechanism is introduced to remove frequently occurring background patterns and reduce redundant retrieval operations in practical fixed-camera scenarios. Experiments on the UA-DETRAC dataset demonstrate that VocaDet achieves effective open-vocabulary detection performance without conventional detector training, while supporting continuously expandable recognition capability as additional positive and negative samples are accumulated.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

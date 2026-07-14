@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-14 <!--dpr-date:20260714-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/14/2607.08541v1-vocadet-sample-driven-open-vocabulary-object-detection-and-segmentation-via-visual-tokenization-and-vector-database-retrieval" data-sidebar-item="{&quot;title&quot;: &quot;VocaDet: Sample-Driven Open-Vocabulary Object Detection and Segmentation via Visual Tokenization and Vector Database Retrieval&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.08541v1-vocadet-sample-driven-open-vocabulary-object-detection-and-segmentation-via-visual-tokenization-and-vector-database-retrieval&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;开放词汇检测发现新类别&quot;}">VocaDet: Sample-Driven Open-Vocabulary Object Detection and Segmentation via Visual Tokenization and Vector Database Retrieval</a>
   * 2026-07-12 <!--dpr-date:20260712-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/12/2607.07258v1-fmmvcc-fuzzy-mamba-based-multi-view-contrastive-clustering-for-univariate-time-series" data-sidebar-item="{&quot;title&quot;: &quot;FMMVCC: Fuzzy Mamba-based Multi-View Contrastive Clustering for Univariate Time Series&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.07258v1-fmmvcc-fuzzy-mamba-based-multi-view-contrastive-clustering-for-univariate-time-series&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;用于无监督时间序列分组的对比聚类框架&quot;}">FMMVCC: Fuzzy Mamba-based Multi-View Contrastive Clustering for Univariate Time Series</a>
