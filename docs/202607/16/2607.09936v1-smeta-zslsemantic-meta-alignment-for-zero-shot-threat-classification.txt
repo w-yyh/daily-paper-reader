@@ -1,0 +1,490 @@
+Title: SMETA-ZSL:Semantic Meta-Alignment for Zero-Shot Threat Classification
+
+URL Source: https://arxiv.org/pdf/2607.09936v1
+
+Published Time: Tue, 14 Jul 2026 00:19:33 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+Preprint. Under review. 
+
+# SMETA-ZSL: Semantic Meta-Alignment for Zero-Shot Threat Classification 
+
+Ivan Alejandro Montoya Sanchez, Anantaa Kotal, Aritran Piplai 
+
+The University of Texas at El Paso 500 W. University Avenue El Paso, TX 79968, USA 
+
+iamontoyasa@miners.utep.edu, {akotal,apiplai }@utep.edu 
+
+Abstract 
+
+Cybersecurity systems must adapt rapidly to emerging threats. However, labeled data for new threat categories is unavailable when those threats first appear. Generalized zero-shot learning offers a natural solution by enabling recognition of unseen classes through auxiliary semantic knowl-edge rather than labeled examples. Large language models are particu-larly promising in this setting because they can convert unstructured CTI reports into semantic prototypes for emerging threats. However, apply-ing language-driven zero-shot learning to cybersecurity is difficult due to strong semantic overlap between threat descriptions, heterogeneity be-tween behavioral attributes and text, severe class imbalance, and open-set conditions where unseen threats are unknown during training. We propose SMETA-ZSL, that learns semantic prototypes from overlapping language descriptions through contrastive finetuning, aligns behavioral features through episodic meta-learning and knowledge distillation, and performs adaptive routing for generalization across seen-unseen classes. Across 7 benchmarks, SMETA-ZSL delivers the strongest overall generalized zero-shot performance under the strictest inductive setting, surpassing prior methods by 10.8 points on average, with gains up to 18.1 points. Github: 
+
+https://github.com/Security-And-Intelligence-Lab-UTEP/SMETA-ZSL 
+
+1 Introduction 
+
+Cyber defense systems rely on large amounts of raw data, such as malware samples or logs, to train and update models, yet this data is often difficult to obtain, slow to analyze, and not always available when new threats emerge. Consider the task of malware classification: the continuous emergence of new variants and families (Tang et al., 2023) necessitates frequent retraining of classifiers, imposing significant computational overhead (Li et al., 2024a) and making it difficult to obtain timely, labeled data for adapting models to new threats (Barros et al., 2022; Aurna et al., 2025). In contrast, Cyber Threat Intelligence (CTI) reports are regularly published by analysts and provide timely natural language descriptions of attacker behavior. However, most defense systems do not operate over natural language, and therefore cannot directly use CTI to adapt or update their behavior, leaving valuable intelligence underutilized. Large Language Models (LLMs) offer a way to process CTI and extract information that can be used by downstream systems. Prior work (Chakraborty et al., 2026; Mitra et al., 2025; Bertiger et al., 2025; Schwartz et al., 2025) has largely focused on using LLMs to generate rule-based defenses. In contrast, leveraging CTI to update data-driven, black-box machine learning systems is significantly more difficult, as it requires converting textual descriptions into signals that can influence model behavior without access to raw data. This gap creates an important language modeling problem: can language models convert unstructured threat reports into representations that are useful for updating non-linguistic machine learning systems, even when no labeled examples of the new threat exist? Directly using LLMs for zero-shot malware or attack detection is challenging because cybersecurity artifacts are often too large to analyze in full, making inference costly and frequently exceeding practical context-window limits (Qian et al., 2025). Truncating these artifacts into abstract 1arXiv:2607.09936v1 [cs.LG] 10 Jul 2026 Preprint. Under review. features degrades performance (Zhou et al., 2024). Instead, the goal is to extract and transfer knowledge from CTI using language models to adapt existing cyber-defense systems. We formulate this problem as a Generalized Zero-Shot Learning (GZSL) setting, where a downstream machine learning model must recognize both seen and unseen classes, with Cyber Threat Intelligence (CTI) providing semantic information for unseen threats. While GZSL with semantic auxiliary information has been extensively explored in generalized settings, such as the vision-language domain (Chen et al., 2023; Ma & Hu, 2020; Rao et al., 2024; Lei et al., 2024), its application to cybersecurity remains an open and largely unsolved challenge, despite being of critical practical importance. The unique challenges in this setup are as follows. 1. Semantic ambiguity of class prototypes: Unlike generalized domains with distinguish-able semantic features, cybersecurity relies on CTI reports whose descriptions often overlap heavily across malware families. Different families frequently share APIs, behav-ioral patterns, and attack techniques, making semantic prototypes weakly separable and reducing transfer to unseen classes. Figure 1 illustrates this challenge. 2. Cross-modal heterogeneity: Malware features are derived from behavioral observations such as API calls, system traces, and network traffic . These features differ substantially from the sparse, high-level semantics of CTI reports, making alignment between feature and semantic spaces difficult. 3. Class imbalance: Seen class dominance is already a major challenge in GZSL . In cy-bersecurity, this is amplified by severe imbalance, where benign samples dominate and emerging malware families are rare , biasing predictions toward frequent seen classes. 4. Open-set classification: In practice, the number and identity of unseen malware families are unknown during training. Models must therefore distinguish between seen and unseen threats without assuming a fixed set of candidate unseen classes in advance. We propose SMETA-ZSL , a semantically grounded meta-GZSL framework designed for the realistic cyber threat setting in which unseen classes are not predefined during training, unlabeled unseen instances are unavailable, and adaptation must rely solely on natural-language CTI reports rather than raw artifacts. Unlike prior methods that assume closed sets, access to raw unseen-class data, or predefined unseen prototypes, SMETA-ZSL operates under a stricter open-set, class-inductive, instance-inductive setting . To address the resulting challenges, our framework combines: (1) a contrastively fine-tuned LLM encoder that produces discriminative semantic prototypes from overlapping CTI descriptions; (2) a cross-modal alignment framework that uses episodic meta-learning to explicitly simulate unseen-class emergence during training; and (3) a parameter-free gating mechanism for adaptive inference. Across 7 benchmark datasets, SMETA-ZSL delivers the strongest overall generalized zero-shot performance under the strictest inductive setting. 
+
+Figure 1: CTI reports for two distinct malware families: Mobidash and Dowgin, share substantial lexical overlap in behavioral descriptions, illustrating why cybersecurity class prototypes are weakly separable in semantic space. 
+
+2 Background 
+
+ZSL addresses the problem of recognizing instances from classes never observed during training (Pourpanah et al., 2022; Wang et al., 2019). In GZSL, the classifier must operate over the union of both seen and unseen classes simultaneously (Li et al., 2024b; Verma et al., 2020), compounding the difficulty with seen-class dominance — where the posterior probability of seen classes systematically overwhelms that of unseen classes at inference 2Preprint. Under review. time (Kwon & Al Regib, 2022; Bhat et al., 2025; Xian et al., 2017). Since unseen classes are never observed during training, ZSL methods rely on auxiliary semantic information to bridge the gap. Drawing inspiration from human cognition, where unfamiliar concepts are recognized through background knowledge relating them to familiar ones (Fu et al., 2015; Romera-Paredes & Torr, 2015; Tang et al., 2024; Li et al., 2024b; Sanchez et al., 2025), existing approaches broadly fall into three families: learning a joint embedding space between modalities and semantic representations (Ali & Khan, 2023; Nawaz et al., 2022; Chen et al., 2023; Lei et al., 2024), synthetically generating unseen-class data from semantic descriptions (Mishra et al., 2018; Ma & Hu, 2020; Tang et al., 2024; Wu & Bergman, 2025b; Marszałek et al.), and learning semantic prototypes (Wang et al., 2025a; Fu et al., 2017; Wang et al., 2021; Rao et al., 2024; Fan et al., 2026; Gill et al., 2026). Among these, the semantic prototype approach is particularly well-suited for settings where class-level descriptions are available but instance-level data for unseen classes is absent. ZSL has also been adapted to domain-specific settings, including cybersecurity, where specialized frameworks address malware detection under data scarcity (Barros et al., 2022; Wang et al., 2025b; Aurna et al., 2025). 
+
+3 Methodology 
+
+We propose SMETA-ZSL, a semantically grounded GZSL framework for tabular data classi-fication. Our core hypothesis is that language models, when appropriately fine-tuned, can serve as a reliable semantic bridge between overlapping natural language descriptions and fine-grained behavioral attributes, enabling zero-shot recognition of unseen classes through episodic meta-training that explicitly aligns heterogeneous modalities. Figure 2 gives an overview of our proposed framework. 
+
+Figure 2: Overview of our proposed SMETA-ZSL framework that uses semantic prototype for GZSL, when semantic descriptions are overlapping and at a higher level of abstraction. 
+
+3.1 Preliminaries 
+
+In Zero-shot learning there are two disjoint sets of classes: the seen classes S, for which labeled training instances are available, and the unseen classes U , for which no labeled instances exist at training time. Specifically in GZSL, the classifier f (·) : X → S ∪ U must operate over the union of both seen and unseen classes. Each class c ∈ S ∪ U is represented by a prototype vector t ∈ T ⊆ RM, encoded via a prototyping function π(·) : S ∪ U → T .This yields prototype sets Ts = {tsi }Ns 
+
+> i=1
+
+and Tu = {tui }Nu 
+
+> i=1
+
+for seen and unseen classes respectively, serving as the semantic bridge through which knowledge is transferred from 
+
+S to U . Given a test instance xi, a projection network fθ : X → T maps it into the shared semantic space, and the predicted class is determined by nearest-prototype matching: ˆyi = arg max 
+
+> c∈S∪U
+
+fθ (xi) · tc
+
+∥ fθ (xi)∥∥ tc∥ (1) The cybersecurity setting introduces two additional structural constraints that go beyond standard GZSL. First, we operate under the open-set assumption: unlike closed-set GZSL where S ∪ U is fully predefined, only S is known at training time. The unseen classes U ,including their cardinality |U | = Nu and identities {cui }Nu
+
+> i=1
+
+, are revealed only at inference, reflecting the real-world scenario where novel malware families cannot be anticipated in advance. Second, we adopt the Class-Inductive, Instance-Inductive (CIII) setting (Pourpanah et al., 2022), under which the model is trained using only Dtr and Ts, without access to Tu
+
+3Preprint. Under review. during training. The unseen prototypes are made available only at inference, serving as the semantic bridge through which the model generalizes to novel unseen classes. In the cybersecurity domain, this bridge is constructed from cyber threat intelligence (CTI) reports, unstructured expert-authored documents describing behavioral signatures, tactics, and techniques of each threat class. Our goal is to ensure that knowledge transfers reliably from 
+
+S to U despite the semantic overlap and cross-modal heterogeneity these reports introduce, a challenge addressed directly by SMETA-ZSL. 
+
+3.2 Discriminative Semantic Prototype Learning with LLM LLM for Semantic Prototyping: LLMs are natural candidates for semantic prototype construction: given a natural language description of a class, a pretrained encoder can map the text into a dense vector that captures its semantic content. These vectors serve as class prototypes in T , providing a representation of each class However, naively encoding CTI reports with a pretrained language model yields weakly separable prototypes, as threat descriptions across different classes frequently share structural vocabulary and domain-specific terminology, causing their embeddings to cluster around a shared centroid rather than reflect class-discriminative structure. 
+
+Supervised Contrastive Objective: Let zi ∈ RM denote the L2-normalized embedding of description sample i produced by the language model. To enforce intra-class compactness and inter-class separation in the language model’s representation space, we optimize it with a Supervised Contrastive loss (Khosla et al., 2020), which pulls descriptions of the same class together while pushing descriptions of different classes apart: 
+
+LSupCon = ∑
+
+> i∈I
+
+−1
+
+|P(i)| ∑
+
+> p∈P(i)
+
+log exp (zi · zp/τ)
+
+∑a∈A(i) exp (zi · za/τ) (2) where P(i) is the set of positive samples whose descriptions share the same class label as i, A(i) is the set of all other description samples in the batch, and τ is a temperature hyperparameter. Figure 3 illustrates the effect of contrastive finetuning on the geometry of the learned semantic space. 
+
+Isotropy Regularization: Optimizing solely on LSupCon is insufficient when class descrip-tions share substantial structural overlap. The encoder tends to learn the general structure of descriptions rather than class-discriminative signatures, causing embeddings to collapse toward a shared mean. To explicitly counteract this, we introduce an isotropy regulariza-tion term that penalizes the mean squared cosine similarity of each embedding zi to the L2-normalized batch mean ¯z, discouraging the semantic space from collapsing toward a centroid driven by shared boilerplate vocabulary: 
+
+LIso = 1
+
+N
+
+> N
+
+# ∑
+
+> i=1
+
+(zi · ¯z)2 (3) The combined training objective for the semantic encoder is Lsem = LSupCon + γLIso , where 
+
+γ ≥ 0 controls the strength of the isotropy regularization relative to the contrastive objective. 
+
+Prototype Construction: Once the encoder is trained, a class prototype tc ∈ T is computed for each class c ∈ S ∪ U as the L2-normalized mean of its constituent embeddings, where Sc
+
+denotes the set of description samples belonging to class c. This yields the prototype sets Ts
+
+and Tu, which serve as fixed semantic anchors for all subsequent alignment and inference. 
+
+3.3 Cross-Modal Alignment via Meta Knowledge Distillation 
+
+Even with discriminative semantic prototypes, aligning X with T remains non-trivial due to the granularity mismatch between precise instance-level behavioral observations and coarse, abstract semantic descriptions. We address this through a novel framework that combines meta-knowledge distillation (Pan et al., 2021) with episodic meta-learning, where the zero-shot condition is explicitly simulated at every training step. 
+
+Two-Tower Architecture: The framework operates across two representation spaces. The Semantic Tower encodes class descriptions into T , producing the fixed class prototypes {tc}
+
+4Preprint. Under review. 
+
+> (a) Semantic embeddings with Pretrained LLM
+> (b) Semantic embeddings with Contrastively Finetuned LLM
+
+Figure 3: Comparison of semantic embedding quality with and without contrastive fine-tuning for datapoints in CIC-AndMal (Canadian Institute for Cybersecurity (CIC) and Canadian Centre for Cyber Security (CCCS), 2020) dataset. derived in Section 3.2. The Behavioral Tower consists of a projection network fθ : X → T 
+
+that learns to map behavioral feature vectors into the shared semantic space, producing ˆzi = fθ (xi) ∈ RM for each instance xi ∈ X .
+
+Episodic Meta-Training: To prevent fθ from overfitting to seen-class alignment and to explicitly enforce generalization to unseen classes, training is structured as a series of meta-learning episodes that simulate the zero-shot condition at every step. At each episode, the set of available training classes Ctrain is randomly partitioned into a support set Csup 
+
+and a query set Cqry , where Ctrain = Csup ∪ C qry and Csup ∩ C qry = ∅. The query set classes are treated as proxy-unseen classes, known training classes deliberately withheld at each episode to simulate novel conditions, forcing fθ to generalize its cross-modal alignment beyond the classes it is currently supervised on. 
+
+Dual-Objective Distillation Loss: The loss function balances exact knowledge transfer on support classes with generalization on withheld query classes. Let si,c = ˆzi · tc/∥ ˆzi∥∥ tc∥
+
+denote the cosine similarity between the projected instance and prototype tc. For the support set, the student is supervised via a distillation objective that combines soft knowledge transfer through KL divergence against the teacher’s similarity distribution with a hard cross-entropy target: 
+
+Lsup = LKL 
+
+
+
+σ
+
+ si,c
+
+T
+
+
+
+σ
+
+ ˆsi,c
+
+T
+
+ 
+
++ LCE ( ˆzi, yi) (4) where T is the distillation temperature, ˆsi,c are the teacher’s similarity logits, and σ(·) denotes the softmax function. The KL divergence transfers the teacher’s soft relational structure across classes, while the cross-entropy term anchors the student to the correct hard label. For the query set, no distillation supervision is provided and the student is evaluated purely on prototype matching, acting as a generalization regularizer: Lqry = LCE ( ˆzi, yi), i ∈ C qry .The combined training objective is: 
+
+Lalign = Lsup + λLqry (5) where λ ≥ 0 scales the generalization penalty relative to the distillation objective. 
+
+3.4 Generalized Inference via Adaptive Confidence Gating Z-Score Confidence Estimation: The central observation motivating the gating mechanism is that a seen-class instance produces a similarity distribution over seen prototypes with one sharply dominant score, while an unseen-class instance produces a flatter, less discriminative distribution, as empirically confirmed in Figure 4. Rather than comparing the top seen-class score against a fixed threshold, we evaluate how statistically dominant it is relative to the per-sample distribution of all seen-class similarities. Given a test instance xi, we compute ˆzi = fθ (xi) and the cosine similarity si,c = ˆzi · tc/∥ ˆzi∥∥ tc∥ against every seen prototype 
+
+tc ∈ T s. The per-sample mean μi and standard deviation σi of this seen-class similarity 5Preprint. Under review. 
+
+Figure 4: Distribution of per-sample σi (standard deviation of seen-class cosine similarities) stratified by ground truth label. distribution are then computed, and the Z-score of the maximum seen-class similarity 
+
+smax  
+
+> i
+
+= max c∈S si,c measures how many standard deviations it lies above the mean: 
+
+Zi = smax  
+
+> i
+
+− μi
+
+max (σi, ϵ) (6) where ϵ ensures numerical stability when all seen-class similarities are nearly identical. 
+
+Routing Decision: Zi quantifies how statistically dominant the best seen-class match is for a given sample. A high Zi indicates that one seen prototype produces a sharply dominant response, suggesting the instance belongs to a seen class. A low Zi indicates a flat similarity distribution, suggesting the instance is out-of-distribution with respect to S and likely belongs to an unseen class. The routing decision is formalized as: ˆyi =
+
+arg max c∈S si,c if Zi ≥ τ
+
+arg max c∈U si,c if Zi < τ (7) where τ is a confidence threshold optimized on the validation set to maximize the harmonic mean between seen and unseen class accuracy. This mechanism requires no additional learned parameters and operates entirely on the cosine similarity scores already computed during inference. 
+
+4 Experiments 
+
+Baselines: We evaluate nine methods capable of zero-shot tabular data classification — a critical requirement in cybersecurity — spanning three paradigms: generative (Mishra et al., 2018; Verma et al., 2020), cybersecurity-specific (Wang et al., 2025b; Aurna et al., 2025; Barros et al., 2022), and LLM-based (Shi et al., 2024; Wang et al., 2025a; Ali & Khan, 2023; Yun et al., 2024). We additionally evaluate TabPFN (Hollmann et al., 2023), APT (Wu & Bergman, 2025a), and ZEUS (Marszałek et al.), which generalise to novel datasets with minimal oversight but still require at least one sample from each unseen class at inference time. As such, these models do not strictly satisfy our GZSL formulation and are evaluated in the one-shot setting. Finally, HistGradBoost (Pedregosa et al., 2011) and XGBoost (Chen & Guestrin, 2016) serve as standard tabular classification baselines. Table 1 highlights four axes along which methods differ from SMETA-ZSL. ZET-LLM (Shi et al., 2024), ProtoLLM (Wang et al., 2025a), and SMELL (Barros et al., 2022) require architectural adaptation for zero-shot inference, while ZEUS, TabPFN, and APT do not support it at all and are therefore included only in the one-shot comparison. Only TabPFN and APT require unseen class prototypes at training time. CLIP-decoder (Ali & Khan, 2023), P2T (Yun et al., 2024), ZEUS, and TZSL (Wang et al., 2025b) require unlabelled unseen instances during training. Only CLIP-decoder and P2T support open-set recognition among the baselines. SMETA-ZSL is the only method satisfying all four criteria simultaneously. As baselines differ in which assumptions they relax, we evaluate each under its native setting while holding SMETA-ZSL to the strictest assumption throughout. 6Preprint. Under review. Table 1: Requirements and capabilities of baseline methods. Checkmarks indicate whether each method supports zero-shot classification natively, trains without unseen prototypes or unlabelled instances, and handles open-set recognition.                                                                                  
+
+> Method Architecture Learning Principle Zero-Shot Classification Trains w/o Unseen Prototypes Trains w/o Unlabelled Unseen Instances Open-Set
+> CVAE-ZSL (Mishra et al. (2018)) VAE Generative, prototype ✓✓✓✗
+> MZSL (Verma et al. (2020)) GAN + MLP Generative, meta-learning ✓✓✓✗
+> CLIP-decoder (Ali & Khan (2023)) ViT Transfer learning ✓✓✗✓
+> P2T (Yun et al. (2024)) LLM Transfer learning ✓✓✗✓
+> ZET-LLM (Shi et al. (2024)) LLM + MLP Feature extraction ✓(Modified) ✓✓✗
+> ProtoLLM (Wang et al. (2025a)) LLM Prototype, transfer learning ✓(Modified) ✓✓✗
+> ZEUS (Marszałek et al.) LLM Federated learning ✗✓✗✗
+> TabPFN (Hollmann et al. (2023)) LLM Transductive ✗✗✓✗
+> APT (Wu & Bergman (2025a)) LLM Metric learning ✗✗✓✗
+> ZSL for Cybersecurity
+> SMELL (Barros et al. (2022)) MLP Metric learning ✓(Modified) ✓✓✗
+> FL-ZSL (Aurna et al. (2025)) MLP Continual learning ✓✓✓✗
+> TZSL (Wang et al. (2025b)) VQ-VAE Transfer learning ✓✓✗✗
+> SMETA-ZSL LLM + MLP Prototype, meta-learning ✓✓✓✓
+
+Datasets: We evaluate SMETA-ZSL on seven benchmark datasets spanning four cybersecu-rity domains CIC-AndMal-2020 (Canadian Institute for Cybersecurity (CIC) and Canadian Centre for Cyber Security (CCCS) (2020)), BODMAS (Yang et al. (2021)), APIGRAPH (Zhang et al. (2020)), AVASTCTU (Bo ˇsansk `y et al. (2022)) and three general-domain tabular datasets GOODREADS (Wan & McAuley (2018); Wan et al. (2019)), PETFINDER (PetFinder.my (2018)), FAKEDDIT (Nakamura et al. (2020)). Dataset details including the class distribu-tions are provided in Table 2. Table 2: Overview of evaluation datasets spanning cybersecurity and general-domain benchmarks                                                 
+
+> Dataset Features Size Semantic Source Total Classes Seen Unseen
+> CIC-AndMal-2020 Dynamic behavioral features (API, memory, network, logcat) 400,000 CTI reports 26 22 4BODMAS Static PE features (2,381-dim) 134,435 CTI reports 44 40 4APIGRAPH Android API calls 322,594 CTI reports 74 69 5AVASTCTU Dynamic sandbox execution logs (CAPEv2) ∼49,000 CTI reports 10 73GOODREADS Book metadata (page count, publication year, rating) 10,000 Book description 862PETFINDER Pet attributes (age, breed, gender) 15,000 Adoption profile 532FAKEDDIT Post metadata (score, upvote ratio) 420,000 Title/OCR text 642
+
+Implementation Details: Semantic prototypes are encoded using LLaMA-3.1-8B, loaded in 4-bit precision via bitsandbytes and fine-tuned with LoRA to embed per-class behavioral descriptions into 4,096-dimensional prototype vectors. The projection network fθ is a two-block residual MLP with hidden size 1,024, GELU activations, BatchNorm, and dropout (p=0.1), mapping tabular features into T with L2-normalized outputs. All hyperparameters are tuned on the validation set; sensitivity analysis is provided in Appendix 9. 
+
+CTI Report Collection: CTI reports were collected from two open-source repositories: the ORKL Community CTI Library (ORKL (2024)), a searchable corpus of public threat intelligence reports, and the APT REPORT archive (CyberMonitor (2024)), a community-maintained collection of vendor and government CTI documents. To ensure semantic coverage across all malware families, particularly for unseen classes with limited report availability, we employed a structured augmentation pipeline: a LLM was prompted to generate synthetic CTI variants conditioned on relevant MITRE ATT&CK technique descriptors (TTPs) corresponding to each malware family (The MITRE Corporation (2024)). LLM-based generation of CTI has been explored as a viable approach to address report scarcity in threat intelligence workflows (Ranade et al. (2021)). 
+
+Evaluation Protocol: For finetuning of the LLM we use a 90/10 split for training and validation. Unseen classes are selected previously and held out during the whole fine-tuning process. During the meta-learning stage, we hold out 15% of the seen samples as validation and 15% for test.The number of unseen families varies between 3 and 2 depending on the dataset label size. We follow the standard GZSL evaluation protocol, reporting accuracy on seen classes (S), accuracy on unseen classes (U), and their harmonic mean (H) as the primary metric. The harmonic mean is used as the primary ranking criterion as it penalizes 7Preprint. Under review. methods that trivially favour either seen or unseen classes. Results are averaged over five random splits and reported with standard deviation. 
+
+5 Results 
+
+GZSL Baseline Comparison: Table 3 reports GZSL results across 5 runs for seven tabular benchmarks spanning both cybersecurity and general-domain datasets. On average, SMETA-ZSL improves the harmonic mean by approximately 10.8 points over the strongest baseline on the datasets where it leads, with the largest gains observed on CIC-AndMal (+18.1 over MZSL), GOODREADS (+11.6 over ProtoLLM), AVASTCTU (+12.5 over FL-ZSL) and APIGRAPH (+19.4 over TZSL). On FAKEDDIT, ProtoLLM leads (47.80 vs. 44.45), where prototype-based alignment appears particularly well-suited to the dataset’s multimodal label structure. SMETA-ZSL is the only method that performs consistently well across all seven datasets under strict inductive assumptions. Figure 5 further illustrates this trend: SMETA-ZSL attains the highest average unseen accuracy across all seven benchmarks while maintaining competitive seen accuracy. The full results for seen, unseen and mean accuracy across all 5 runs are given in Appendix. Table 3: GZSL results across seven tabular datasets. SMETA-ZSL is evaluated under the strictest inductive assumptions; baselines under their native settings. Best results (in blue )indicate the highest harmonic mean between seen and unseen class accuracy.                                                                                                                                                                                                                          
+
+> Method CIC-AndMal BODMAS APIGRAPH AVASTCTU GOODREADS PETFINDER FAKEDDIT
+> CVAE-ZSL 17.56 ±2.61 30.20 ±2.50 8.22 ±2.32 24.85 ±7.23 11.89 ±1.72 1.46 ±1.95 14.33 ±4.05 MZSL 39.70 ±5.89 42.23 ±4.97 23.21 ±2.62 22.27 ±14.74 22.50 ±0.72 30.96 ±1.05 38.16 ±2.19 CLIP 14.34 ±3.72 43.15 ±8.39 21.49 ±4.55 39.14 ±6.46 18.76 ±0.90 32.24 ±1.25 36.56 ±14.66 P2T 0.00 ±0.00 0.00 ±0.00 0.47 ±0.49 0.48 ±0.10 7.81 ±0.93 2.52 ±0.68 0.55 ±0.35 ZET-LLM 13.03 ±1.20 32.32 ±8.36 12.67 ±1.57 0.01 ±0.01 20.48 ±0.55 23.14 ±0.78 1.05 ±0.19 ProtoLLM 38.15 ±0.67 37.01 ±0.19 21.59 ±0.16 42.26 ±4.15 24.34 ±0.25 25.69 ±0.91 47 .80 ±0.20
+> SMELL 28.35 ±1.48 27.60 ±2.18 12.32 ±5.45 36.71 ±1.09 24.21 ±1.54 3.15 ±0.59 21.10 ±5.52 FL-ZSL 29.43 ±3.27 48.12 ±1.76 27.16 ±2.53 44.46 ±5.54 21.89 ±1.02 31.41 ±0.42 21.20 ±4.65 TZSL 10.94 ±4.88 41.20 ±9.47 30.80 ±3.59 29.67 ±23.09 0.00 ±0.00 6.13 ±0.37 17.58 ±1.78
+> SMETA-ZSL 57 .78 ±1.02 50 .20 ±9.10 50 .19 ±3.61 57 .00 ±1.22 35 .92 ±2.50 33 .36 ±0.58 44.45 ±4.28
+
+Figure 5: Average seen and unseen class accuracy across all benchmark datasets. Our proposed SMETA-ZSL achieves the highest unseen accuracy among all compared methods while maintaining competitive seen accuracy. 
+
+One-Shot Baseline Comparison: Table 4 compares SMETA-ZSL (zero-shot) against few-shot and standard tabular baselines. SMETA-ZSL achieves the best harmonic mean on five of seven benchmarks, with margins of +15.0 on GOODREADS, +10.4 on PETFINDER, and +7.1 on APIGRAPH. On BODMAS and AVASTCTU, HistGradBoost and ZEUS respectively benefit from labelled support examples unavailable to SMETA-ZSL. Despite strictly zero-shot assumptions, SMETA-ZSL remains the most consistently strong method across the suite. Fully supervised upper-bound results are in Appendix 8. 
+
+Effect of Embedding Model: Table 5 reports the effect of substituting the semantic encoder on GZSL performance, holding the remainder of SMETA-ZSL fixed. LLaMA3.1-8B is the best-performing encoder overall, achieving the highest scores on both CIC-AndMAL (56.70 8Preprint. Under review. Table 4: One-shot classification results across seven tabular benchmarks. SMETA-ZSL is compared against methods designed for few-shot tabular generalisation and standard tabular classifiers. Best results in blue .                                                                                                                                     
+
+> Method CIC-AndMal BODMAS APIGRAPH AVASTCTU GOODREADS PETFINDER FAKEDDIT
+> TabPFN 36.28 ±0.38 49.09 ±5.41 4.91 ±6.61 42.14 ±1.31 0.00 ±0.00 0.00 ±0.00 12.66 ±8.36 APT 51.92 ±1.10 49.44 ±0.72 11.54 ±0.64 65.52 ±0.66 20.57 ±0.74 14.82 ±1.40 10.59 ±3.07 ZEUS 47.29 ±0.69 58.72 ±4.22 43.12 ±0.93 79 .87 ±3.31 20.97 ±3.77 23.00 ±1.97 40.84 ±3.50 HistGradBoost 37.21 ±1.09 59 .83 ±3.18 38.93 ±0.96 61.70 ±2.11 0.02 ±0.02 0.57 ±0.06 1.04 ±0.15 XGBoost 24.57 ±7.60 27.85 ±17.82 1.67 ±1.08 9.26 ±10.32 0.00 ±0.00 0.00 ±0.00 0.00 ±0.00
+> SMETA-ZSL 56 .7±1.650.19 ±3.61 50 .20 ±9.10 57.00 ±1.22 35 .92 ±2.50 33 .36 ±0.58 44 .45 ±4.28
+
+± 1.6) and BODMAS (50.19 ± 3.61). It also exhibits relatively low variance, suggesting stable semantic prototypes across splits. Table 5: Effect of language model on SMETA-ZSL                                           
+
+> Dataset Qwen-3-4B Gemma-3-4B LLaMA3.1-3B LLaMA3.1-8B Mistral-Nemo-Base-12B Qwen-14B
+> CIC-AndMAL 55.45 ±2.03 54.34 ±3.57 45.61 ±4.93 56.70 ±1.6 37.14 ±6.79 48.58 ±3.36 BODMAS 33.25 ±2.76 48.71 ±2.29 41.68 ±1.96 50.19 ±3.61 33.25 ±2.76 48.30 ±5.02
+
+Ablation Studies: Table 6 reports each component’s contribution via systematic ablation. Removing LLM semantic embeddings drops the harmonic mean by 9.3 points on average, confirming prototype quality as the primary performance driver. Replacing episodic meta-learning with standard training degrades unseen-class accuracy substantially ( −5.11 on APIGRAPH, −4.88 on AVASTCTU), validating that simulating the zero-shot condition during training is critical. Removing knowledge distillation yields a more moderate but consistent drop, indicating soft relational transfer provides complementary signal beyond hard label supervision. 
+
+Few-Shot Setting: Appendix 16 examines how SMETA-ZSL performs as labeled samples per unseen class increase from zero to five. Performance generally continues to improve with more shots, with gains of up to 18.8 points on AVASTCTU at K = 5, though with diminishing returns beyond K = 2. Table 6: Ablation study across cybersecurity datasets. Each row removes or replaces one component of SMETA-ZSL. 
+
+Configuration CIC-AndMAL BODMAS APIGRAPH AVASTCTU Full SMETA-ZSL 56.7 59.10 50.19 57.00 
+
+w/o LLM semantic embeddings (random init) 36.12 48.71 46.12 54.92 w/o meta-learning episodes 54.63 59.11 45.08 52.12 w/o knowledge distillation 55.78 57.41 44.55 52.12 Replace LLM with static GloVe vectors 22.99 33.95 39.84 49.33 
+
+Effect of Synthetic CTI: Our problem space has a core data scarcity issue: the number of real CTI reports per malware family is too small to provide sufficient within-class diversity for optimizing the supervised contrastive objective. Large-scale paired malware-CTI data is difficult to obtain in practice, as organizations often release malware artifacts or CTI descriptions, but rarely both Johnson et al. (2016); MISP Project (2024). This is precisely the premise of our problem setting: if the malware artifact is available, its corresponding attack description may not be, and conversely, if a CTI report describing an attack is released, the real malware sample may not be shared. To verify that training-time synthetic CTI does not confer an unfair advantage at test time, we ablate synthetic CTI entirely for unseen classes (i.e., classes present only at inference), constructing unseen-class prototypes from real CTI descriptions only, while keeping seen-class training unchanged. As shown in Table 7, unseen accuracy ( U) and harmonic mean (H) are statistically indistinguishable with and without synthetic CTI across both datasets, 9Preprint. Under review. Table 7: Ablation on synthetic CTI usage for unseen-class prototype construction. S: seen accuracy, U: unseen accuracy, H: harmonic mean.                   
+
+> Dataset Unseen Prototype Source SUH
+> CIC-AndMal Real CTI only 53.75 50.00 51.81 Real + Synthetic CTI 53.75 50.67 52.16 BODMAS Real CTI only 66.75 35.00 45.92 Real + Synthetic CTI 66.56 33.50 44.57
+
+confirming that inference-time performance is driven by learned cross-modal alignment rather than synthetic CTI influencing prototype construction. 
+
+Reproducibility Statement: All experiments reporting mean ± std are repeated over 5 runs with different seeds. Per seed result reported in Appendix. Hyperparameters are listed in Appendix 9. Semantic prototypes were generated with Llama-3.1-8B and are released as fixed .npy files to avoid non-determinism. Training was performed on 3× NVIDIA RTX ADA 48GB GPUs. Code, checkpoints, and preprocessing scripts are available at https: //github.com/Security-And-Intelligence-Lab-UTEP/SMETA-ZSL/blob/main/README.md 
+
+6 Conclusion 
+
+We presented SMETA-ZSL, a framework for a realistic but underexplored cyber-defense setting in which new threat classes emerge without labeled behavioral examples, unlabeled unseen instances, or prior knowledge of unseen classes. In practice, the only available super-vision often comes from natural-language CTI reports. We show that language models can act as semantic adaptation interfaces for downstream cyber-defense systems by converting CTI into discriminative semantic prototypes that transfer to structured behavioral data. Across seven benchmarks spanning four cybersecurity and three general-domain datasets, SMETA-ZSL consistently outperforms prior methods under stricter open-set assumptions, improving baseline by an average of 10.8 points. 
+
+References 
+
+Muhammad Ali and Salman Khan. Clip-decoder: Zeroshot multilabel classification using multimodal clip aligned representations. In Proceedings of the IEEE/CVF international conference on computer vision , pp. 4675–4679, 2023. Nahid Ferdous Aurna, Yuzo Taenaka, and Youki Kadobayashi. A feedback-driven federated zero-shot learning framework for adaptive detection of evolving banking malware. IEEE Access , 2025. Pedro H Barros, Eduarda TC Chagas, Leonardo B Oliveira, Fabiane Queiroz, and Heitor S Ramos. Malware-smell: A zero-shot learning strategy for detecting zero-day vulnerabili-ties. Computers & Security , 120:102785, 2022. Anna Bertiger, Bobby Filar, Aryan Luthra, Stefano Meschiari, Aiden Mitchell, Sam Scholten, and Vivek Sharath. Evaluating llm generated detection rules in cybersecurity. arXiv preprint arXiv:2509.16749 , 2025. S Divakar Bhat, Amit More, Mudit Soni, and Bhuvan Aggarwal. Pc-gzsl: Prior correction for generalized zero shot learning. In 2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) , pp. 7173–7183. IEEE, 2025. Branislav Bo ˇsansk `y, Daniel Kouba, Ond ˇrej Manhal, Tom ´a ˇs Sick, Viliam Lisy, Jakub Kroustek, and Petr Somol. Avast-ctu public cape dataset. arXiv preprint arXiv:2209.03188 , 2022. Canadian Institute for Cybersecurity (CIC) and Canadian Centre for Cyber Security (CCCS). CCCS-CIC-AndMal-2020 Dataset. https://www.unb.ca/cic/datasets/andmal2020.html ,2020. 10 Preprint. Under review. Arjun Chakraborty, Sandra Ho, Adam Cook, and Manuel Mel ´endez. Cti-realm: Benchmark to evaluate agent performance on security detection rule generation capabilities. arXiv preprint arXiv:2603.13517 , 2026. Tianqi Chen and Carlos Guestrin. XGBoost: A scalable tree boosting system. In Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining ,pp. 785–794. ACM, 2016. doi: 10.1145/2939672.2939785. Zhuo Chen, Yufeng Huang, Jiaoyan Chen, Yuxia Geng, Wen Zhang, Yin Fang, Jeff Z Pan, and Huajun Chen. Duet: Cross-modal semantic grounding for contrastive zero-shot learning. In Proceedings of the AAAI conference on artificial intelligence , volume 37, pp. 405–413, 2023. CyberMonitor. APT CyberCriminal Campagin Collections. https://github.com/ CyberMonitor/APT CyberCriminal Campagin Collections , 2024. Jinfu Fan, Jiangnan Li, Xiaowen Yan, Xiaohui Zhong, Wenpeng Lu, and Linqing Huang. Clip-driven zero-shot learning with ambiguous labels. arXiv preprint arXiv:2603.05053 ,2026. Zhenyong Fu, Tao Xiang, Elyor Kodirov, and Shaogang Gong. Zero-shot object recognition by semantic manifold distance. In Proceedings of the IEEE conference on computer vision and pattern recognition , pp. 2635–2644, 2015. Zhenyong Fu, Tao Xiang, Elyor Kodirov, and Shaogang Gong. Zero-shot learning on semantic class prototype graph. IEEE transactions on pattern analysis and machine intelligence ,40(8):2009–2022, 2017. Naveen Gill et al. Llm-fs: Zero-shot feature selection for effective and interpretable malware detection. arXiv preprint arXiv:2602.09634 , 2026. Noah Hollmann, Samuel M ¨uller, Katharina Eggensperger, and Frank Hutter. TabPFN: A transformer that solves small tabular classification problems in a second. In Proceedings of the 11th International Conference on Learning Representations (ICLR) , 2023. URL https: //arxiv.org/abs/2207.01848 .Chris Johnson, Lee Badger, David Waltermire, Julie Snyder, Clem Skorupka, et al. Guide to cyber threat information sharing. NIST special publication , 800(150):35, 2016. Prannay Khosla, Piotr Teterwak, Chen Wang, Aaron Sarna, Yonglong Tian, Phillip Isola, Aaron Maschinot, Ce Liu, and Dilip Krishnan. Supervised contrastive learning. Advances in neural information processing systems , 33:18661–18673, 2020. Gukyeong Kwon and Ghassan Al Regib. A gating model for bias calibration in generalized zero-shot learning. IEEE Transactions on Image Processing , 2022. Jiaming Lei, Lin Li, Chunping Wang, Jun Xiao, and Long Chen. Seeing beyond classes: Zero-shot grounded situation recognition via language explainer. In Proceedings of the 32nd ACM International Conference on Multimedia , pp. 1602–1611, 2024. Adrian Shuai Li, Arun Iyengar, Ashish Kundu, and Elisa Bertino. Revisiting concept drift in windows malware detection: Adaptation to real drifted malware with minimal samples. 
+
+arXiv preprint arXiv:2407.13918 , 2024a. Yapeng Li, Yong Luo, Zengmao Wang, and Bo Du. Improving generalized zero-shot learning by exploring the diverse semantics from external class names. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 23344–23353, 2024b. Peirong Ma and Xiao Hu. A variational autoencoder with deep embedding model for generalized zero-shot learning. In Proceedings of the AAAI conference on artificial intelligence ,volume 34, pp. 11733–11740, 2020. 11 Preprint. Under review. Patryk Marszałek, Tomasz Ku ´smierczyk, Witold Wydma ´nski, Jacek Tabor, and Marek ´Smieja. Zeus: Zero-shot embeddings for unsupervised separation of tabular data. In The Thirty-ninth Annual Conference on Neural Information Processing Systems .Ashish Mishra, Shiva Krishna Reddy, Anurag Mittal, and Hema A Murthy. A generative model for zero shot learning using conditional variational autoencoders. In Proceedings of the IEEE conference on computer vision and pattern recognition workshops , pp. 2188–2196, 2018. MISP Project. MISP – open source threat intelligence platform & open standards for threat information sharing. https://www.misp-project.org/ , 2024. Shaswata Mitra, Azim Bazarov, Martin Duclos, Sudip Mittal, Aritran Piplai, Md Rayhanur Rahman, Edward Zieglar, and Shahram Rahimi. Falcon: Autonomous cyber threat intelligence mining with llms for ids rule generation. arXiv preprint arXiv:2508.18684 ,2025. Kai Nakamura, Sharon Levy, and William Yang Wang. r/fakeddit: A new multimodal benchmark dataset for fine-grained fake news detection. In Proceedings of the 12th Language Resources and Evaluation Conference , pp. 6149–6158, 2020. Shah Nawaz, Jacopo Cavazza, and Alessio Del Bue. Semantically grounded visual embed-dings for zero-shot learning. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 4589–4599, 2022. ORKL. The ORKL Community CTI Library. https://orkl.eu/ , 2024. Accessed: 2026-03-31. Haojie Pan, Chengyu Wang, Minghui Qiu, Yichang Zhang, Yaliang Li, and Jun Huang. Meta-kd: A meta knowledge distillation framework for language model compression across domains. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pp. 3026–3036, 2021. Fabian Pedregosa, Ga ¨el Varoquaux, Alexandre Gramfort, Vincent Michel, Bertrand Thirion, Olivier Grisel, Mathieu Blondel, Peter Prettenhofer, Ron Weiss, Vincent Dubourg, et al. Scikit-learn: Machine learning in Python. Journal of Machine Learning Research , 12:2825– 2830, 2011. PetFinder.my. Petfinder.my adoption prediction. https://www.kaggle.com/c/ petfinder-adoption-prediction , 2018. Farhad Pourpanah, Moloud Abdar, Yuxuan Luo, Xinlei Zhou, Ran Wang, Chee Peng Lim, Xi-Zhao Wang, and QM Jonathan Wu. A review of generalized zero-shot learning methods. 
+
+IEEE transactions on pattern analysis and machine intelligence , 45(4):4051–4070, 2022. Xingzhi Qian, Xinran Zheng, Yiling He, Shuo Yang, and Lorenzo Cavallaro. Lamd: Context-driven android malware detection and classification with llms. In 2025 IEEE Security and Privacy Workshops (SPW) , pp. 126–136. IEEE, 2025. Priyanka Ranade, Aritran Piplai, Sudip Mittal, Anupam Joshi, and Tim Finin. Generating fake cyber threat intelligence using transformer-based models. In 2021 International Joint Conference on Neural Networks (IJCNN) , pp. 1–9, 2021. doi: 10.48550/arXiv.2102.04351. Zhijie Rao, Jingcai Guo, Xiaocheng Lu, Jingming Liang, Jie Zhang, Haozhao Wang, Kang Wei, and Xiaofeng Cao. Dual expert distillation network for generalized zero-shot learning. 
+
+arXiv preprint arXiv:2404.16348 , 2024. Bernardino Romera-Paredes and Philip Torr. An embarrassingly simple approach to zero-shot learning. In International conference on machine learning , pp. 2152–2161. PMLR, 2015. Ivan Montoya Sanchez, Shaswata Mitra, Aritran Piplai, and Sudip Mittal. Semantic-aware contrastive fine-tuning: Boosting multimodal malware classification with discriminative embeddings. In 2025 International Joint Conference on Neural Networks (IJCNN) , pp. 1–8. IEEE, 2025. 12 Preprint. Under review. Yuval Schwartz, Lavi Ben-Shimol, Dudu Mimran, Yuval Elovici, and Asaf Shabtai. Llmcloud-hunter: Harnessing llms for automated extraction of detection rules from cloud-based cti. In Proceedings of the ACM on Web Conference 2025 , pp. 1922–1941, 2025. Zhiyi Shi, Junsik Kim, Davin Jeong, and Hanspeter Pfister. Surprisingly simple: Large language models are zero-shot feature extractors for tabular and text data. 2024. Bowen Tang, Jing Zhang, Long Yan, Qian Yu, Lu Sheng, and Dong Xu. Data-free generalized zero-shot learning. In Proceedings of the AAAI conference on artificial intelligence , volume 38, pp. 5108–5117, 2024. Lihong Tang, Xiao Chen, Sheng Wen, Li Li, Marthie Grobler, and Yang Xiang. Demystifying the evolution of android malware variants. IEEE Transactions on Dependable and Secure Computing , 21(4):3324–3341, 2023. The MITRE Corporation. MITRE ATT&CK. https://attack.mitre.org/ , 2024. Accessed: 2026-03-31. Vinay Kumar Verma, Dhanajit Brahma, and Piyush Rai. Meta-learning for generalized zero-shot learning. In Proceedings of the AAAI conference on artificial intelligence , volume 34, pp. 6062–6069, 2020. Mengting Wan and Julian McAuley. Item recommendation on monotonic behavior chains. In Proceedings of the 12th ACM Conference on Recommender Systems , pp. 86–94, 2018. Mengting Wan, Rishabh Misra, Ndapa Nakashole, and Julian McAuley. Fine-grained spoiler detection from large-scale review corpora. arXiv preprint arXiv:1905.13416 , 2019. Chaoqun Wang, Shaobo Min, Xuejin Chen, Xiaoyan Sun, and Houqiang Li. Dual progressive prototype network for generalized zero-shot learning. Advances in Neural Information Processing Systems , 34:2936–2948, 2021. Peng Wang, Dongsheng Wang, He Zhao, Hangting Ye, Dandan Guo, and Yi Chang. Llm empowered prototype learning for zero and few-shot tasks on tabular data. arXiv preprint arXiv:2508.09263 , 2025a. Ping Wang, Hao-Cyuan Li, Hsiao-Chung Lin, Wen-Hui Lin, and Nian-Zu Xie. A transduc-tive zero-shot learning framework for ransomware detection using malware knowledge graphs. Information , 16(6):458, 2025b. Wei Wang, Vincent W Zheng, Han Yu, and Chunyan Miao. A survey of zero-shot learning: Settings, methods, and applications. ACM Transactions on Intelligent Systems and Technology (TIST) , 10(2):1–37, 2019. Yulun Wu and Doron L. Bergman. Zero-shot meta-learning for tabular prediction tasks with adversarially pre-trained transformer. In Proceedings of the 42nd International Conference on Machine Learning . PMLR, 2025a. URL https://arxiv.org/abs/2502.04573 . ICML. Yulun Wu and Doron L Bergman. Zero-shot meta-learning for tabular prediction tasks with adversarially pre-trained transformer. In International Conference on Machine Learning , pp. 67111–67127. PMLR, 2025b. Yongqin Xian, Bernt Schiele, and Zeynep Akata. Zero-shot learning-the good, the bad and the ugly. In Proceedings of the IEEE conference on computer vision and pattern recognition , pp. 4582–4591, 2017. Limin Yang, Arridhana Ciptadi, Ihar Laziuk, Ali Ahmadzadeh, and Gang Wang. Bodmas: An open dataset for learning based temporal analysis of pe malware. In 4th Deep Learning and Security Workshop (DLS) , 2021. Sukmin Yun, Jaehyun Nam, Woomin Song, Seong Hyeon Park, Jihoon Tack, Jaehyung Kim, Kyu Hwan Oh, and Jinwoo Shin. Tabular transfer learning via prompting llms. In 
+
+Conference on Language Modeling (COLM) , pp. 1–18. COLM Organizing Committee, 2024. 13 Preprint. Under review. Xueqiang Zhang, Yating Zhang, Ming Zhong, Dandan Ding, Yinzhi Cao, Yin Zhang, Min Zhang, and Min Yang. Enhancing state-of-the-art classifiers with api semantics to detect evolved android malware. In Proceedings of the 2020 ACM SIGSAC Conference on Computer and Communications Security , pp. 757–770, 2020. Xin Zhou, Kisub Kim, Bowen Xu, DongGyun Han, and David Lo. Out of sight, out of mind: Better automatic vulnerability repair by broadening input ranges and sources. In 
+
+Proceedings of the IEEE/ACM 46th international conference on software engineering , pp. 1–13, 2024. 
+
+A Appendix 
+
+Table 8: Fully supervised ceiling performance across seven tabular benchmarks. Each method is trained and evaluated on all classes with full label access, representing the upper bound that zero-shot methods aspire to approach. Results are mean ± standard deviation over five runs.                                                                                                                                      
+
+> Method CIC-AndMal-2020 BODMAS APIGRAPH AVASTCTU GOODREADS PETFINDER FAKEDDIT
+> TabPFN 85.86 ±1.05 94.92 ±0.33 77.08 ±1.15 99.35 ±0.30 58.91 ±0.66 63.75 ±0.62 99.99 ±0.02 APT 66.85 ±0.81 56.26 ±0.53 15.52 ±1.09 98.55 ±0.21 41.97 ±0.39 61.97 ±1.19 99.99 ±0.02 ZEUS 56.40 ±1.90 82.84 ±1.36 57.59 ±0.69 93.26 ±1.07 32.81 ±2.28 38.64 ±2.26 91.16 ±1.08 HistGradBoost 83.76 ±1.44 93.62 ±0.81 78.83 ±1.27 98.78 ±0.16 58.69 ±0.86 36.14 ±0.45 99.99 ±0.01 XGBoost 83.27 ±1.70 94.06 ±0.57 79.63 ±1.25 98.81 ±0.15 59.33 ±0.67 39.53 ±0.94 99.99 ±0.01 MLP 77.15 ±0.15 90.72 ±0.59 77.88 ±1.03 98.67 ±0.15 47.71 ±1.28 36.08 ±0.97 98.91 ±0.68
+
+Table 9: Sensitivity of SMETA to key hyperparameters across cybersecurity datasets. H =Harmonic Mean (%). One parameter is varied at a time while others are fixed to their default values (marked with ⋆). Stable H across values indicates low sensitivity to that parameter. 
+
+Hyperparameter Value CIC-AndMAL BODMAS APIGRAPH 
+
+Query Loss λqry 
+
+0.1 53.7 64.1 33.3 0.5 50.6 59.2 29.3 1.0 46.7 50.6 33.7 2.0 ⋆ 44.8 47.9 32.6 3.0 42.9 47.8 33.2 4.0 42.4 47.8 31.7 KD Temp tkd 
+
+1.0 44.6 48.5 32.6 2.0 45.0 48.2 32.6 3.0 ⋆ 44.8 47.9 32.6 4.0 44.8 48.2 32.4 5.0 44.5 48.0 32.4 Alpha α
+
+0.1 48.3 53.6 33.6 0.3 46.8 51.0 33.4 0.5 45.9 50.1 32.3 0.7 ⋆ 44.8 47.9 32.6 0.9 42.5 51.3 32.4 Ratio (S, U) (15, 3) 35.9 36.9 33.9 (13, 5) ⋆ 44.8 47.9 32.6 (10, 8) 51.7 46.9 35.2 (8, 10) 53.0 61.0 30.5 (5, 13) 54.4 62.4 33.4 14 Preprint. Under review. Table 10: GZSL results on CIC-AndMal-2020. Seen = Seen Acc (%), Unseen = Unseen Acc (%), Mean = H-Mean (%). Best Mean in bold .
+
+Class CVAE-ZSL MZSL CLIP-Decoder P2T ZET-LLM ProtoLLM SMELL FL-ZSL TZSL SMETA-ZSL 
+
+Run 1 (Seed 42) 
+
+Seen 48.23 57.76 24.59 5.41 56.22 47.87 19.89 61.88 11.29 66.59 Unseen 9.10 27.73 6.50 0.00 6.54 33.05 56.26 22.97 25.87 49.54 Mean 15.32 37.47 10.28 0.00 11.72 39.10 29.39 33.50 15.72 56.81 
+
+Run 2 (Seed 123) 
+
+Seen 48.69 60.12 18.59 5.41 56.25 43.97 21.05 61.29 8.00 66.12 Unseen 11.06 33.29 21.69 0.00 8.40 32.83 55.90 20.53 17.40 53.71 Mean 18.02 42.86 20.02 0.00 14.62 37.59 30.58 30.76 10.96 59.27 
+
+Run 3 (Seed 456) 
+
+Seen 47.18 59.06 18.82 5.29 56.13 45.91 18.81 62.71 10.00 66.94 Unseen 8.57 42.81 9.40 0.00 6.92 33.27 56.17 17.05 6.03 51.62 Mean 14.51 49.64 12.54 0.00 12.32 38.58 28.19 26.81 7.53 58.29 
+
+Run 4 (Seed 789) 
+
+Seen 49.14 70.47 19.29 5.42 56.57 44.65 17.66 61.76 11.65 66.12 Unseen 11.99 23.20 13.23 0.00 7.94 32.40 55.10 16.01 24.13 50.93 Mean 19.28 34.91 15.69 0.00 13.93 37.55 26.74 25.43 15.71 57.54 
+
+Run 5 (Seed 2025) 
+
+Seen 48.61 58.94 18.47 5.41 56.07 44.52 17.35 60.47 2.71 67.06 Unseen 13.13 23.55 10.21 0.00 7.09 33.04 59.12 20.53 20.88 49.54 Mean 20.68 33.65 13.15 0.00 12.58 37.93 26.82 30.66 4.79 56.98 
+
+Average ± Std 
+
+Seen 48.37 ±0.74 61.27 ±4.66 19.95 ±2.61 5.39 ±0.05 56.25 ±0.19 45.38 ±1.56 18.95 ±1.38 61.62 ±0.82 8.73 ±3.66 66 .56 ±0.44 
+
+Unseen 10.77 ±1.92 30.12 ±7.32 12.20 ±5.82 0.00 ±0.00 7.38 ±0.77 32.92 ±0.33 56.51 ±1.37 19.42 ±2.84 18.86 ±7.87 51 .07 ±1.73 
+
+Mean 17.56 ±2.61 39.70 ±5.89 14.34 ±3.72 0.00 ±0.00 13.03 ±1.20 38.15 ±0.67 28.35 ±1.48 29.43 ±3.27 10.94 ±4.88 57 .78 ±1.02 
+
+Table 11: GZSL results on BODMAS. Seen = Seen Acc (%), Unseen = Unseen Acc (%), Mean = H-Mean (%). Best Mean in bold .
+
+Class CVAE-ZSL MZSL CLIP-Decoder P2T ZET-LLM ProtoLLM SMELL FL-ZSL TZSL SMETA-ZSL 
+
+Run 1 (Seed 42) 
+
+Seen 30.50 92.38 62.44 3.31 85.31 72.64 21.46 64.69 57.56 83.25 Unseen 37.17 24.17 33.50 0.00 18.67 25.00 27.00 41.50 58.67 50.00 Mean 33.50 38.31 43.60 0.00 30.63 37.20 23.92 50.56 58.11 62.48 
+
+Run 2 (Seed 123) 
+
+Seen 23.75 92.75 60.44 3.50 86.31 70.20 43.96 64.06 45.00 76.31 Unseen 32.00 24.00 19.50 0.00 28.00 24.83 21.67 37.00 32.50 32.00 Mean 27.26 38.13 29.49 0.00 42.28 36.69 29.03 46.91 37.74 45.09 
+
+Run 3 (Seed 456) 
+
+Seen 30.44 90.56 64.69 3.50 85.06 72.98 47.56 65.00 46.00 82.31 Unseen 32.67 30.33 34.83 0.00 12.00 24.83 22.17 36.17 31.17 44.00 Mean 31.51 45.45 45.28 0.00 21.03 37.06 30.24 46.47 37.16 57.35 
+
+Run 4 (Seed 789) 
+
+Seen 28.75 92.69 57.38 3.50 85.56 71.83 37.01 64.06 38.88 74.00 Unseen 32.33 24.50 48.33 0.00 17.50 25.00 20.83 40.17 34.00 31.00 Mean 30.44 38.76 52.47 0.00 29.06 37.09 26.66 49.38 36.27 43.70 
+
+Run 5 (Seed 2025) 
+
+Seen 25.25 91.94 63.25 3.50 86.50 71.29 32.01 63.56 42.13 74.31 Unseen 32.17 34.83 34.83 0.00 24.83 25.00 25.17 37.67 32.50 29.67 Mean 28.29 50.52 44.93 0.00 38.59 37.02 28.18 47.30 36.69 42.40 
+
+Average ± Std 
+
+Seen 27.74 ±3.08 92.06 ±0.80 61.64 ±2.84 3.46 ±0.08 85.75 ±0.63 71.79 ±1.11 36.40 ±9.21 64.28 ±0.57 45.91 ±7.08 78 .04 ±4.43 
+
+Unseen 33.27 ±2.19 27.57 ±4.34 34.20 ±10.21 0.00 ±0.00 20.20 ±6.31 24.93 ±0.09 23.37 ±2.33 38.50 ±2.25 37.77 ±11.73 37 .33 ±9.11 
+
+Mean 30.20 ±2.50 42.23 ±4.97 43.15 ±8.39 0.00 ±0.00 32.32 ±8.36 37.01 ±0.19 27.60 ±2.18 48.12 ±1.76 41.20 ±9.47 50 .20 ±9.10 
+
+15 Preprint. Under review. Table 12: GZSL results on APIGRAPH. Seen = Seen Acc (%), Unseen = Unseen Acc (%), Mean = H-Mean (%). Best Mean in bold .
+
+Class CVAE-ZSL MZSL CLIP-Decoder P2T ZET-LLM ProtoLLM SMELL FL-ZSL TZSL SMETA-ZSL 
+
+Run 1 (Seed 42) 
+
+Seen 23.38 71.13 58.40 1.45 34.62 43.77 53.83 53.08 32.23 46.32 Unseen 7.36 12.34 10.54 0.00 6.80 14.58 4.23 19.04 44.55 57.92 Mean 11.20 21.02 17.86 0.00 11.37 21.87 7.85 28.03 37.40 51.48 
+
+Run 2 (Seed 123) 
+
+Seen 25.39 71.23 57.29 2.23 33.92 41.29 49.46 52.53 29.22 39.73 Unseen 4.45 17.25 16.77 0.15 6.70 14.48 5.46 19.76 28.50 64.21 Mean 7.58 27.77 25.94 0.28 11.19 21.44 9.84 28.72 28.86 49.09 
+
+Run 3 (Seed 456) 
+
+Seen 23.56 73.63 57.94 2.58 34.20 42.76 54.86 52.53 29.22 48.33 Unseen 4.75 14.73 15.69 0.00 7.50 14.38 13.52 14.97 33.41 65.85 Mean 7.91 24.55 24.69 0.00 12.30 21.52 21.70 23.30 31.18 55.74 
+
+Run 4 (Seed 789) 
+
+Seen 21.46 74.89 57.29 1.35 34.27 41.17 49.15 53.23 37.69 40.35 Unseen 2.81 12.46 14.73 0.61 9.50 14.63 6.83 17.25 20.84 54.37 Mean 4.97 21.36 23.44 0.84 14.88 21.59 11.99 26.05 26.84 46.32 
+
+Run 5 (Seed 2025) 
+
+Seen 22.86 74.19 56.84 1.99 34.43 42.18 57.59 52.33 31.93 38.09 Unseen 5.96 12.46 8.98 0.91 8.50 14.48 5.60 20.72 27.78 66.12 Mean 9.46 21.33 15.51 1.25 13.63 21.55 10.21 29.68 29.71 48.33 
+
+Average ± Std 
+
+Seen 23.33 ±1.42 73.01 ±1.55 57.55 ±0.61 1.92 ±0.47 34.29 ±0.26 42.23 ±1.05 52.98 ±3.63 52.74 ±0.39 32.06 ±3.09 42 .56 ±4.48 
+
+Unseen 5.07 ±1.71 13.84 ±1.92 13.34 ±3.39 0.33 ±0.36 7.80 ±1.19 14.51 ±0.09 7.13 ±3.69 18.35 ±2.28 31.02 ±7.86 61 .69 ±5.27 
+
+Mean 8.22 ±2.32 23.21 ±2.62 21.49 ±4.55 0.47 ±0.49 12.67 ±1.57 21.59 ±0.16 12.32 ±5.45 27.16 ±2.53 30.80 ±3.59 50 .19 ±3.61 
+
+Table 13: GZSL results on AVASTCTU. Seen = Seen Acc (%), Unseen = Unseen Acc (%), Mean = H-Mean (%). Best Mean in bold .
+
+Class CVAE-ZSL MZSL CLIP-Decoder P2T ZET-LLM ProtoLLM SMELL FL-ZSL TZSL SMETA-ZSL 
+
+Run 1 (Seed 42) 
+
+Seen 46.18 99.44 65.30 14.29 99.48 90.07 81.18 96.45 52.50 96.68 Unseen 22.33 14.90 35.73 0.33 0.00 31.40 25.40 30.60 58.62 42.07 Mean 30.11 25.92 46.19 0.65 0.00 46.57 38.69 46.46 55.39 58.63 
+
+Run 2 (Seed 123) 
+
+Seen 40.81 99.44 62.03 14.29 99.48 90.48 81.13 95.61 18.50 88.28 Unseen 24.07 0.78 34.67 0.18 0.00 28.68 23.42 26.23 39.62 40.83 Mean 30.28 1.55 44.48 0.36 0.00 43.56 36.34 41.17 25.22 55.84 
+
+Run 3 (Seed 456) 
+
+Seen 31.09 99.39 62.12 14.29 99.48 91.73 80.90 95.84 35.54 97.43 Unseen 13.92 11.35 19.78 0.23 0.00 27.55 23.17 29.72 11.62 39.87 Mean 19.23 20.37 30.01 0.46 0.00 42.37 36.02 45.37 17.51 56.58 
+
+Run 4 (Seed 789) 
+
+Seen 37.53 99.44 63.80 14.29 99.48 89.74 81.18 96.40 83.65 95.89 Unseen 9.37 30.72 26.48 0.27 0.00 28.65 22.77 35.58 35.90 39.57 Mean 14.99 46.94 37.43 0.52 0.00 43.43 35.56 51.98 50.24 56.02 
+
+Run 5 (Seed 2025) 
+
+Seen 29.79 99.67 37.27 14.29 99.48 90.30 81.13 95.14 0.00 97.43 Unseen 29.52 9.05 37.88 0.20 0.00 22.00 23.90 23.23 41.92 41.20 Mean 29.65 16.59 37.58 0.39 0.00 35.38 36.92 37.35 0.00 57.91 
+
+Average ± Std 
+
+Seen 37.08 ±6.82 99 .48 ±0.10 58.10 ±11.72 14.29 ±0.00 99.48 ±0.00 90.46 ±0.76 81.10 ±0.10 95.89 ±0.55 38.04 ±32.11 95.14 ±3.89 
+
+Unseen 19.84 ±8.10 13.36 ±9.84 30.91 ±7.57 0.24 ±0.05 0.00 ±0.00 27.66 ±3.47 23.73 ±0.91 29.07 ±4.67 37.53 ±16.90 40 .71 ±1.01 
+
+Mean 24.85 ±7.23 22.27 ±14.74 39.14 ±6.46 0.48 ±0.10 0.01 ±0.01 42.26 ±4.15 36.71 ±1.09 44.46 ±5.54 29.67 ±23.09 57 .00 ±1.22 
+
+16 Preprint. Under review. Table 14: GZSL results on GOODREADS. Seen = Seen Acc (%), Unseen = Unseen Acc (%), Mean = H-Mean (%). Best Mean in bold .
+
+Class CVAE-ZSL MZSL CLIP-Decoder P2T ZET-LLM ProtoLLM SMELL FL-ZSL TZSL SMETA-ZSL 
+
+Run 1 (Seed 42) 
+
+Seen 6.83 25.28 12.50 17.89 14.56 23.92 21.28 34.53 16.67 34.03 Unseen 36.53 18.72 31.00 4.58 31.28 24.75 36.18 17.65 0.00 47.50 Mean 11.51 21.51 17.82 7.30 19.87 24.33 26.80 23.36 0.00 39.65 
+
+Run 2 (Seed 123) 
+
+Seen 7.72 26.89 13.06 26.69 15.81 24.27 21.64 32.75 16.67 25.06 Unseen 45.02 20.03 34.58 4.00 32.50 24.77 22.33 16.52 0.00 50.77 Mean 13.18 22.96 18.96 6.96 21.27 24.52 21.98 21.96 0.00 33.55 
+
+Run 3 (Seed 456) 
+
+Seen 6.58 16.75 14.19 29.67 15.36 23.36 22.17 34.36 16.67 31.56 Unseen 42.53 31.13 33.23 4.40 29.18 24.78 25.93 15.30 0.00 43.73 Mean 11.40 21.78 19.89 7.66 20.13 24.05 23.90 21.17 0.00 36.66 
+
+Run 4 (Seed 789) 
+
+Seen 8.67 27.11 13.75 28.53 15.50 24.45 20.81 36.33 16.67 31.47 Unseen 34.92 20.53 32.05 4.33 29.78 24.88 28.20 16.05 0.00 35.80 Mean 13.89 23.37 19.24 7.52 20.39 24.67 23.94 22.26 0.00 33.50 
+
+Run 5 (Seed 2025) 
+
+Seen 5.33 15.56 12.86 21.97 15.06 23.54 20.92 31.78 16.67 30.67 Unseen 42.93 43.35 29.33 6.15 33.45 24.82 29.32 15.37 0.00 44.30 Mean 9.49 22.90 17.88 9.61 20.77 24.16 24.41 20.72 0.00 36.24 
+
+Average ± Std 
+
+Seen 7.03 ±1.25 22.32 ±5.09 13.27 ±0.69 24.95 ±4.40 15.26 ±0.48 23.91 ±0.47 21.36 ±0.50 33.95 ±1.76 16.67 ±0.00 30 .56 ±3.32 
+
+Unseen 40.39 ±4.40 26.75 ±9.41 32.04 ±2.02 4.69 ±0.75 31.24 ±1.79 24.80 ±0.05 28.39 ±4.57 16.18 ±0.97 0.00 ±0.00 44 .42 ±5.59 
+
+Mean 11.89 ±1.72 22.50 ±0.72 18.76 ±0.90 7.81 ±0.93 20.48 ±0.55 24.34 ±0.25 24.21 ±1.54 21.89 ±1.02 0.00 ±0.00 35 .92 ±2.50 
+
+Table 15: GZSL results on PETFINDER. Seen = Seen Acc (%), Unseen = Unseen Acc (%), Mean = H-Mean (%). Best Mean in bold .
+
+Class CVAE-ZSL MZSL CLIP-Decoder P2T ZET-LLM ProtoLLM SMELL FL-ZSL TZSL SMETA-ZSL 
+
+Run 1 (Seed 42) 
+
+Seen 1.95 36.95 32.52 28.20 25.40 27.94 53.71 44.30 3.91 29.01 Unseen 48.47 27.87 36.24 1.64 19.85 25.72 1.90 24.19 25.08 39.33 Mean 3.76 31.77 34.28 3.09 22.28 26.78 3.67 31.29 6.76 33.39 
+
+Run 2 (Seed 123) 
+
+Seen 0.05 27.15 31.79 31.87 27.05 24.15 51.13 44.24 3.71 30.79 Unseen 49.44 34.05 31.47 0.78 21.45 25.66 1.71 24.51 17.12 38.59 Mean 0.11 30.21 31.63 1.52 23.93 24.88 3.30 31.54 6.10 34.26 
+
+Run 3 (Seed 456) 
+
+Seen 0.00 29.74 31.52 38.23 26.30 27.41 52.72 44.50 4.04 27.48 Unseen 49.48 29.99 30.74 1.72 19.37 25.53 1.02 25.07 11.57 40.18 Mean 0.00 29.86 31.13 3.29 22.31 26.44 1.99 32.07 5.99 32.64 
+
+Run 4 (Seed 789) 
+
+Seen 1.78 34.97 35.43 30.65 27.15 25.50 50.93 44.24 3.38 28.15 Unseen 49.86 30.56 30.08 1.43 20.85 25.63 1.81 23.92 19.87 40.89 Mean 3.43 32.62 32.53 2.73 23.59 25.57 3.50 31.05 5.77 33.34 
+
+Run 5 (Seed 2025) 
+
+Seen 0.00 25.23 32.85 34.18 25.78 23.98 52.98 43.58 4.30 29.27 Unseen 50.27 38.02 30.53 1.01 21.75 25.59 1.69 24.14 10.03 38.24 Mean 0.00 30.33 31.65 1.95 23.60 24.76 3.28 31.07 6.02 33.16 
+
+Average ± Std 
+
+Seen 0.76 ±1.01 30.81 ±4.49 32.82 ±1.55 32.63 ±3.40 26.34 ±0.77 25.80 ±1.82 52.29 ±1.08 44.17 ±0.35 3.87 ±0.35 28.94 ±1.26 
+
+Unseen 49.51 ±0.67 32.10 ±3.57 31.81 ±2.53 1.32 ±0.36 20.65 ±1.02 25.63 ±0.07 1.63 ±0.31 24.37 ±0.45 16.73 ±6.15 39 .45 ±1.10 
+
+Mean 1.46 ±1.95 30.96 ±1.05 32.24 ±1.25 2.52 ±0.68 23.14 ±0.78 25.69 ±0.91 3.15 ±0.59 31.41 ±0.42 6.13 ±0.37 33 .36 ±0.58 
+
+Table 16: SMETA-ZSL performance under varying numbers of labeled samples per unseen family ( K-shot) across cybersecurity datasets. K = 0 is the zero-shot setting; S = Seen Acc (%), U = Unseen Acc (%), H = Harmonic Mean (%). 
+
+CIC-AndMAL-2020 BODMAS AVASTCTU 
+
+K S U H S U H S U H
+
+0 (zero-shot) 66.56 51.07 57.78 77.75 47.67 59.10 99.58 34.28 51.01 1 57.41 64.45 60.73 80.69 55.28 65.61 95.80 54.96 69.85 2 61.53 61.36 61.44 78.94 66.50 72.19 95.75 63.76 76.55 5 57.53 61.88 59.62 80.69 65.13 72.08 95.84 68.17 79.67 
+
+17

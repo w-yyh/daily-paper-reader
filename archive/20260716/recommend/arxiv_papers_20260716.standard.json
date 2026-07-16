@@ -1,0 +1,93 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-16T21:15:23.783306+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.13504v1",
+      "source": "arxiv",
+      "title": "DP-BOA: Dirichlet-Process Birth-or-Assign for On-the-Fly Category Discovery",
+      "abstract": "On-the-fly category discovery requires deciding for each incoming test sample whether to assign it to an existing category or spawn a new one. Existing methods typically implement this decision through matching-based heuristics, such as radius- or hash-based rules. While effective in practice, these methods usually treat category birth implicitly as a fallback when no existing category matches confidently, rather than as an explicit alternative supported by its own statistical evidence. To address this, we propose DP-BOA, a posterior-predictive decision framework based on an online Dirichlet-process Gaussian mixture model with a Normal-Inverse-Wishart prior. During training, we use labeled data to calibrate a shared NIW prior over category Gaussians and warm-start the known-category posteriors. At test time, for each incoming sample, DP-BOA compares the posterior predictive evidence for assignment to existing categories against the evidence for spawning a new category induced by the DP prior, and then updates category statistics online after the decision. The method captures anisotropic category geometry and naturally adapts decision confidence as evidence accumulates. Across standard OCD benchmarks, DP-BOA consistently outperforms strong baselines and delivers particularly strong novel-class discovery performance while maintaining competitive known-class accuracy.",
+      "authors": [
+        "Peiyan Gu",
+        "Zixin Teng",
+        "Xuming He"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-15T06:58:12+00:00",
+      "link": "https://arxiv.org/pdf/2607.13504v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "On-the-fly category discovery decides for each sample to assign or spawn, directly targeting novel class discovery in open worlds",
+      "llm_evidence_cn": "即时类别发现决策分配或创建新类，直接针对开放世界新类发现",
+      "llm_evidence": "即时类别发现决策分配或创建新类，直接针对开放世界新类发现",
+      "canonical_evidence": "即时类别发现决策分配或创建新类，直接针对开放世界新类发现",
+      "llm_tldr_en": "DP-BOA proposes a posterior-predictive decision framework for on-the-fly category discovery using a Dirichlet-process Gaussian mixture. It explicitly models category birth as a statistically supported alternative, overcoming heuristic fallbacks, thereby advancing principled open-world novelty detection.",
+      "llm_tldr_cn": "DP-BOA针对即时类别发现问题，提出基于狄利克雷过程高斯混合模型的后验预测决策框架。该方法将新类创建视为显式统计决策，避免了启发式方法的局限性。通过在线狄利克雷过程与NIW先验，该方法能够在连续数据流中自适应地平衡已知类分类与新类发现，有望提升实际开放世界系统的自主适应能力。",
+      "llm_tldr": "DP-BOA针对即时类别发现问题，提出基于狄利克雷过程高斯混合模型的后验预测决策框架。该方法将新类创建视为显式统计决策，避免了启发式方法的局限性。通过在线狄利克雷过程与NIW先验，该方法能够在连续数据流中自适应地平衡已知类分类与新类发现，有望提升实际开放世界系统的自主适应能力。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.09936v1",
+      "source": "arxiv",
+      "title": "SMETA-ZSL:Semantic Meta-Alignment for Zero-Shot Threat Classification",
+      "abstract": "Cybersecurity systems must adapt rapidly to emerging threats. However, labeled data for new threat categories is unavailable when those threats first appear. Generalized zero-shot learning offers a natural solution by enabling recognition of unseen classes through auxiliary semantic knowledge rather than labeled examples. Large language models are particularly promising in this setting because they can convert unstructured CTI reports into semantic prototypes for emerging threats. However, applying language-driven zero-shot learning to cybersecurity is difficult due to strong semantic overlap between threat descriptions, heterogeneity between behavioral attributes and text, severe class imbalance, and open-set conditions where unseen threats are unknown during training. We propose SMETA-ZSL, that learns semantic prototypes from overlapping language descriptions through contrastive finetuning, aligns behavioral features through episodic meta-learning and knowledge distillation, and performs adaptive routing for generalization across seen-unseen classes. Across 7 benchmarks, SMETA-ZSL delivers the strongest overall generalized zero-shot performance under the strictest inductive setting, surpassing prior methods by 10.8 points on average, with gains up to 18.1 points. Github:https://github.com/Security-And-Intelligence-Lab-UTEP/SMETA-ZSL",
+      "authors": [
+        "Ivan Alejandro Montoya Sanchez",
+        "Anantaa Kotal",
+        "Aritran Piplai"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CR"
+      ],
+      "published": "2026-07-10T19:33:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.09936v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "zero-shot learning for unseen threat classes in open-set conditions",
+      "llm_evidence_cn": "开放集条件下针对未知威胁的零样本学习",
+      "llm_evidence": "开放集条件下针对未知威胁的零样本学习",
+      "canonical_evidence": "开放集条件下针对未知威胁的零样本学习",
+      "llm_tldr_en": "SMETA-ZSL leverages zero-shot learning and LLMs to detect unseen cyber threats by generating semantic prototypes from CTI reports, addressing open-set conditions where novel threats appear without labeled data.",
+      "llm_tldr_cn": "SMETA-ZSL 利用零样本学习和大语言模型，从威胁情报报告中生成语义原型，以检测未见过的网络威胁，应对新型威胁出现时无标注数据的开放集条件。该方法通过语义元对齐增强对新威胁的泛化能力，在网络安全领域具有重要应用价值。",
+      "llm_tldr": "SMETA-ZSL 利用零样本学习和大语言模型，从威胁情报报告中生成语义原型，以检测未见过的网络威胁，应对新型威胁出现时无标注数据的开放集条件。该方法通过语义元对齐增强对新威胁的泛化能力，在网络安全领域具有重要应用价值。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
