@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-21 <!--dpr-date:20260721-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/21/2607.14661v2-smartrag-native-graph-based-rag-for-mobile-device" data-sidebar-item="{&quot;title&quot;: &quot;SmartRAG: Native Graph-Based RAG for Mobile Device&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.14661v2-smartrag-native-graph-based-rag-for-mobile-device&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;EvoNER逐步扩展标签库以吸收以前未见过的实体类型&quot;}">SmartRAG: Native Graph-Based RAG for Mobile Device</a>
   * 2026-07-16 <!--dpr-date:20260716-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/16/2607.13504v1-dp-boa-dirichlet-process-birth-or-assign-for-on-the-fly-category-discovery" data-sidebar-item="{&quot;title&quot;: &quot;DP-BOA: Dirichlet-Process Birth-or-Assign for On-the-Fly Category Discovery&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.13504v1-dp-boa-dirichlet-process-birth-or-assign-for-on-the-fly-category-discovery&quot;, &quot;score&quot;: &quot;10.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;即时类别发现决策分配或创建新类，直接针对开放世界新类发现&quot;}">DP-BOA: Dirichlet-Process Birth-or-Assign for On-the-Fly Category Discovery</a>

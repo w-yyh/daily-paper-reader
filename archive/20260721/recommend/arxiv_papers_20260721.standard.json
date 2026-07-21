@@ -1,0 +1,60 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-21T20:18:21.677097+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.14661v2",
+      "source": "arxiv",
+      "title": "SmartRAG: Native Graph-Based RAG for Mobile Device",
+      "abstract": "Deploying large language models (LLMs) as personal assistants on mobile devices demands privacy, low latency, and offline availability, yet the computational cost of giant models clashes with strict edge-hardware budgets. We argue that this tension cannot be resolved by model compression alone; it requires decomposing on-device intelligence into complementary functional roles. We present SmartRAG, a fully on-device framework that organizes an intelligent assistant around four coordinated modules -- Perception, Memory, Focus, and Thinking. At the core of SmartRAG is EvoNER, a continually learnable named-entity recognizer that incrementally expands its label inventory through teacher-distilled updates, enabling the system to absorb previously unseen entity types without retraining the backbone LLM. Extracted knowledge is stored in MRGraph, a three-layer provenance-preserving knowledge graph, and retrieved at query time through a hybrid pipeline combining graph traversal, lexical matching, and dense semantic search. The on-device LLM is invoked only for high-value semantic operations -- labeling, planning, and answer synthesis -- keeping inference costs bounded. Experiments on four QA benchmarks (TriviaQA, Natural Questions, HotpotQA, MultiHopQA) show that SmartRAG with a quantized 1.7B-parameter backbone achieves multi-hop reasoning performance competitive with models up to 18$\\times$ larger, while running entirely on commodity smartphones within practical memory and latency envelopes.",
+      "authors": [
+        "Zhihan Jiang",
+        "Meng Li",
+        "Shenghao Liu",
+        "Keran Li",
+        "Ruiben Zhou",
+        "Wei Wang",
+        "Xianjun Deng",
+        "Shuai Wang",
+        "Haipeng Dai"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-16T07:28:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.14661v2",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "EvoNER incrementally expands its label inventory to handle previously unseen entity types",
+      "llm_evidence_cn": "EvoNER逐步扩展标签库以吸收以前未见过的实体类型",
+      "llm_evidence": "EvoNER逐步扩展标签库以吸收以前未见过的实体类型",
+      "canonical_evidence": "EvoNER逐步扩展标签库以吸收以前未见过的实体类型",
+      "llm_tldr_en": "SmartRAG proposes an on-device framework where EvoNER, a continually learnable NER, incrementally expands its label set via teacher-distilled updates to absorb novel entity types without retraining, enabling open-world novel class handling.",
+      "llm_tldr_cn": "SmartRAG是一款全在端框架，将智能分解为感知、记忆、聚焦与思考四模块，核心组件EvoNER通过教师引导的增量更新逐步扩展标签库，吸收新实体类型而无需重新训练。该框架在移动场景下实现了对新类别的持续适应，为开放世界中命名实体识别的新类发现提供了轻量高效的解决思路。",
+      "llm_tldr": "SmartRAG是一款全在端框架，将智能分解为感知、记忆、聚焦与思考四模块，核心组件EvoNER通过教师引导的增量更新逐步扩展标签库，吸收新实体类型而无需重新训练。该框架在移动场景下实现了对新类别的持续适应，为开放世界中命名实体识别的新类发现提供了轻量高效的解决思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
