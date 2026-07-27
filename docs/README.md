@@ -6,29 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-26
-- 运行时间：2026-07-26 21:03:45 UTC
+- 最新运行日期：2026-07-27
+- 运行时间：2026-07-27 21:29:52 UTC
 - 运行状态：成功
 - 本次总论文数：2
 - 精读区：0
 - 速读区：2
 
 ### 今日简报（AI）
-今天速读了两篇AI前沿工具论文：利用基础模型实现无源域适应，以及统一软聚类Python库。  
-前者为迁移学习引入大模型能力，后者为模糊聚类提供了即用型标准框架，评分均为6分。  
-对迁移学习或数据聚类感兴趣的读者，可上手该聚类库或关注大模型在域适应中的实际表现。
-- 详情：[/202607/26/README](/202607/26/README)
+今日速读两篇中规中矩的工作，分别探索流形优化的理论与FSCIL中的捷径问题。  
+一篇将正则化框架搬上格拉斯曼流形，另一篇用区域解耦缓解小样本增量学习的捷径依赖。  
+若对几何优化或稳健的持续学习感兴趣，可带着批判眼光精读方法细节。
+- 详情：[/202607/27/README](/202607/27/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [LFM: Leveraging Foundation Models for Source-Free Universal Domain Adaptation](/202607/26/2607.17653v1-lfm-leveraging-foundation-models-for-source-free-universal-domain-adaptation)  
+1. [Regularized Optimization on Grassmann Manifold: Theory, Algorithm and Applications](/202607/27/2607.21039v1-regularized-optimization-on-grassmann-manifold-theory-algorithm-and-applications)  
    标签：评分：6.0/10、query:cgcd
-   evidence：在无源通用域适应中处理未知类别发现
-2. [SCPP: A Unified Python Library for Soft Clustering](/202607/26/2607.19620v1-scpp-a-unified-python-library-for-soft-clustering)  
+   evidence：提出基于Grassmann流形正则化优化的鲁棒谱聚类，可用于聚类新类别
+2. [Alleviating Regional Shortcuts for Few-Shot Class-Incremental Learning](/202607/27/2607.22072v1-alleviating-regional-shortcuts-for-few-shot-class-incremental-learning)  
    标签：评分：6.0/10、query:cgcd
-   evidence：统一的软聚类库，可用于新类别发现中的聚类任务
+   evidence：分析导致新类误分类的捷径并提出解决方案
 
 
 <div class="dpr-home-promo-card">

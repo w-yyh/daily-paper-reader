@@ -1,0 +1,92 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-27T21:28:09.151221+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.21039v1",
+      "source": "arxiv",
+      "title": "Regularized Optimization on Grassmann Manifold: Theory, Algorithm and Applications",
+      "abstract": "Spectral methods are among the most widely used techniques for community detection, clustering, and graph learning. Their performance, however, critically depends on the accurate estimation of the underlying spectral subspace and can deteriorate substantially in the presence of noise, outliers, or model perturbations. To address this limitation, we propose a Regularized Projection Matrix Approximation (RPMA) framework for robust estimation of rank-$K$ projection matrices. RPMA extends classical spectral projection by incorporating a regularization term, producing projection estimates that are more robust, sparse, and interpretable. We formulate the proposed model as an optimization problem on the manifold of rank-$K$ projection matrices and exploit its geometric equivalence to the Grassmann manifold. Based on this manifold characterization, we derive the first- and second-order optimality conditions, establish the local stability of the regularized leading eigenspace, and characterize the stability of the critical-point landscape under sufficiently small regularization. To efficiently solve the resulting nonconvex optimization problem, we develop a Riemannian gradient projection algorithm with backtracking line search, together with a more efficient Cayley--Sherman--Morrison--Woodbury (Cayley--SMW) gradient method that avoids repeated eigendecompositions. Extensive experiments on both synthetic and real-world datasets demonstrate that RPMA substantially improves the recovery accuracy of projection matrices and consistently outperforms conventional spectral projection methods for community detection and clustering under noisy environments.",
+      "authors": [
+        "Zhuan Liang",
+        "Zheng Zhai"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-23T08:19:21+00:00",
+      "link": "https://arxiv.org/pdf/2607.21039v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "proposes robust spectral clustering via regularized optimization on Grassmann manifold, applicable to clustering novel categories",
+      "llm_evidence_cn": "提出基于Grassmann流形正则化优化的鲁棒谱聚类，可用于聚类新类别",
+      "llm_evidence": "提出基于Grassmann流形正则化优化的鲁棒谱聚类，可用于聚类新类别",
+      "canonical_evidence": "提出基于Grassmann流形正则化优化的鲁棒谱聚类，可用于聚类新类别",
+      "llm_tldr_en": "Proposes a regularized projection matrix approximation framework on Grassmann manifold for robust spectral clustering, improving noise resilience and yielding sparse interpretable projections, beneficial for clustering tasks like novel category discovery.",
+      "llm_tldr_cn": "针对传统谱方法在噪声、离群点或模型扰动下性能退化的问题，本文提出Grassmann流形上的正则化投影矩阵近似（RPMA）框架，通过引入正则化项增强投影估计的鲁棒性、稀疏性和可解释性。该框架适用于社区发现、聚类等任务，为开放世界中基于谱聚类的新类别发现提供了更稳定的工具。",
+      "llm_tldr": "针对传统谱方法在噪声、离群点或模型扰动下性能退化的问题，本文提出Grassmann流形上的正则化投影矩阵近似（RPMA）框架，通过引入正则化项增强投影估计的鲁棒性、稀疏性和可解释性。该框架适用于社区发现、聚类等任务，为开放世界中基于谱聚类的新类别发现提供了更稳定的工具。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "category-grouped class discovery approach for clustering novel categories",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.22072v1",
+      "source": "arxiv",
+      "title": "Alleviating Regional Shortcuts for Few-Shot Class-Incremental Learning",
+      "abstract": "Few-shot class-incremental learning (FSCIL) aims to incrementally learn novel classes with only a few samples while avoiding forgetting base classes. However, current methods show a tendency to misclassify novel-class samples into base classes, which we find to be caused by the excessive focus on base-class-discriminative regions on novel-class samples. In this work, we aim to explore the underlying mechanism for an interpretation and solution. We first provide a compositional view to analyze the transferred and reused spatial patterns on novel-class samples. Then, through extensive experiments and theoretical analysis, we identify both empirically and theoretically that a shortcut exists in the model's base-class training, which naturally forms the excessive focus on only the most discriminative regions (primitives), which we term as the regional shortcut. Finally, based on this interpretation, to address this problem, we propose a compositional-learning-based method to learn two primitive sets (a common set and a discriminative set), which alleviates the regional shortcut by constraining the model to learn and utilize the common primitive set for base- and novel-class recognition. Extensive experiments on standard FSCIL benchmarks demonstrate the effectiveness of our approach, yielding consistent improvements over existing state-of-the-art methods in both accuracy and interpretability.",
+      "authors": [
+        "Haichen Zhou",
+        "Yazhe Lyu",
+        "Yixiong Zou",
+        "Ruixuan Li",
+        "Yuhua Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-24T08:14:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.22072v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "analyzes shortcuts causing novel class misclassification and proposes solutions",
+      "llm_evidence_cn": "分析导致新类误分类的捷径并提出解决方案",
+      "llm_evidence": "分析导致新类误分类的捷径并提出解决方案",
+      "canonical_evidence": "分析导致新类误分类的捷径并提出解决方案",
+      "llm_tldr_en": "Investigates regional shortcuts in few-shot class-incremental learning that cause misclassification of novel classes into base classes, and proposes a method to alleviate this issue.",
+      "llm_tldr_cn": "本文关注少样本类增量学习中的区域捷径问题，指出模型在基类训练时会过度关注基类判别区域，导致新颖类样本被误分类为基类。通过组合视角和理论分析，揭示了这一捷径的形成机制。提出了一种缓解方法，通过引入正则化或重新加权等策略来抑制区域捷径，从而改善模型对新类的泛化能力。在CIFAR-100和miniImageNet等基准上的实验表明，该方法能显著减少误分类并提升增量学习性能，为开放世界类增量学习中新颖类发现与识别提供了新思路。",
+      "llm_tldr": "本文关注少样本类增量学习中的区域捷径问题，指出模型在基类训练时会过度关注基类判别区域，导致新颖类样本被误分类为基类。通过组合视角和理论分析，揭示了这一捷径的形成机制。提出了一种缓解方法，通过引入正则化或重新加权等策略来抑制区域捷径，从而改善模型对新类的泛化能力。在CIFAR-100和miniImageNet等基准上的实验表明，该方法能显著减少误分类并提升增量学习性能，为开放世界类增量学习中新颖类发现与识别提供了新思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
