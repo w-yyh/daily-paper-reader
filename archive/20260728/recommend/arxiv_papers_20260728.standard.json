@@ -1,0 +1,53 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-28T20:48:23.699593+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2607.23981v1",
+      "source": "arxiv",
+      "title": "Multimodal Semantic-Probabilistic Objectness for Open World Object Detection",
+      "abstract": "Open-world object detection (OWOD) requires a detector to recognize known categories, discover unnamed objects from unseen categories, and incrementally learn newly annotated classes. PROB improves unknown discovery by modeling class-agnostic probabilistic objectness in the decoder-query space. However, visual objectness alone cannot determine whether an object-like query corresponds to a hard known instance, an unseen-category object, or background clutter, resulting in an ambiguous known-unknown decision boundary. We propose MSPO, a lightweight semantic calibration framework that augments PROB with task-aware known-category language priors while preserving its detector architecture and incremental learning protocol. For each currently known category, MSPO constructs an extended text description covering category attributes, visual appearance, typical scenes, and functional usage, and encodes it using a frozen CLIP text encoder. Decoder query features are projected into the same semantic space to estimate their support from the current known-category semantics. This semantic evidence is fused with PROB's visual objectness to calibrate known and unknown predictions without turning OWOD into open-vocabulary classification. Importantly, MSPO never uses future-category names, and all unseen categories remain unnamed during evaluation. Experiments on M-OWODB and S-OWODB show that MSPO improves the strong PROB baseline on the main aggregate metrics while retaining competitive unknown recall. It also improves early unknown-confusion metrics and raises PASCAL VOC final mAP by up to 2.7 points. These results demonstrate that known-category language semantics provide an effective calibration signal for probabilistic objectness under the standard OWOD setting.",
+      "authors": [
+        "Weijun Tian",
+        "Rui Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-27T04:12:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.23981v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Discovers unnamed objects from unseen categories in open-world object detection",
+      "llm_evidence_cn": "在开放世界目标检测中发现未命名的新类对象",
+      "llm_evidence": "在开放世界目标检测中发现未命名的新类对象",
+      "canonical_evidence": "在开放世界目标检测中发现未命名的新类对象",
+      "llm_tldr_en": "Proposes MSPO, a semantic calibration framework for OWOD that integrates language priors with probabilistic objectness to resolve known-unknown ambiguity and improve discovery of unseen categories.",
+      "llm_tldr_cn": "该论文针对开放世界目标检测中视觉目标性存在已知-未知决策边界模糊的问题，提出了一种轻量级多模态语义-概率校准框架MSPO，结合概率目标性和已知类别的语言先验，有效提升了未见类别的发现能力。实验表明该方法在保持增量学习协议的同时优于纯视觉基准。该工作为开放世界场景中的新类发现提供了更鲁棒的语义决策边界。",
+      "llm_tldr": "该论文针对开放世界目标检测中视觉目标性存在已知-未知决策边界模糊的问题，提出了一种轻量级多模态语义-概率校准框架MSPO，结合概率目标性和已知类别的语言先验，有效提升了未见类别的发现能力。实验表明该方法在保持增量学习协议的同时优于纯视觉基准。该工作为开放世界场景中的新类发现提供了更鲁棒的语义决策边界。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}

@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-28 <!--dpr-date:20260728-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/28/2607.23981v1-multimodal-semantic-probabilistic-objectness-for-open-world-object-detection" data-sidebar-item="{&quot;title&quot;: &quot;Multimodal Semantic-Probabilistic Objectness for Open World Object Detection&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.23981v1-multimodal-semantic-probabilistic-objectness-for-open-world-object-detection&quot;, &quot;score&quot;: &quot;10.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;在开放世界目标检测中发现未命名的新类对象&quot;}">Multimodal Semantic-Probabilistic Objectness for Open World Object Detection</a>
   * 2026-07-27 <!--dpr-date:20260727-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/27/2607.21039v1-regularized-optimization-on-grassmann-manifold-theory-algorithm-and-applications" data-sidebar-item="{&quot;title&quot;: &quot;Regularized Optimization on Grassmann Manifold: Theory, Algorithm and Applications&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.21039v1-regularized-optimization-on-grassmann-manifold-theory-algorithm-and-applications&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;提出基于Grassmann流形正则化优化的鲁棒谱聚类，可用于聚类新类别&quot;}">Regularized Optimization on Grassmann Manifold: Theory, Algorithm and Applications</a>

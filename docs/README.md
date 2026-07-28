@@ -6,29 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-27
-- 运行时间：2026-07-27 21:29:52 UTC
+- 最新运行日期：2026-07-28
+- 运行时间：2026-07-28 20:50:07 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：0
-- 速读区：2
+- 本次总论文数：1
+- 精读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读两篇中规中矩的工作，分别探索流形优化的理论与FSCIL中的捷径问题。  
-一篇将正则化框架搬上格拉斯曼流形，另一篇用区域解耦缓解小样本增量学习的捷径依赖。  
-若对几何优化或稳健的持续学习感兴趣，可带着批判眼光精读方法细节。
-- 详情：[/202607/27/README](/202607/27/README)
+今天精读了一篇满分论文，探讨如何让检测模型学会“我不知道这是什么，但我知道这里有东西”的未知物体感知力。  
+核心结论是融合语义与概率的对象性建模，在开放世界检测中显著提升了对未知类别的召回与定位精度。  
+建议读者关注开放世界感知中的“对象性先验”这一设计思路，或可复用到其他需要应对未知输入的智能体任务中。
+- 详情：[/202607/28/README](/202607/28/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Multimodal Semantic-Probabilistic Objectness for Open World Object Detection](/202607/28/2607.23981v1-multimodal-semantic-probabilistic-objectness-for-open-world-object-detection)  
+   标签：评分：10.0/10、query:cgcd
+   evidence：在开放世界目标检测中发现未命名的新类对象
 
 ### 速读区论文标签
-1. [Regularized Optimization on Grassmann Manifold: Theory, Algorithm and Applications](/202607/27/2607.21039v1-regularized-optimization-on-grassmann-manifold-theory-algorithm-and-applications)  
-   标签：评分：6.0/10、query:cgcd
-   evidence：提出基于Grassmann流形正则化优化的鲁棒谱聚类，可用于聚类新类别
-2. [Alleviating Regional Shortcuts for Few-Shot Class-Incremental Learning](/202607/27/2607.22072v1-alleviating-regional-shortcuts-for-few-shot-class-incremental-learning)  
-   标签：评分：6.0/10、query:cgcd
-   evidence：分析导致新类误分类的捷径并提出解决方案
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">

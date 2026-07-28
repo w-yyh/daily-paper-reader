@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-28",
+  "date": "2026-07-28",
+  "generated_at": "2026-07-28T20:50:14",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/28/2607.23981v1-multimodal-semantic-probabilistic-objectness-for-open-world-object-detection",
+      "section": "deep",
+      "title_en": "Multimodal Semantic-Probabilistic Objectness for Open World Object Detection",
+      "authors": "Weijun Tian, Rui Liu",
+      "date": "2026-07-27",
+      "pdf": "https://arxiv.org/pdf/2607.23981v1",
+      "score": "10.0",
+      "evidence": "在开放世界目标检测中发现未命名的新类对象",
+      "tldr": "开放世界目标检测（OWOD）要求检测器同时识别已知类别、发现未知目标并逐步学习新类别。现有方法PROB用概率对象性建模未知发现，但视觉对象性单一导致已知/未知决策边界模糊。为此我们提出MSPO，通过已知类别扩展语义描述与CLIP文本编码，将语义校准信号融入解码器查询特征，融合视觉对象性。实验表明，MSPO在M-OWODB、S-OWODB上提升PROB基线的主要聚合指标，未知召回率保持竞争力，并将PASCAL VOC最终mAP提升最多2.7点。这证明了在不泛化成开放词汇分类、不使用未来类别名称的前提下，已知类别语言语义为概率对象性提供有效校准。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-world object detection (OWOD) requires a detector to recognize known categories, discover unnamed objects from unseen categories, and incrementally learn newly annotated classes. PROB improves unknown discovery by modeling class-agnostic probabilistic objectness in the decoder-query space. However, visual objectness alone cannot determine whether an object-like query corresponds to a hard known instance, an unseen-category object, or background clutter, resulting in an ambiguous known-unknown decision boundary. We propose MSPO, a lightweight semantic calibration framework that augments PROB with task-aware known-category language priors while preserving its detector architecture and incremental learning protocol. For each currently known category, MSPO constructs an extended text description covering category attributes, visual appearance, typical scenes, and functional usage, and encodes it using a frozen CLIP text encoder. Decoder query features are projected into the same semantic space to estimate their support from the current known-category semantics. This semantic evidence is fused with PROB's visual objectness to calibrate known and unknown predictions without turning OWOD into open-vocabulary classification. Importantly, MSPO never uses future-category names, and all unseen categories remain unnamed during evaluation. Experiments on M-OWODB and S-OWODB show that MSPO improves the strong PROB baseline on the main aggregate metrics while retaining competitive unknown recall. It also improves early unknown-confusion metrics and raises PASCAL VOC final mAP by up to 2.7 points. These results demonstrate that known-category language semantics provide an effective calibration signal for probabilistic objectness under the standard OWOD setting.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
