@@ -1,0 +1,1607 @@
+Title: Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory
+
+URL Source: https://arxiv.org/pdf/2607.24237v2
+
+Published Time: Thu, 30 Jul 2026 01:16:16 GMT
+
+Number of Pages: 29
+
+Markdown Content:
+# Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory 
+
+Kaifeng Zhang 
+
+School of Artificial Intelligence Nanjing University, China 
+
+Kai Ming Ting 
+
+School of Artificial Intelligence Nanjing University, China 
+
+Sanjay Chawla 
+
+Qatar Computing Research Institute, HBKU 
+
+## Abstract 
+
+Many existing clustering methods are designed based on a set-oriented definition— a cluster is a set of similar points—relying a point-to-point similarity function to find similar points. This works well for compact clusters, but clustering perfor-mance can deteriorate badly when cluster shapes are irregular, and densities or sizes vary between clusters. Recent ‘Cluster-as-Distribution’ (CaD) clustering has been shown to discover these generic types of clusters in practice by treating each cluster as a set of independent and identically distributed points generated from some unknown distribution via a greedy search, achieving a clustering objective equiv-alent to that of Spectral Clustering, but with better clustering outcomes without eigen-decomposition. However, a theoretical analysis of this phenomenon is still lacking. Our analyses are from two angles. First, we analyze the approximation error between the true and empirical distribution embeddings. Second, we show that the greedy search employed to achieve the CaD clustering objective can be mapped to a partition matroid—yielding greedy optimality. These yield a near-optimality guarantee for the CaD clustering objective, with regret controlled by the approximation error. This is the first analysis that explains why CaD clustering via greedy search can discover clusters of arbitrary shapes, densities and sizes (where all set-oriented clustering methods have failed to discover) when the estimated cluster embeddings faithfully approximate the underlying cluster distributions. 
+
+## 1 Introduction 
+
+Most existing clustering methods treat each cluster as a set of similar points and optimize local similarity structure based on some assumption (e.g., each cluster can be represented with a centroid or Gaussian distribution [ 1 , 14 ]) relying on a point-to-point similarity/distance function. This set-oriented paradigm is effective for compact, homogeneous clusters, but it is often less reliable when clusters are non-convex, multi-scale, or density-heterogeneous [3, 11, 34]. Even more sophisticated clustering such as Spectral Clustering [ 28 , 4 ] and Deep Clustering [ 29 ] have their fundamental limitations [ 13 , 16 , 21 , 26 , 32 ]. This is because the assumed cluster structure (in either the input space or the learned representation space) often does not match the distributions in which the clusters are generated. In addition, all these algorithms have time complexity worse than quadratic, except 
+
+k-means clustering. A recent ‘Cluster-as-Distribution’ (CaD) Clustering [ 26 , 30 , 33 , 26 ] addresses this mismatch by treating each cluster as a set of independent and identically distributed (i.i.d.) samples generated from an underlying distribution. In this setting, the task can be stated as follows: Given unlabeled points in 
+
+> Preprint. arXiv:2607.24237v2 [cs.LG] 29 Jul 2026
+
+Rd, discover k clusters as k sets of i.i.d. samples generated from k distinct unknown distributions with potentially arbitrary shapes, sizes, and densities. 
+
+Example methods of CaD Clustering are Kernel-Bounded Clustering (KBC) [ 30 , 31 ], Isolation Distributional Kernel Clustering (IDKC) [ 33 ], and Point-Set Kernel Clustering (psKC) [ 25 ], and they have produced better clustering outcomes than kernel k-means, Spectral Clustering and deep clustering. The unique difference of CaD Clustering is utilizing the distributional information in a given dataset to perform clustering via a distributional kernel, without parametric estimation (as in Gaussian Mixture Modeling [ 8 , 18 ]) or density estimation [ 19 ] (as in density-based clustering [ 3, 6 ]). 
+
+The shared clustering procedure of CaD Clustering is simple: construct a distribution proxy PG
+
+of core cluster G ⊂ C, for each to-be-discovered cluster C, then assign each point x in the given dataset to the most similar proxy based on a distributional kernel K(δ(x), PG), without using a sophisticated optimization such as deep learning, Expectation-Maximization (EM) optimization or eigen-decomposition, where δ(x) is the Dirac measure which converts a point into a distribution, and 
+
+K measures the similarity between two distributions. The CaD clustering objective is to maximize the total similarity between points and their assigned proxies, as measured by K, via a greedy search. Despite this strong clustering performance, a fundamental question remains unanswered: Why does a greedy search method achieve better clustering outcomes than deep learning, EM optimization, or eigen-decomposition based methods (as reported in the literature [ 25 , 30 , 31 , 26 , 33 ])? This paper provides an explanation towards answering this question. In particular, we answer two central questions: (i) How accurately does a core cluster G ⊂ C represent a cluster distribution PC ? (ii) Once the core clusters (having approximation errors) are fixed, does the one-pass assignment, via a greedy search based on K(δ(x), PG), achieve the clustering objective optimally? This paper answers these two questions within a single framework. Our contributions are: 1. Decomposition of distribution embedding approximation error into three components: trun-cation, estimation, and core selection. The core selection term depends on how representative the selected proxies are and it is the main factor that affects the approximation quality. 2. Fixed-core assignment optimality is formulated via an one-pass assignment with fixed-core embeddings as a maximum-weight basis selection problem on a partition matroid [ 5], showing that the greedy rule is optimal for the CaD clustering objective. 3. Distribution regret under embedding approximation error links the error to the CaD clus-tering objective via the partition matroid—providing a margin-based label recovery corollary. 4. Diagnostic experiments validate the error decomposition on synthetic benchmarks, showing that all the bounds are valid, while the core bias bound is conservative because it is model-agnostic. We also compare CaD clustering with kernel k-means, where both share many similarities but have important differences. These results provide the first theoretical understanding on why CaD clustering via a greedy search can be effective from a statistical and combinatorial perspective. Notations are summarized in Table 1. 
+
+## 2 Related Work and Preliminaries 
+
+2.1 ‘Cluster-as-Distribution’ Clustering 
+
+‘Cluster-as-Distribution’ (CaD) clustering methods replace the typical set view with a distribution view, where each cluster is defined to be a set of i.i.d. samples generated from an underlying distribution. This can be represented via a distributional kernel based on Kernel Mean Embedding (KME) [15, 22, 23], without Gaussian distribution assumption or density estimation. Representative methods KBC [ 30 , 31 ], psKC [ 25 ], IDKC [ 33 ] can be understood to operate under a two-stage approach (see Appendix C for the detailed algorithmic descriptions): (1) Representing the distribution of each cluster in input space, via KME, as a point in a Reproducing Kernel Hilbert Space (RKHS). (2) Performing clustering via one-pass assignment where each individual data point is assigned to the most similar cluster, as measured by a distributional kernel and computed in RKHS. Let k : X × X → R be the Gaussian kernel k(x, y ) = exp( −∥ x − y∥2/2σ2), and let ϕ(x) = 
+
+k(x, ·) ∈ H be its feature map in RKHS. Denote by P the underlying continuous distribution of a target cluster and by G = {x1, . . . , x m} the core cluster (a finite subset of the support of P) found 2by a specific method (e.g., connected component). KBC optimizes the total self-similarity objective, i.e., max C
+
+P
+
+> C∈C
+
+P 
+
+> x∈C
+
+K(δ(x), PC ), where K is the distributional kernel induced by point kernel 
+
+k, C is the set of all possible clustering results and PC is the distribution of cluster C.
+
+Definition 1. The mean embedding of distribution P is defined as μP = R 
+
+> X
+
+ϕ(x)dP(x).
+
+Definition 2. The empirical mean embedding based on core cluster G, which is a set of i.i.d. samples from P, is defined as ˆμG = 1
+
+> |G|
+
+P 
+
+> x∈G
+
+ϕ(x).
+
+The central quantity that we are about to analyze in Section 3 is the discrepancy between the two embeddings in RKHS: ∆ = ∥μP − ˆμG∥H. Our analysis is also related to the broader literature on Kernel Mean Embeddings [ 15 , 22 , 23 ] and Maximum Mean Discrepancy [ 9]. The standard KME theory provides approximation tools for distributional representations in RKHS. Our work differs in that it decomposes the approximation error ∆ of the core cluster embedding into truncation, estimation, and core selection terms, and then links this decomposition to one-pass assignment via a greedy search in achieving the optimality of the CaD clustering objective. 
+
+2.2 Matroid Theory 
+
+A matroid [ 5 ] abstracts the notion of linear independence in vector spaces to general sets. Matroids identify an important class of feasible-set systems in which the locally greedy choice is guaranteed to produce a globally optimal solution for linear objectives [5, 7]. 
+
+Definition 3 (Matroid [ 5]) . A matroid M is a pair (S, I), where S is a finite ground set and I ⊆ 2S
+
+is a collection of independent sets satisfying: (1) Non-emptiness: ∅ ∈ I . (2) Hereditary Property: If 
+
+A ∈ I and B ⊆ A, then B ∈ I . (3) Exchange Property: If A, B ∈ I and |A| < |B|, there exists an element e ∈ B \ A such that A ∪ { e} ∈ I .
+
+Theorem 1 (Rado-Edmonds Theorem [ 5, 17 ]) . Let M = ( S, I) be a matroid. For any non-negative weight function w : S → R+, the greedy algorithm (which iteratively picks the heaviest element that maintains independence) is guaranteed to find a set A ∈ I that maximizes P 
+
+> e∈A
+
+w(e).
+
+## 3 Error Analysis of KME approximation 
+
+We derive an upper bound for ∆ by decomposing it into truncation, estimation, and core selection components. All proofs are provided in Appendix B. 
+
+Figure 1: Left : visualization on a 2D Gaussian distribution P = N (0, I ), showing dense region Q,sampled points U from Q, and core cluster G obtained by KBC (largest connected component under kernel-threshold graph). Right : decomposition view of Theorem 2 versus s (the sample size from Q,i.e., |U |), including the empirical and upper bound curves for truncation bias (Lemma 1), estimation bias (Lemma 2), core bias (Lemma 3), together with empirical total error and the Theorem 2 bound. Each point is averaged over 30 repeated samplings, and the band is mean ±1 std. 
+
+3.1 Error Decomposition 
+
+The total error ∆ = ∥μP − ˆμG∥H is decomposed into three components by introducing the truncated distribution Q = P|S λ (Sλ = {x ∈ supp (P) | fP (x) ≥ λ}), i.e., the distribution supported on high 3density region of P . ˆμU is the empirical estimated KME of the set U of finite points sampled from 
+
+Q, which are the candidates of core cluster G:
+
+∥μP − ˆμG∥H ≤ ∥ μP − μQ∥H
+
+| {z }
+
+> Truncation Bias
+
++ ∥μQ − ˆμU ∥H
+
+| {z }
+
+> Estimation Bias
+
++ ∥ˆμU − ˆμG∥H
+
+| {z }
+
+> Core Bias
+
+.
+
+A demonstration of this decomposition is provided in Figure 1. 
+
+3.2 Truncation Bias 
+
+We separate P into truncated distribution Q and tail distribution T . Let η = P(X \ S λ) be the probability mass of the tail. We show the relation between the truncation bias (difference in kernel space) and μT − μQ (difference in original space) in Lemma 1. 
+
+Lemma 1. When using Gaussian kernel kσ (x, y ), the truncation bias satisfies ∥μP − μQ∥H ≤∥E[Q] − E[T ]∥ · ησ + O  1
+
+> σ2
+
+ , where η = P(X \ S λ) is the probability mass of the tail. 
+
+Note that the ∥μP − μQ∥H ≈ ∥ E[Q] − E[T ]∥ · ησ only holds when σ is very large. In practice, when using Gaussian kernel with a small σ, there is a significant difference between the truncation bias and the first term of the right side in the equality above. Appendix F.1 confirms this trend: for 
+
+P = N (0 , I ), the gap between empirical truncation bias and its leading term is larger at small σ and shrinks as σ increases. The O  1
+
+> σ2
+
+ term can be either negative or positive due to hyperparameter setting, as shown in Figure 6. In Lemma 1, a smaller tail mass excluded will lead to a more accurate approximation of Q to P. For regular symmetric distributions such as a 2D Gaussian, this truncation effect can be quite small. For asymmetric or complex-shaped distributions, the truncated region may deviate more substantially due to skewness, heavy tails, or irregular support, and the resulting truncation bias can therefore be larger. 
+
+3.3 Estimation Bias 
+
+For the truncation distribution Q and a set of points U sampled from Q with size s, we prove the 
+
+O(1 /√s) convergence of the estimation bias in Lemma 2 . 
+
+Lemma 2 (Convergence of the Empirical Embedding of Dense Region) . For a sample of s i.i.d. points U from the truncated distribution Q and a Gaussian kernel with k(x, x ) ≤ 1, it holds with probability at least 1 − δ that ∥μQ − ˆμU ∥H ≤
+
+
+
+1 + p2 ln(1 /δ )
+
+
+
+/√s.
+
+Appendix F.2 supports Lemma 2: with fixed δ = 0 .01 , the empirical estimation bias decreases with s
+
+by following a O(1 /√s). This estimation bias is only related to subsample size s, which has a linear ratio of the dataset size n. So we can also treat the estimation bias as O(1 /√n).
+
+3.4 Core Bias 
+
+The core bias term depends on the quality of the core cluster, a subset of the set of points sampled from Q with size s. Lemma 3 provides a method-agnostic upper bound under a coupling condition. The quality of the core cluster is directly reflected in parameter r 1 and determined by a specific core cluster construction method. Appendix F.3 provides a direct empirical check of this inequality. 
+
+Lemma 3 (A method-agnostic upper bound for core bias) . Let U = {qi}si=1 be sampled points from Q and let G = {gj }mj=1 be core points. Assume there exists a mapping π : {1, . . . , s } → {1, . . . , m } such that ∥qi − gπ(i)∥ ≤ r, ∀i ∈ { 1, . . . , s }. Define occupancy proportions pj = 
+
+> 1
+> s
+
+|{ i : π(i) = j}| , j = 1 , . . . , m, and imbalance term B = Pmj=1 pj − 1 
+
+> m
+
+. Then for Gaussian kernel kσ , it holds that ∥ˆμU − ˆμG∥H ≤ rσ + B. 
+
+3.5 Total Error 
+
+With the analysis above, we reach Theorem 2. Figure 1 (right) provides an empirical reflection of Theorem 2 under σ = 0 .35 , τ = 0 .95 , δ = 0 .05 , and λ = 0 .05 . 
+
+> 1In the experiments, we use nearest neighbor projection as mapping π.
+
+4Theorem 2. When using Gaussian kernel kσ (x, y ) in CaD clustering, with probability at least 1 − δ,it holds that 
+
+∥μP − ˆμG∥H ≤ ∥ E[Q] − E[T ]∥ · ησ + O
+
+ 1
+
+σ2
+
+| {z }
+
+> distribution-dependent
+
++ 1 + p2 ln(1 /δ )
+
+√s
+
+| {z }
+
+> sample-dependent
+
++
+
+ rσ + B
+
+| {z }
+
+> method-dependent
+
+.
+
+The bandwidth σ plays a central role in the total error bound because it controls the distance sensitivity of the Gaussian kernel kσ (x, y ) = exp( −∥ x − y∥2/(2 σ2)) . When σ is small, the kernel value decays rapidly as the distance increases, making the embedding more sensitive to tail discrepancy and mismatch between sampled points and selected cores. When σ is larger, the kernel varies more smoothly with distance, so these discrepancies induce smaller perturbations in RKHS, which is reflected in the 1/σ dependence of the truncation bias and core bias. Hence, σ determines a tradeoff between preserving fine local structure and improving approximation robustness. The error analysis in Theorem 2 establishes that the reliability of CaD clustering depends on three factors: distribution truncation quality, sample size ( s) of dense region, and core cluster selection quality. 1. Distribution-dependent Truncation Bias. The analysis shows that the truncation bias depends on how well the dense region Q approximates the underlying distribution P. This term is distribution-dependent: for a symmetric distribution like a 2d Gaussian distribution in R2, this term can be very small. For asymmetric or complex-shaped distributions, the truncation bias can be larger due to heavier tails or irregular support. 2. Sample-dependent Estimation Bias. The parameter s represents the number of sampled points drawn from the dense region Q to estimate μQ. In practice, the O(1 /√s) convergence rate means that increasing s reduces statistical estimation noise. 3. Method-dependent Core Bias. The core bias contribution quantifies how well core cluster represents sampled points from the dense region Q. By Lemma 3, this term is upper bounded by r/σ + B, where r is the geometric approximation radius and B is the sample-to-core imbalance, which are both determined by the core cluster construction method. For a practitioner, this provides a mathematical guarantee that a one-pass assignment is reliable provided core clusters are representative of the underlying distribution and the number of points in dataset is large enough. 
+
+Conservativeness of the Total Error Bound Due to Core Bias. The looseness of the total bound in Figure 1 is mainly caused by the core bias term, whose upper bound decreases more slowly than the empirical estimate. This is expected because the analysis uses a method-agnostic upper bound, which is intended to apply across different core construction procedures and is therefore conservative for any particular method. Nevertheless, Figure 8 in Appendix shows that the bound can become much tighter under certain hyperparameter settings. 
+
+Remark on estimation and core bias. Although the estimation bias decreases with sample size s, the overall approximation quality may still be bad when the initial core is not representative, since a small sample size could cause the quality of core clusters to deteriorate. For KBC, a specific CaD method, Appendix D.2 gives a complementary interpretation of the core selection term through density level sets. In the Gaussian kernel case, the KBC threshold τ induces a graph radius ετ = σp2 log(1 /τ ).The KBC core bias can be controlled by the boundary band mass plus a finite sample deviation. This result is conditional on the level set connectivity assumption, so it should be viewed as a KBC-specific certificate rather than an unconditional replacement for Lemma 3. 
+
+## 4 Modeling of the Assignment via Distributional Kernel as Matroid 
+
+The ‘cluster-as-distribution’ assumption has enabled the one-pass assignment via greedy search— such that proving it via matroid is simple—to produce the optimal clustering outcome. Once each core is represented as a distributional proxy, each point-to-cluster weight is independent of other assignments, yielding an additive objective that decomposes over points and fits a partition matroid. 
+
+The partition matroid simply formalizes the exact optimality of the fixed-core one-pass assignment and separates it from the core-cluster construction problem. 
+
+54.1 Matroid Axioms for CaD clustering Ground Set. Let D = {x1, x 2, . . . , x n} be the dataset and K = {1, 2, . . . , k } be the set of cluster indices. We define the ground set Sg as the set of all possible point-to-cluster assignments: Sg =
+
+D × K = {(xi, j ) | 1 ≤ i ≤ n, 1 ≤ j ≤ k}.
+
+Partition Matroid. To ensure each point xi is assigned to at most one cluster, we partition Sg into n
+
+disjoint blocks S1, S 2, . . . , S n, where: Si = {(xi, 1) , (xi, 2) , . . . , (xi, k )}. We define the family of independent sets I as I = {A ⊆ S g | | A ∩ Si| ≤ 1, ∀i ∈ { 1, . . . , n }} .
+
+Proposition 1. The pair (Sg, I) as defined for the CaD clustering is a matroid. 
+
+The proof is provided in Appendix B.5. The rationale behind |A ∩ Si| ≤ 1 is given in Appendix D.1. 
+
+4.2 Optimality of the One-Pass Assignment 
+
+To start the analysis on the assignment, we first define a weight function to link matroid and the objective of CaD clustering. 
+
+Weight Definition. Given the pre-identified cluster cores G1, . . . , G k with empirical embeddings 
+
+ˆμGj , the weight of an assignment e = ( xi, j ) is defined as the RKHS inner product score: w(xi, j ) = 
+
+⟨ϕ(xi), ˆμGj ⟩H. The objective of the CaD clustering during the assignment phase is to maximize 
+
+W (A) = P 
+
+> e∈A
+
+w(e) for a set A that covers all points, i.e., |A| = n.The CaD clustering algorithm performs the following greedy step for each point xi ∈ D: j∗ =arg max j∈K ⟨ϕ(xi), ˆμGj ⟩H. The one-pass assignment can be viewed as a greedy procedure on the partition matroid (Sg, I). Since the objective is additive over assignment elements, maximizing the total weight reduces to selecting, for each point xi, the assignment (xi, j ) with the largest weight 
+
+w(xi, j ). Therefore, the one-pass rule coincides with a greedy selection on the partition matroid. Finally, given fixed core clusters, the optimality is guaranteed by Theorem 1, as shown in Theorem 3. 
+
+Theorem 3 (Optimality for fixed-core assignment ) . Given some fixed core clusters G1, . . . , G k, and define additive weights w(xi, j ) = ⟨ϕ(xi), ˆμGj ⟩H on the partition matroid (Sg, I). The one-pass assignment that selects j∗ 
+
+> i
+
+∈ arg max j∈K w(xi, j ) for all i, produces a maximum-weight basis and is optimal for the assignment objective max A∈I 
+
+P 
+
+> e∈A
+
+w(e).
+
+The proof is provided in Appendix B.6. 
+
+The above optimality statement is conditional on fixed core clusters. It does not claim global optimality for the full clustering procedure, since the quality of the final result depends critically on how well the core clusters approximate the cluster distributions. 
+
+## 5 From KME Approximation Error to CaD Clustering Objective 
+
+Theorem 3 establishes the optimality of the objective induced by fixed-core embeddings. We now connect this result to the CaD clustering objective defined by the true distributions. For cluster j, let μj = μPj be the distribution embedding and ˆμj = ˆ μGj be its empirical proxy. Define w⋆(xi, j ) = ⟨ϕ(xi), μ j ⟩H and ˆw(xi, j ) = ⟨ϕ(xi), ˆμj ⟩H. For any feasible assignment set 
+
+A ∈ I with |A| = n, define W ⋆(A) = P 
+
+> (xi,j )∈A
+
+w⋆(xi, j ) and ˆW (A) = P 
+
+> (xi,j )∈A
+
+ˆw(xi, j ).
+
+Proposition 2 (Near-optimality for the assignment objective) . Assume ∥ϕ(x)∥H ≤ 1 for all 
+
+x, and define ε = max j∈K ∥μj − ˆμj ∥H. Let A⋆ ∈ arg max A∈I , |A|=n W ⋆(A) and ˆA ∈
+
+arg max A∈I , |A|=n ˆW (A). Then W ⋆(A⋆) − W ⋆( ˆA) ≤ 2nε. 
+
+The proof is provided in Appendix B.7. The following links the KME error in Theorem 2 with Proposition 2 and show how the KME error upper bounds the objective in Proposition 3 with the proof provided in Appendix B.8. 
+
+Proposition 3 (Relation with KME error) . Suppose each cluster j ∈ K satisfies ∥μj − ˆμj ∥H ≤ bj ,where bj := ∥E[Qj ] − E[Tj ]∥ · ηj 
+
+> σ
+
++ O  1
+
+> σ2
+
+ + 1+ √2 ln(1 /δ ) 
+
+> √sj
+
++ rj 
+
+> σ
+
++ Bj . Then the one-pass assignment 
+
+ˆA satisfies W ⋆(A⋆) − W ⋆( ˆA) ≤ 2n max j∈K bj .
+
+66 Label Recovery 
+
+In Theorem 4, we formalize the ‘optimal clustering’—all labels assigned by the distribution kernel equal to the ground truth: label recovery is guaranteed when the embedding error is smaller than half of the distribution score margin. 
+
+Theorem 4 (Label recovery under error) . Let y⋆i ∈ arg max j∈K w⋆(xi, j ) and w⋆(xi, j ) =
+
+⟨ϕ(xi), μ j ⟩H, and assume the distribution top-two margin is strictly positive, i.e., γ⋆ := min 1≤i≤n
+
+
+
+w⋆(xi, y ⋆i ) − max j̸ =y⋆i w⋆(xi, j )
+
+
+
+> 0.
+
+If ε := max j∈K ∥μj − ˆμj ∥H < γ⋆ 
+
+> 2
+
+, then the one-pass proxy assignment ˆyi ∈ arg max j∈K ˆw(xi, j )
+
+with ˆw(xi, j ) = ⟨ϕ(xi), ˆμj ⟩H, recovers all labels exactly, i.e., ˆyi = y⋆i for all i.
+
+Proposition 4 (Recovery condition via decomposition terms) . Under the assumptions of Theorem 4, if max j∈K bj < γ⋆ 
+
+> 2
+
+, where bj is defined in Proposition 3, then the label recovery holds for all points. 
+
+This shows that increasing dense region sample size sj , improving core quality (smaller rj , B j ); and reducing the truncation error tightens bj , making the recovery condition easier to satisfy. 
+
+## 7 Experiments 
+
+7.1 Empirical Validation of Error Decomposition 
+
+We aim to verify empirically that the three error components identified in Theorem 2 (truncation, estimation, and core bias) decrease as the sample size n increases, and that the corresponding theoretical upper bounds remain valid and capture the observed decay trend. The core bias bound is expected to be conservative because Lemma 3 is model-agnostic and is designed to apply across different core construction procedures. We use KBC [ 31 ] as the representative CaD clustering method 2 in our experiments, since it has the simplest mechanism among the three methods considered and is the easiest to interpret in light of our analysis. We evaluate KBC on five synthetic datasets that represent a diverse range of cluster geometries and size distributions (Figure 2, top row; see Appendix E.1 for the full details). 
+
+Figure 2: Top. Five benchmark datasets. Middle. Mean (over the number of clusters) estimation bias and total error w.r.t. sample size n; NMI on the right axis. Bottom row. Core and truncation biases w.r.t. n. All results are averaged over 10 seeds. The detailed mean and std are reported in Table 2. 
+
+> 2Additional GDKC [33] evidence are deferred to Appendix F.7.
+
+7Figure 2 (middle and bottom rows) reports all components on log scale. Middle row shows that both the estimation bias and total error decay steadily with n, and NMI converges toward 1 across all five datasets, confirming that KBC is consistent. The bottom row shows the core bias and truncation bias likewise decrease monotonically. The dashed theoretical bounds remain valid across all tested sample sizes and correctly reflect the overall decay trend. The core bias bound is visibly more conservative than the empirical curve. This is expected because the bound in Lemma 3 is model-agnostic and therefore not tailored to the specific core extraction rule used by KBC. Figure 2 serves as a diagnostic validation under an oracle hyperparameter protocol. Appendix F.6.1 provides a heuristic unsupervised method that selects a hyperparameter to form core clusters that yield high coverage, strong within-core cohesion, and balanced core clusters. The heuristic is shown to provide a good selection that produces optimal or close to optimal CaD clustering outcomes. 
+
+7.2 Comparison with Kernel k-means 
+
+We choose Gaussian Kernel k-means (KKM) as the main baseline because it is the most directly comparable method to KBC. Both KBC methods rely on the same Gaussian kernel and perform clustering in RKHS with a similar objective function P
+
+> C∈C
+
+P 
+
+> x∈C
+
+f (x, ˆμC ) having a minor dif-ference in f : KKM employs squared Euclidean distance and KBC utilizes the dot product. Their two main differences are: (i) Cluster representation: KKM treats ˆμC as a mean vector and it is updated in each iteration of an optimization process. Furthermore, ˆμC is a randomly initialized, relying on the optimization to significantly improve ˆμC as the iteration progresses. Most importantly, 
+
+none of the mean vectors ˆμC —the initialization and its updates—are treated as a distribution in the whole clustering process. In contrast, KBC treats ˆμC as a distributional proxy of cluster C—in the initialization of cluster cores as well as those in the point assignment—in the entire clustering process. (ii) Optimization required: KKM must employ the Expectation-Maximization (EM) optimization, but KBC uses a greedy search in the one-pass assignment—equivalent to the only one iteration in the EM optimization! Therefore, comparing against KKM focuses specifically on the benefits of the distributional representation of core clusters and the point assignment can be achieved in a greedy search in one iteration. We compare KBC against Kernel k-means (KKM) on the same five benchmark datasets to assess (1) the values of the objective functions KBC and KKM, (2) the embedding approximation error (w.r.t. the ground truth embedding), and (3) empirical clustering performance in terms of NMI, as the number of iterations increases. Two variants of KKM are also used: (I) KKM+KBC assign : KKM completes the ordinary run in each iteration followed by the point assignment step of KBC: each point is reassigned to the cluster j∗ to maximize the inner product ⟨ϕ(x), ˆμj ⟩H. (II) KBC-guided KKM : the KKM updates ˆμj in each iteration by employing the labels assigned by the distributional kernel, as used in the second step of KBC. All methods use Gaussian kernel with bandwidth σ tuned jointly by a grid search. Each of KKM and its two variants runs with 20 random initializations per dataset, and the best result is reported for comparisons. Unlike KKM, KBC does not rely on random initialization; its procedure is deterministic and free of stochastic components. 
+
+The observations of the per-iteration dynamics shown in Figure 3 are given as follows: 
+
+1. As shown in the first two rows, KBC-guided KKM consistently achieves higher distributional objective (Row 1) and lower within-cluster RKHS difference (Row 2) at each iteration than the vanilla KKM across all five datasets. This demonstrates that the ‘warm’ start of KBC places each iteration in a more favorable region of the objective landscape, enabling faster convergence to better solutions and mitigating the sensitivity to random initialization that afflicts the vanilla KKM. Note that KBC has the best objective values, Total Error and NMI in all datasets, except Concentric-Ring (see the discussion in the next paragraph). 2. The result in terms of the total error of the embedding w.r.t. the ground-truth cluster embedding (Row 3) reveals the sharpest distinction: KBC-guided KKM rapidly reduces to near zero across almost all datasets, whereas the vanilla KKM plateaus at substantially higher values on non-convex datasets. This shows that optimizing the KKM objective alone does not necessarily recover the ground-truth clusters. Concentric-Rings (Column 2) is an example: although KKM’s objective value (Row 2) decreases as the number of iterations increases, the ring-shaped clusters cannot be represented well by the mean vectors, and all versions of KKM converge to large total errors (Row 3) and have very poor NMIs (Row 4). Interestingly, KBC has NMI=1 and Total Error = 0 (perfect clustering outcome), even though it achieves its 8Figure 3: Per-iteration dynamics. Row 1. KBC objective function value. Row 2. KKM objective function value. Row 3. Total Error. Row 4. NMI at each iteration for the same runs. objective value which is lower than that achieved by all versions of KKM (shown in Row 1). This example demonstrates the power of the ‘cluster-as-distribution’ assumption used in CaD Clustering over the ‘cluster as a set of similar points’ assumption employed in KKM. The visualization of clustering results can be found in Appendix F.5. 
+
+## 8 Discussion 
+
+Comparison with more baselines. Representative CaD clustering methods on real datasets have already been extensively evaluated in prior works. KBC has been compared with spectral clustering and other baselines (KKM, U-SPEC [ 10 ], Density Peak Clustering [ 20 ]) and their variants (Table A6 in [ 31 ]), while IDKC/GDKC has been validated on 22 datasets (Table 3 in [ 33 ]). KBC and GDKC both outperform KKM in clustering result and runtime. The purpose of our experiments is to provide diagnostics for the proposed error decomposition and to explain why the distributional proxies of core clusters, even with some error, can lead to optimal one-pass assignment via greedy search. 
+
+## 9 Conclusions 
+
+This is the first analysis, from the statistical and combinatorial viewpoints, that explains why CaD clustering via greedy search can discover clusters of arbitrary shapes, densities and sizes (where all set-oriented clustering methods have failed to discover) when the estimated cluster embeddings faithfully approximate the underlying distributions of the clusters. We decompose the distribution-to-core embedding error into three components: truncation, estimation, and core selection terms, and show that the one-pass assignment via greedy search is optimal for the fixed-core assignment subproblem through a partition matroid formulation. This leads to a near-optimality guarantee for the CaD clustering objective and label recovery, with the distribution regret controlled by the approximation error. The cluster-as-distribution (CAD) assumption has rendered the greedy-optimality proof via matroid straightforward, while the commonly-held set-oriented view of ‘cluster is a set of similar points’ has made the correct cluster identification impossible for existing clustering algorithms [ 12 ]. This is because it is difficult to ascertain the membership of a cluster based on a point-to-point similarity function, ignoring the distributional information in the dataset; whereas it is straightforward when a cluster is treated as a distribution via a distributional kernel, as shown in the CaD Clustering. Note that the impossibility theorem of clustering [ 12 ] is derived based on the above set-oriented view, 9and thus it is not applicable to the CaD Clustering. A further discussion of this issue, the limitations of this investigation and future work are provided in Appendix D.3. 
+
+## References 
+
+[1] Charu C Aggarwal. Data mining: the textbook , volume 1. Springer, 2015. [2] Kevin Beyer, Jonathan Goldstein, Raghu Ramakrishnan, and Uri Shaft. When is “nearest neighbor” meaningful? In Catriel Beeri and Peter Buneman, editors, Database Theory — ICDT’99 , pages 217–235, Berlin, Heidelberg, 1999. Springer Berlin Heidelberg. [3] Panthadeep Bhattacharjee and Pinaki Mitra. A survey of density based clustering algorithms. Frontiers of Computer Science , 15(1):151308, 2021. [4] Inderjit S Dhillon, Yuqiang Guan, and Brian Kulis. Kernel k-means: spectral clustering and normalized cuts. In Proceedings of the tenth ACM SIGKDD International Conference on Knowledge Discovery and Data Mining , pages 551–556, 2004. [5] Jack Edmonds. Matroids and the greedy algorithm. Mathematical Programming , 1(1):127–136, 1971. [6] Martin Ester, Hans-Peter Kriegel, Jörg Sander, and Xiaowei Xu. A density-based algorithm for discovering clusters in large spatial databases with noise. In Proceedings of the Second International Conference on Knowledge Discovery and Data Mining , pages 226–231, 1996. [7] Ulrich Faigle and Satoru Fujishige. A general model for matroids and the greedy algorithm. Mathematical Programming , 119(2):353–369, 2009. [8] Isobel Claire Gormley, Thomas Brendan Murphy, and Adrian E Raftery. Model-based clustering. Annual Review of Statistics and Its Application , 10(1):573–595, 2023. [9] Arthur Gretton, Karsten Borgwardt, Malte Rasch, Bernhard Schölkopf, and Alex Smola. A kernel method for the two-sample-problem. Advances in Neural Information Processing Systems , 19, 2006. [10] Dong Huang, Chang-Dong Wang, Jian-Sheng Wu, Jian-Huang Lai, and Chee-Keong Kwoh. Ultra-scalable spectral clustering and ensemble clustering. IEEE Transactions on Knowledge and Data Engineering ,32(6):1212–1226, 2020. [11] Anil K Jain. Data clustering: 50 years beyond k-means. Pattern Recognition Letters , 31(8):651–666, 2010. [12] Jon Kleinberg. An impossibility theorem for clustering. Advances in Neural Information Processing Systems , 15, 2002. [13] Yiding Lu, Haobin Li, Yunfan Li, Yijie Lin, and Xi Peng. A survey on deep clustering: From the prior perspective. arXiv preprint arXiv:2406.19602 , 2024. [14] P Macnaughton-Smith, WT Williams, MB Dale, and LG Mockett. Dissimilarity analysis: a new technique of hierarchical sub-division. Nature , 202(4936):1034–1035, 1964. [15] Krikamol Muandet, Kenji Fukumizu, Bharath Sriperumbudur, and Bernhard Schölkopf. Kernel mean embedding of distributions: A review and beyond. Found. Trends Mach. Learn. , 10(1–2):1–141, June 2017. [16] Boaz Nadler and Meirav Galun. Fundamental limitations of spectral clustering. Advances in Neural Information Processing Systems , 19, 2006. [17] Richard Rado. Note on independence functions. Proceedings of the London Mathematical Society ,3(1):300–320, 1957. [18] Douglas A Reynolds et al. Gaussian mixture models. Encyclopedia of biometrics , 741(659-663):3, 2009. [19] Alessandro Rinaldo, Aarti Singh, Rebecca Nugent, and Larry Wasserman. Stability of density-based clustering. Journal of Machine Learning Research , 13(4), 2012. [20] Alex Rodriguez and Alessandro Laio. Clustering by fast search and find of density peaks. Science ,344(6191):1492–1496, 2014. [21] Frederic Ros, Rabia Riad, and Serge Guillaume. Deep clustering framework review using multicriteria evaluation. Knowledge-Based Systems , 285:111315, 2024. 
+
+10 [22] Alex Smola, Arthur Gretton, Le Song, and Bernhard Schölkopf. A Hilbert space embedding for distribu-tions. In Algorithmic Learning Theory , pages 13–31, Berlin, Heidelberg, 2007. Springer. [23] Bharath K Sriperumbudur, Arthur Gretton, Kenji Fukumizu, Bernhard Schölkopf, and Gert RG Lanckriet. Hilbert space embeddings and metrics on probability measures. Journal of Machine Learning Research ,11:1517–1561, 2010. [24] Kai Ming Ting, Takashi Washio, Ye Zhu, Yang Xu, and Kaifeng Zhang. Is it possible to find the single nearest neighbor of a query in high dimensions? Artificial Intelligence , 336:104206, 2024. [25] Kai Ming Ting, Jonathan R Wells, and Ye Zhu. Point-set kernel clustering. IEEE Transactions on Knowledge and Data Engineering , 35(5):5147–5158, 2023. [26] Kai Ming Ting, Wei-Jie Xu, and Hang Zhang. How to achieve the intended aim of deep clustering now, without deep learning. arXiv preprint arXiv:2602.05749 , 2026. [27] Kai Ming Ting, Yue Zhu, and Zhi-Hua Zhou. Isolation kernel and its effect on SVM. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining , pages 2329–2337, 2018. [28] Ulrike Von Luxburg. A tutorial on spectral clustering. Statistics and Computing , 17(4):395–416, 2007. [29] Lirong Wu, Lifan Yuan, Guojiang Zhao, Haitao Lin, and Stan Z Li. Deep clustering and visualization for end-to-end high-dimensional data analysis. IEEE Transactions on Neural Networks and Learning Systems ,34(11):8543–8554, 2022. [30] Hang Zhang, Kai Ming Ting, and Ye Zhu. Kernel-bounded clustering: Achieving the objective of spectral clustering without eigendecomposition. Artificial Intelligence , 350:104440, 2026. [31] Hang Zhang, Yi Zhang, Kai Ming Ting, Jie Zhang, and Qiuran Zhao. Kernel-bounded clustering for spatial transcriptomics enables scalable discovery of complex spatial domains. Genome Research , 35(2):355–367, 2025. [32] Sheng Zhou, Hongjia Xu, Zhuonan Zheng, Jiawei Chen, Zhao Li, Jiajun Bu, Jia Wu, Xin Wang, Wenwu Zhu, and Martin Ester. A comprehensive survey on deep clustering: Taxonomy, challenges, and future directions. ACM Computing Surveys , 57(3):1–38, 2024. [33] Ye Zhu and Kai Ming Ting. Kernel-based clustering via isolation distributional kernel. Information Systems , 117:102212, 2023. [34] Ye Zhu, Kai Ming Ting, and Mark J Carman. Density-ratio based clustering for discovering clusters with varying densities. Pattern Recognition , 60:983–997, 2016. 
+
+## A Notations 
+
+We show the main notations used in the paper in Table 1. Table 1: Notations used for basic symbols, clustering, and matroid analysis. 
+
+Notation Description 
+
+D Finite dataset {x1, . . . , x n}.
+
+H Reproducing Kernel Hilbert Space. 
+
+ϕ(x) Feature map of point x in H.
+
+P Distribution of a cluster. 
+
+Q Truncated distribution of P, supported on Sλ = {x ∈ supp (P)|fP (x) ≥ λ}
+
+G Core cluster, a representative subset of points used to characterize a cluster. 
+
+μP Kernel Mean Embedding of distribution P.
+
+ˆμG Estimated Kernel Mean Embedding of a dataset G with finite points. 
+
+I Family of independent sets in the partition matroid. 
+
+w(xi, j ) Weight of assigning point xi to cluster j.
+
+11 B Proofs 
+
+B.1 Proof of Lemma 1 Lemma 1: 
+
+When using Gaussian Kernel kσ (x, y ) and σ → ∞ , for the truncation bias, it holds that 
+
+∥μP − μQ∥H = ∥E[Q] − E[T ]∥ · ησ + O
+
+ 1
+
+σ2
+
+
+
+. (1) 
+
+Proof. Expanding the inner product ⟨· , ·⟩ H, we have 
+
+∥E∥ 2 
+
+> H
+
+= η2 (⟨μT , μ T ⟩H + ⟨μQ, μ Q⟩H − 2⟨μT , μ Q⟩H) . (2) Using the reproducing property ⟨μP , μ Q⟩H = Ex∼P ,y ∼Q [k(x, y )] , we express the bound in terms of Expected Kernels: 
+
+∥E∥ 2 
+
+> H
+
+= η2
+
+Ex,x ′∼T [k(x, x ′)] 
+
+| {z }
+
+> γT
+
++ Ey,y ′∼Q [k(y, y ′)] 
+
+| {z }
+
+> γQ
+
+−2 Ex∼T ,y ∼Q [k(x, y )] 
+
+| {z }
+
+> δT Q
+
+ , (3) where γT , γ Q represent the self-similarity (intra-cluster coherence) and δT Q represents the cross-similarity between Q and T .For a Gaussian kernel, kσ (x, y ) ∈ (0 , 1] . As σ → ∞ , the second-order Taylor expansion with remainder gives 
+
+kσ (x, y ) = 1 − ∥x − y∥2
+
+2σ2 + O
+
+ ∥x − y∥4
+
+σ4
+
+
+
+. (4) Substituting into the RKHS norm expression yields 
+
+∥E∥ 2 
+
+> H
+
+= η2
+
+ 
+
+1 − E∥x − x′∥2
+
+2σ2
+
+
+
++
+
+
+
+1 − E∥y − y′∥2
+
+2σ2
+
+
+
+− 2
+
+
+
+1 − E∥x − y∥2
+
+2σ2
+
+ 
+
++ O
+
+ 1
+
+σ4
+
+
+
+.
+
+(5) Simplifying the terms: 
+
+∥E∥ 2 
+
+> H
+
+= η2
+
+ 2Ex∈T ,y ∈Q ∥x − y∥2 − Ex,x ′∈T ∥x − x′∥2 − Ey,y ′∈Q ∥y − y′∥2
+
+2σ2
+
+
+
++ O
+
+ 1
+
+σ4
+
+
+
+= η2 ∥E[Q] − E[T ]∥2
+
+σ2 + O
+
+ 1
+
+σ4
+
+
+
+.
+
+(6) Now let 
+
+A = η2∥E[Q] − E[T ]∥2, f (σ) = ∥μP − μQ∥H ≥ 0. (7) From the previous step, 
+
+f (σ)2 = Aσ2 + O
+
+ 1
+
+σ4
+
+
+
+, (8) so there exists C > 0 such that, for sufficiently large σ,
+
+f (σ)2 − Aσ2 ≤ Cσ4 . (9) Define g(σ) = √A/σ ≥ 0. Then 
+
+|f (σ) − g(σ)| = |f (σ)2 − g(σ)2|
+
+f (σ) + g(σ) . (10) Moreover, since f (σ)2 = A/σ 2 + O(1 /σ 4), we have f (σ) + g(σ) = Θ(1 /σ ) in the non-degenerate case A > 0. Therefore 
+
+|f (σ) − g(σ)| = O
+
+ 1/σ 4
+
+1/σ 
+
+
+
+= O
+
+ 1
+
+σ3
+
+
+
+⊆ O
+
+ 1
+
+σ2
+
+
+
+. (11) 12 Hence the conservative asymptotic form is 
+
+∥μP − μQ∥H =
+
+√Aσ + O
+
+ 1
+
+σ2
+
+
+
+. (12) Thus, we have 
+
+∥μP − μQ∥H = ∥E[Q] − E[T ]∥ · ησ + O
+
+ 1
+
+σ2
+
+
+
+.
+
+B.2 Proof of Lemma 2 Lemma 2 (Convergence of the Embedding of Dense Region ): 
+
+For a sample of s i.i.d. points U from distribution Q and a Gaussian kernel with k(x, x ) ≤ 1, it holds that with probability at least 1 − δ
+
+∥μQ − ˆμU ∥H ≤ 1 + p2 ln(1 /δ )
+
+√s . (13) 
+
+Proof. Consider the function f (x1, . . . , x s) = ∥μQ − 1
+
+> s
+
+Psi=1 ϕ(xi)∥H. Changing one coordinate 
+
+xi to x′ 
+
+> i
+
+results in a maximum change: 
+
+|f (. . . , x i, . . . ) − f (. . . , x ′
+
+> i
+
+, . . . )| ≤ 1
+
+s ∥ϕ(xi) − ϕ(x′
+
+> i
+
+)∥H ≤ 2
+
+s (14) Applying McDiarmid’s inequality: 
+
+P (f − E[f ] ≥ ϵ) ≤ exp 
+
+
+
+− 2ϵ2
+
+P(2 /s )2
+
+
+
+= exp 
+
+
+
+− sϵ 2
+
+2
+
+
+
+(15) Setting δ = exp( −sϵ 2/2) gives the deviation term ϵ =
+
+q 2 ln(1 /δ ) 
+
+> s
+
+. Then with probability at least 
+
+1 − δ, it holds 
+
+f − E[f ] = ∥μQ − ˆμU ∥H − E[∥μQ − ˆμU ∥H] ≤
+
+r 2 ln(1 /δ )
+
+s . (16) By Jensen’s inequality, the expected value is bounded by: 
+
+E[f ] ≤ pE[f 2] = 
+
+vuut 1
+
+s2
+
+> s
+
+X
+
+> i=1
+
+Var (ϕ(xi)) ≤ 1
+
+√s . (17) This holds because given ∥ϕ(x)∥ ≤ 1, we have Var Q(ϕ(X)) ≤ E∥ϕ(x)∥2 ≤ 1.Combining the two inequalities above, we finish the proof. 
+
+B.3 Proof of Lemma 3 Lemma 3 (A generic upper bound for core bias): 
+
+Let U = {qi}si=1 be sampled points from Q and let G = {gj }mj=1 be core points. Assume there exists a mapping π : {1, . . . , s } → { 1, . . . , m } such that 
+
+∥qi − gπ(i)∥ ≤ r, ∀i ∈ { 1, . . . , s }. (18) Define occupancy proportions 
+
+pj = 1
+
+s |{ i : π(i) = j}| , j = 1 , . . . , m, (19) and imbalance term 
+
+B =
+
+> m
+
+X
+
+> j=1
+
+pj − 1
+
+m . (20) Then for Gaussian kernel kσ ,
+
+∥ˆμU − ˆμG∥H ≤ rσ + B. (21) 13 Proof. Let 
+
+eμG = 1
+
+s
+
+> s
+
+X
+
+> i=1
+
+ϕ(gπ(i)) = 
+
+> m
+
+X
+
+> j=1
+
+pj ϕ(gj ). (22) By triangle inequality, 
+
+∥ˆμU − ˆμG∥H ≤ ∥ ˆμU − eμG∥H + ∥eμG − ˆμG∥H. (23) For the first term, 
+
+∥ˆμU − eμG∥H = 1
+
+s
+
+> s
+
+X
+
+> i=1
+
+ ϕ(qi) − ϕ(gπ(i))
+
+> H
+
+≤ 1
+
+s
+
+> s
+
+X
+
+> i=1
+
+∥ϕ(qi) − ϕ(gπ(i))∥H. (24) For Gaussian kernel, using k(x, x ) = 1 ,
+
+∥ϕ(x) − ϕ(y)∥2 
+
+> H
+
+= 2 
+
+
+
+1 − e−∥ x−y∥2/(2 σ2)
+
+≤ ∥x − y∥2
+
+σ2 , (25) thus ∥ϕ(x) − ϕ(y)∥H ≤ ∥ x − y∥/σ . Substituting ∥qi − gπ(i)∥ ≤ r for all i gives 
+
+∥ˆμU − eμG∥H ≤ rσ . (26) For the second term, 
+
+∥eμG − ˆμG∥H =
+
+> m
+
+X
+
+> j=1
+
+
+
+pj − 1
+
+m
+
+
+
+ϕ(gj )
+
+> H
+
+≤
+
+> m
+
+X
+
+> j=1
+
+pj − 1
+
+m ∥ϕ(gj )∥H ≤ B, (27) where ∥ϕ(gj )∥H = pk(gj , g j ) = 1 . Combining the two bounds yields 
+
+∥ˆμU − ˆμG∥H ≤ rσ + B. (28) 
+
+B.4 Proof of Theorem 2 
+
+Proof. Starting from the decomposition 
+
+∥μP − ˆμG∥H ≤ ∥ μP − μQ∥H + ∥μQ − ˆμU ∥H + ∥ˆμU − ˆμG∥H,
+
+apply Lemma 1, Lemma 2, and Lemma 3 to the three terms, respectively: 
+
+∥μP − μQ∥H ≤ ∥ E[Q] − E[T ]∥ · ησ + O
+
+ 1
+
+σ2
+
+
+
+, (29) 
+
+∥μQ − ˆμU ∥H ≤ 1 + p2 ln(1 /δ )
+
+√s , (30) 
+
+∥ˆμU − ˆμG∥H ≤ rσ + B. (31) Summing the three inequalities gives the stated bound. 
+
+B.5 Proof of Proposition 1 
+
+Proof. We verify the three axioms: 1. Non-emptiness: ∅ ∩ Si = ∅, thus |∅ ∩ Si| = 0 ≤ 1. ∅ ∈ I .2. Hereditary: Let A ∈ I and B ⊆ A. For any i, |B ∩ Si| ≤ | A ∩ Si| ≤ 1. Thus B ∈ I .3. Exchange Property: Let A, B ∈ I with |A| < |B|. Let I(A) = {i | A ∩ Si̸ = ∅} be the indices of points covered by A. Since |A ∩ Si| ≤ 1, |I(A)| = |A|. Since |B| > |A|, there must exist an index m ∈ I(B) \ I(A). This means point xm is covered by B but not by A.Let e = ( xm, j ) ∈ B ∩ Sm. Since m / ∈ I(A), A ∩ Sm = ∅, so |(A ∪ { e}) ∩ Sm| = 1 . For all other i̸ = m, |(A ∪ { e}) ∩ Si| = |A ∩ Si| ≤ 1. Thus A ∪ { e} ∈ I .14 B.6 Proof of Theorem 3 
+
+Proof. The one-pass rule is a greedy algorithm on the partition matroid (Sg, I) with additive weights 
+
+w(xi, j ). The feasible assignments with |A| = n are exactly the bases of this partition matroid. Therefore, by the Rado-Edmonds theorem, greedy returns a maximum-weight basis, which is globally optimal for 
+
+max  
+
+> A∈I ,|A|=n
+
+X
+
+> e∈A
+
+w(e). (32) 
+
+B.7 Proof of Proposition 2 
+
+Proof. For any pair (xi, j ),
+
+|w⋆(xi, j ) − ˆw(xi, j )| = |⟨ ϕ(xi), μ j − ˆμj ⟩H| ≤ ∥ ϕ(xi)∥H ∥μj − ˆμj ∥H ≤ ε. (33) Hence for any feasible A with |A| = n,
+
+|W ⋆(A) − ˆW (A)| ≤ X
+
+> (xi,j )∈A
+
+|w⋆(xi, j ) − ˆw(xi, j )| ≤ nε. (34) Now decompose 
+
+W ⋆(A⋆) − W ⋆( ˆA) =  W ⋆(A⋆) − ˆW (A⋆) +   ˆW (A⋆) − ˆW ( ˆA) +   ˆW ( ˆA) − W ⋆( ˆA) (35) 
+
+≤ nε + 0 + nε = 2 nε, (36) where the middle term is non-positive because ˆA maximizes ˆW over {A ∈ I : |A| = n}. This proves the claim. 
+
+B.8 Proof of Proposition 3 
+
+Proof. By definition, ε = max j ∥μj − ˆμj ∥H ≤ max j bj . Substituting this into Proposition 2 gives the result. 
+
+B.9 Proof of Theorem 4 
+
+Proof. Fix any point xi and any cluster index j. By Cauchy-Schwarz and ∥ϕ(xi)∥H ≤ 1,
+
+| ˆw(xi, j ) − w⋆(xi, j )| = |⟨ ϕ(xi), ˆμj − μj ⟩H| ≤ ∥ ϕ(xi)∥H ∥ˆμj − μj ∥H ≤ ε. (37) Hence for the best class y⋆i ,
+
+ˆw(xi, y ⋆i ) ≥ w⋆(xi, y ⋆i ) − ε, (38) while for any j̸ = y⋆i ,
+
+ˆw(xi, j ) ≤ w⋆(xi, j ) + ε. (39) Therefore 
+
+ˆw(xi, y ⋆i ) − ˆw(xi, j ) ≥  w⋆(xi, y ⋆i ) − w⋆(xi, j ) − 2ε ≥ γ⋆ − 2ε > 0. (40) So y⋆i remains the unique maximizer of ˆw(xi, ·), i.e., ˆyi = y⋆i . Since i is arbitrary, this holds for all points, proving exact recovery. 
+
+B.10 Proof of Proposition 4 
+
+Proof. From Proposition 3, for every cluster index j,
+
+∥μj − ˆμj ∥H ≤ bj , (41) thus 
+
+ε := max  
+
+> j∈K
+
+∥μj − ˆμj ∥H ≤ max  
+
+> j∈K
+
+bj . (42) If max j bj < γ ⋆/2, then ε < γ ⋆/2. Applying Theorem 4 yields ˆyi = y⋆i for all i.15 C Algorithmic Details of CaD Clustering Methods 
+
+This section details how Kernel-Bounded Clustering (KBC) [ 30 , 31 ], Isolation Distributional Kernel Clustering (IDKC) [ 33 ], and Point-Set Kernel Clustering (psKC) [ 25 ] instantiate the same high-level pipeline used in our analysis: (i) construct cluster-as-distribution proxies in RKHS, and (ii) assign each point by maximizing similarity (distributional kernel) to one of these proxies. Despite their differences in proxy construction, KBC, psKC, and IDKC share a fundamental common structure: each method assigns data points based on distributional kernel similarity. 
+
+C.1 KBC (Kernel-Bounded Clustering) 
+
+Figure 4: Demonstrate on how KBC works on Two-Moons dataset. KBC instantiates the cluster-as-distribution clustering pipeline through core extraction followed by one-pass assignment, as follows: 1. Build a kernel-threshold graph on a subsample of the data and extract representative high-density connected components as cores G1, . . . , G k.2. Compute their empirical embeddings 
+
+ˆμGj = 1
+
+|Gj |
+
+X
+
+> x∈Gj
+
+ϕ(x),
+
+And assign each point x in the given dataset to arg max j ⟨ϕ(x), ˆμGj ⟩H.The details are given in Algorithm 1 and Figure 4. 
+
+C.2 psKC and IDKC 
+
+Both psKC and IDKC follow essentially the same cluster-as-distribution clustering process as KBC: cluster-level proxies are first constructed in RKHS, and each point in the given dataset is then assigned according to the maximum similarity to one of these proxies. Their differences lie mainly in how the proxy is initialized and constructed. psKC identifies the maximum-similarity point with respect to the dataset of all unassigned points as the seed for each proxy, and then grows each proxy via the same distributional kernel in a sequential order. IDKC identifies all k seeds for k proxies and then assign points to form k clusters in parallel via the same distributional kernel. Hence, from the perspective of our analysis, all psKC, IDKC and KBC employ the same point assignment procedure to perform the clustering via a distributional kernel to achieve the same clustering objective . The main difference is in the cluster core/proxy initialization. 
+
+C.3 Connection to Our Error Analysis 
+
+Although the three methods differ in how they instantiate kernels and core/cluster representatives, they all use the same assignment based on a distributional kernel, and they all fit the decomposition analyzed in this paper: 
+
+∥μP − ˆμG∥H ≤ ∥ μP − μQ∥H + ∥μQ − ˆμU ∥H + ∥ˆμU − ˆμG∥H. (43) Therefore, the truncation, estimation, and core-selection terms provide a common lens for under-standing approximation quality across KBC, psKC, and IDKC. 16 Algorithm 1 Kernel Bounded Clustering 
+
+Input: D - dataset, k - number of clusters, s - sample size, τ - similarity threshold 
+
+Output: C = {C1, . . . , C k}
+
+Step 1: Find the k initial clusters 
+
+From Ds ⊂ D, find the largest k initial clusters Gj via kernel κ as follows: ∀j ∈ [k],
+
+Gj = {x, y ∈ D | there exists a chain z1, z2, · · · , zq ; z1 = x, zq = y, ∀i, k σ (zi, zi+1 ) > τ }.
+
+if the number of clusters in {G1, G 2, . . . , G j } < k then Assert ‘Parameter τ is set too small!’ and Exit end if 
+
+Step 2: Assignment of data points to clusters 
+
+Cj = {x ∈ D | arg max  
+
+> i∈[1 ,k ]
+
+K(δ(x), PGi ) = j}, ∀j ∈ [1 , k ].
+
+Step 3: Refine C = {C1, . . . , C k} to improve the objective: 
+
+max 
+
+> C
+
+X
+
+> C∈C
+
+X
+
+> x∈C
+
+K(δ(x), PC ).
+
+return C
+
+## D Additional Notes 
+
+D.1 The rationale behind |A ∩ Si| ≤ 1
+
+|A ∩ Si| ≤ 1 indicates that a point can be assigned to one cluster or no cluster. But in practice, each point should be assigned to just one cluster. The reason that |A ∩ Si| ≤ 1 is valid lies in the interaction between the weight function (in Section 4.2) and the global objective. The weight 
+
+w(xi, j ) = ⟨ϕ(xi), ˆμGj ⟩H evaluates the compatibility between point xi and cluster j, given fixed-core cluster embeddings. The overall objective W (A) = P 
+
+> e∈A
+
+w(e) is then purely additive over assignment elements, with no cross-point interaction terms. As a result, once the feasible set is constrained by the partition matroid structure, global optimization reduces to selecting exactly one maximum-weight element from each block Si. So in practice, ∀i ∈ [n], |A ∩ Si| = 1 , i.e., |A| = n.This is precisely why the one-pass assignment is not merely heuristic but coincides with the maximum weight basis for fixed core clusters. 
+
+D.2 Core Bias Analysis for KBC 
+
+Here we give a KBC interpretation of the core bias term. The generic Lemma 3 in the main text bounds the core bias through a sample-to-core coupling radius. Here we use the specific structure of KBC: for a Gaussian kernel, thresholding kernel values is equivalent to building a neighborhood graph, and KBC selects large connected components of that graph. This controls the core bias term by the mass of a boundary band of a density superlevel set. 
+
+D.2.1 Reminder of our setup 
+
+Let Pj be the distribution of cluster j, with density fj on Rd. For a density threshold λ > 0, define the density superlevel set 
+
+Sj,λ = {x ∈ Rd : fj (x) ≥ λ}.
+
+Let Qj = Pj (· | Sj,λ ), and let 
+
+Uj = {q1, . . . , q sj } ∼ Q sj
+
+> j
+
+be dense region samples. For the Gaussian kernel 
+
+kσ (x, y ) = exp 
+
+
+
+− ∥x − y∥2
+
+2σ2
+
+
+
+,
+
+17 the KBC threshold condition kσ (x, y ) > τ is equivalent to 
+
+∥x − y∥ < ε τ , ετ = σp2 log(1 /τ ).
+
+Thus KBC thresholding with τ is equivalent, for the Gaussian kernel, to building an ετ -neighborhood graph. Let Gj (τ ) ⊆ Uj denote the empirical core component selected by KBC for cluster j, restricted to the dense region samples Uj . Define the omitted dense region samples 
+
+Rj (τ ) = Uj \ Gj (τ ),
+
+and the empirical embeddings 
+
+ˆμUj = 1
+
+sj
+
+X
+
+> q∈Uj
+
+ϕ(q), ˆμGj (τ ) = 1
+
+|Gj (τ )|
+
+X  
+
+> g∈Gj(τ)
+
+ϕ(g),
+
+where ϕ(x) = kσ (x, ·) is the RKHS feature map. 
+
+D.2.2 Boundary Band and KBC Coverage 
+
+ετ
+
+Sj,λ 
+
+S−ετ
+
+> j,λ
+
+∂ετ Sj,λ 
+
+green dots: samples covered by Gj (τ )
+
+red dots: samples that may be missed by Gj (τ )
+
+Figure 5: Levelset view of KBC coverage. The blue region is the density superlevel set Sj,λ . The dashed green region is the eroded interior S−ετ 
+
+> j,λ
+
+, where ετ = σp2 log(1 /τ ) is the graph radius induced by the KBC threshold τ . Under the valid level set regime, KBC covers the interior samples in its selected core Gj (τ ); samples not covered by the core can only lie in the boundary band ∂ετ Sj,λ .
+
+Definition 4 (Interior and boundary band) . For ε > 0, define the ε-interior of the superlevel set Sj,λ 
+
+by 
+
+S−εj,λ = {x ∈ Sj,λ : d(x, S cj,λ ) > ε }.
+
+The corresponding inner boundary band is 
+
+∂εSj,λ = Sj,λ \ S−εj,λ = {x ∈ Sj,λ : d(x, S cj,λ ) ≤ ε},
+
+where dist( x, S cj,λ ) is the smallest distance between x to the points in Scj,λ .
+
+Assumption 1 (Valid KBC level set regime) . For the threshold τ , let ετ = σp2 log(1 /τ ). Assume that KBC selects a nonempty component Gj (τ ) ⊆ Uj satisfying 
+
+Uj ∩ S−ετ 
+
+> j,λ
+
+⊆ Gj (τ ).
+
+Equivalently, all dense region samples at distance more than ετ from the level set boundary are covered by the selected KBC core; missed dense region samples may occur only in the ετ -boundary band. 
+
+Remark 1. Assumption 1 is the formal point where the KBC threshold enters the analysis. It is expected to hold when ετ is large enough to connect the empirical samples inside one density component but small enough not to merge distinct density components. 
+
+18 D.2.3 KBC Core Bias Lemma 4 (Coverage decomposition) . Let Gj (τ ) ⊆ Uj , let Rj (τ ) = Uj \ Gj (τ ), and define 
+
+αj (τ ) = |Rj (τ )||Uj | = 1 − |Gj (τ )|
+
+sj
+
+.
+
+If Rj (τ )̸ = ∅, then 
+
+ˆμUj − ˆμGj (τ ) H = αj (τ ) ˆμRj (τ ) − ˆμGj (τ ) H .
+
+If Rj (τ ) = ∅, both sides are zero. Proof. Write mj = |Gj (τ )|, rj = |Rj (τ )|, and sj = mj + rj . If rj = 0 , then Uj = Gj (τ ), and the result is immediate. Otherwise, since Uj = Gj (τ ) ∪ Rj (τ ) is a disjoint union, 
+
+ˆμUj = mj
+
+sj
+
+ˆμGj (τ ) + rj
+
+sj
+
+ˆμRj (τ ).
+
+Subtracting ˆμGj (τ ) gives 
+
+ˆμUj − ˆμGj (τ ) = rj
+
+sj
+
+ ˆμRj (τ ) − ˆμGj (τ )
+
+ ,
+
+and taking norms yields the claim. 
+
+Lemma 5 (Boundary band control of coverage loss) . Under Assumption 1, 
+
+αj (τ ) ≤ 1
+
+sjsj
+
+X
+
+> i=1
+
+1{qi ∈ ∂ετ Sj,λ }.
+
+Proof. Assumption 1 implies that any dense region sample missed by Gj (τ ) cannot belong to the eroded interior S−ετ 
+
+> j,λ
+
+. Since all samples in Uj lie in Sj,λ , every missed sample must lie in ∂ετ Sj,λ .Therefore 
+
+Rj (τ ) ⊆ Uj ∩ ∂ετ Sj,λ .
+
+Dividing cardinalities by sj proves the result. 
+
+Theorem 5 (KBC Core Bias) . Fix 0 < δ < 1 and a threshold τ ∈ (0 , 1) , and let 
+
+pj (τ ) = Qj (∂ετ Sj,λ ), ετ = σp2 log(1 /τ ).
+
+With probability at least 1 − δ over Uj = {qi}sj 
+
+> i=1
+
+∼ Q sj 
+
+> j
+
+, the following implication holds: if Assumption 1 holds for the sampled Uj , then 
+
+ˆμUj − ˆμGj (τ ) H ≤ 2pj (τ ) + 2 
+
+s
+
+log(1 /δ )2sj
+
+.
+
+Proof. We separate the probabilistic part from the deterministic KBC coverage part. The only random quantity that needs concentration is the empirical fraction of dense region samples falling inside the boundary band. 
+
+Step 1: concentration of the empirical boundary band mass. For each dense region sample qi, define 
+
+Zi = 1{qi ∈ ∂ετ Sj,λ }.
+
+Since q1, . . . , q sj are i.i.d. samples from Qj , the variables Z1, . . . , Z sj are i.i.d. Bernoulli random variables. Their common mean is the population boundary band mass: 
+
+E[Zi] = Qj (∂ετ Sj,λ ) = pj (τ ).
+
+Hoeffding’s inequality therefore gives, for every t > 0,
+
+P 1
+
+sjsj
+
+X
+
+> i=1
+
+Zi − pj (τ ) > t 
+
+!
+
+≤ exp( −2sj t2).
+
+19 Taking t = plog(1 /δ )/(2 sj ), we obtain the event Eδ :
+
+1
+
+sjsj
+
+X
+
+> i=1
+
+1{qi ∈ ∂ετ Sj,λ } ≤ pj (τ ) + 
+
+s
+
+log(1 /δ )2sj
+
+.
+
+The probability of the complement of this event is at most 
+
+exp 
+
+
+
+−2sj · log(1 /δ )2sj
+
+
+
+= exp( − log(1 /δ )) = δ. 
+
+Therefore P(Eδ ) ≥ 1 − δ. The rest of the proof is deterministic on Eδ and under Assumption 1. 
+
+Step 2: reduce core bias to coverage loss. If Rj (τ ) = ∅, then ˆμUj = ˆ μGj (τ ), and the claimed bound is trivial. Assume Rj (τ )̸ = ∅. By Lemma 4, 
+
+ˆμUj − ˆμGj (τ ) H = αj (τ ) ˆμRj (τ ) − ˆμGj (τ ) H .
+
+For the Gaussian kernel, kσ (x, x ) = 1 , so ∥ϕ(x)∥H = 1 . Hence every empirical mean embedding has RKHS norm at most one, and 
+
+ˆμRj (τ ) − ˆμGj (τ ) H ≤ 2.
+
+Thus 
+
+ˆμUj − ˆμGj (τ ) H ≤ 2αj (τ ).
+
+Step 3: control the coverage loss by the boundary band. We now use the KBC level-set assumption. By Assumption 1, every sample in the eroded interior Uj ∩ S−ετ 
+
+> j,λ
+
+is included in the selected core 
+
+Gj (τ ). Hence any sample omitted by the core must lie outside this eroded interior. Since all samples in Uj are drawn from Qj = Pj (· | Sj,λ ), they lie in Sj,λ . Therefore the omitted set satisfies 
+
+Rj (τ ) = Uj \ Gj (τ ) ⊆ Uj ∩  Sj,λ \ S−ετ
+
+> j,λ
+
+ = Uj ∩ ∂ετ Sj,λ .
+
+Taking cardinalities and dividing by sj = |Uj | gives 
+
+αj (τ ) = |Rj (τ )|
+
+sj
+
+≤ |Uj ∩ ∂ετ Sj,λ |
+
+sj
+
+= 1
+
+sjsj
+
+X
+
+> i=1
+
+Zi.
+
+On Eδ , the empirical average of the Zi’s is at most 
+
+1
+
+sjsj
+
+X
+
+> i=1
+
+Zi ≤ pj (τ ) + 
+
+s
+
+log(1 /δ )2sj
+
+.
+
+Combining this with the previous display yields 
+
+αj (τ ) ≤ pj (τ ) + 
+
+s
+
+log(1 /δ )2sj
+
+.
+
+Finally, Step 2 gives 
+
+ˆμUj − ˆμGj (τ ) H ≤ 2αj (τ ) ≤ 2pj (τ ) + 2 
+
+s
+
+log(1 /δ )2sj
+
+.
+
+Thus the claimed implication holds on Eδ . Since P(Eδ ) ≥ 1 − δ, the theorem follows. 
+
+Assumption 2 (Linear boundary band mass) . There exists a constant Cj > 0 and a radius ε0 > 0
+
+such that, for every 0 < ε ≤ ε0,
+
+Qj (∂εSj,λ ) ≤ Cj ε. 
+
+Corollary 1 (Explicit dependence on τ ). Fix 0 < δ < 1 and τ ∈ (0 , 1) . Suppose Assumption 2 holds and ετ = σp2 log(1 /τ ) ≤ ε0. Then, with probability at least 1 − δ, the following implication holds: if Assumption 1 holds for the sampled Uj , then 
+
+ˆμUj − ˆμGj (τ ) H ≤ 2Cj σp2 log(1 /τ ) + 2 
+
+s
+
+log(1 /δ )2sj
+
+.
+
+Proof. Apply Theorem 5 and use Assumption 2 with ε = ετ :
+
+pj (τ ) = Qj (∂ετ Sj,λ ) ≤ Cj ετ = Cj σp2 log(1 /τ ).
+
+20 D.2.4 Relation to the Generic Coupling Bound 
+
+The generic core bias Lemma 3 in the main text gives rσ + B whenever the dense samples can be coupled to the selected core with Euclidean radius r and imbalance B. The level set certificate above is complementary rather than universally tighter: it is KBC-specific because τ determines the graph radius ετ , which determines the selected empirical density component and the boundary band mass 
+
+Qj (∂ετ Sj,λ ).When both assumptions are available, one can use the combined certificate 
+
+∥ˆμUj − ˆμGj (τ )∥H ≤ min 
+
+(
+
+rj
+
+σ + Bj , 2pj (τ ) + 2 
+
+s
+
+log(1 /δ )2sj
+
+)
+
+.
+
+Remark 2 (Analysis of τ ). For the Gaussian kernel, choosing τ is equivalent to choosing the graph radius ετ = σp2 log(1 /τ ). A large τ gives a small radius and may fragment one dense component; a small τ gives a large radius and may merge different components. The useful regime is the middle one: the graph connects samples inside each density superlevel set but does not connect across low density gaps. In this regime, KBC can miss only boundary band samples, so the core-bias term is controlled by the boundary band mass pj (τ ) = Qj (∂ετ Sj,λ ) plus the finite sample term O(s−1/2 
+
+> j
+
+).Thus the theorem is a level set certificate for appropriate τ , not an unconditional guarantee for every threshold. 
+
+D.3 Limitations and Future Work 
+
+Our theoretical analyses are conducted with Gaussian kernel. In practice, CaD clustering [ 25 , 26 ,31 , 33 ] is more effective with adaptive kernels such as Isolation Kernel [ 27 ]. The current theory explains the CaD clustering via Gaussian kernel only rather than providing a complete guarantee for all practical kernel choices. Extending the analysis to adaptive kernels is an important direction for future work. The geometric coverage assumptions required for the core bias bound (Lemma 3 and Assumption 1) are highly sensitive to the curse of dimensionality when using a standard Euclidean-based Gaussian kernel. In high-dimensional spaces, satisfying these conditions without an exponentially growing sample size is practically prohibitive. This limitation is one reason why practical CaD clustering methods often use Isolation Kernel rather than Gaussian kernel: A recent work [ 24 ] shows that Isolation Kernel is the only measure that has the distinguishability property in high-dimensional space—enabling meaningful exact nearest neighbor search in high dimensional space, as opposed to other measures that produce meaningless nearest neighbors [2]. An important future direction is to explore the theoretical limits of CaD clustering. Existing im-possibility results for clustering [ 12 ] are formulated under a set-oriented view, where a cluster is treated as a set of similar points satisfying certain abstract axioms. This set-oriented view and its resultant impossibility theorem are a mismatch to the CaD clustering, where each cluster is treated as a set of i.i.d. points sampled from an unknown distribution. The empirical evidence in literature [ 25 , 30 , 31 , 33 , 26 ] and the theory established in this paper point to a potential Possibility Theorem of Clustering, should the premise is cluster-as-distribution. 
+
+## E Experiment Settings 
+
+All experiments reported in this paper were run on a Windows 10 machine (x64) equipped with an Intel Core i7-1360P processor and 32 GB RAM. The synthetic experiments reported here are based on CPU; the integrated GPU on the machine is Intel Iris Xe Graphics. All the codes are available in 
+
+https://github.com/IsolationKernel/Codes .All synthetic experiments use the Gaussian kernel kσ (x, y ) = exp( −∥ x − y∥2/(2 σ2)) and set the number of clusters to the ground-truth value. We evaluate sample sizes n ∈{50 , 100 , 200 , 500 , 1000 , 2000 , 5000 , 10000 }.For the controlled synthetic diagnostics in the main text, KBC hyperparameters are selected by an 
+
+oracle protocol. We search over the finite grid of Gaussian bandwidths and graph thresholds, 
+
+σ ∈ { 0.3, 0.5, 1.0, 2.0, 5.0}, τ ∈ { 0.1, 0.2, . . . , 0.9},
+
+21 and select, for each dataset, the pair (σ, τ ) that maximizes NMI. These oracle-tuned settings are then reused in the error decomposition plots. Accordingly, the synthetic results should be interpreted as controlled validation of the theory under favorable hyperparameter choices, rather than as a claim about fully unsupervised model selection. The evaluation metric is normalized mutual information (NMI). Ground truth labels are used only for reporting NMI and for oracle selection of (σ, τ ) on synthetic data; they are not used by KBC during core extraction or one-pass assignment. In the decomposition experiments, truncation bias, estimation bias, core bias, and total error are computed via their empirical RKHS / MMD estimators using the same Gaussian kernel, and the theoretical upper bounds are evaluated with confidence parameter 
+
+δ = 0 .05 .For the appendix sensitivity studies, Stage 1 is run on a random 70% subsample, repeated over 10 
+
+resamples, with post_process=False to isolate the effect of the initial threshold τ . In the one-pass versus iterative comparison, KBC is deterministic once (σ, τ ) is fixed, whereas Kernel k-means is run with up to 10 random restarts and 100 iterations, and we report its best NMI under the same Gaussian kernel family. 
+
+E.1 Dataset Descriptions 
+
+All five datasets are 2D and consist of n points drawn i.i.d. from the corresponding distribution. 
+
+Two-Moons. Two interleaved half-moon arcs, each containing roughly half the points. The clusters are non-convex and non-linearly separable, making this a canonical benchmark for kernel-based methods. Noise is added by sampling each point from a thin Gaussian tube centred on the arc. 
+
+Concentric-Rings. Two nested annular clusters of similar width and mass. The inner ring is fully enclosed by the outer ring, so any method relying on convexity or linear separation will fail. Points are drawn uniformly on each annulus. 
+
+G-Strip. One elongated cluster (the “strip”) and one compact circular cluster. 
+
+EqSize-Gauss. Two isotropic Gaussian clusters of equal size placed close together so that their supports overlap substantially. This tests the algorithm’s ability to resolve clusters that are well separated in density but not in raw Euclidean distance. 
+
+Imbal-Gauss. Three isotropic Gaussian clusters with a severe size imbalance (approximate ratio 
+
+8 : 2 : 1 ). The minority cluster is easily overwhelmed by majority cluster points in density-based approaches. For the additional qualitative comparison in Figure 9, we also include three benchmark datasets taken directly from prior literature. Spiral and AC are the official synthetic benchmarks used in Fig. 4 of the IDKC paper: Spiral consists of three intertwined non-convex spiral arms, while AC is a highly non-convex benchmark with multiple curved and adjacent components that is designed to stress the geometry bias of centroid or variance driven methods. Two-Strips is the harder official benchmark released with the KBC paper; it contains two elongated strip-like clusters arranged in a way that makes their separation challenging for standard Kernel k-means. On these three datasets, we keep the original ground truth labels and report qualitative clustering assignments together with NMI. 
+
+## F Additional Empirical Results on Gaussian Distribution 
+
+F.1 Empirical Behavior of Truncation Bias under Different σ and λ
+
+To complement Lemma 1, we study P = N (0 , I ) in R2 with dynamic η and compare Empirical Truncation Bias = ∥μP − μQ∥H, Leading Term of Upper Bound = ησ ∥E[Q] − E[T ]∥.
+
+(44) Figure 6 shows the expected asymptotic pattern for σ ∈ { 0.001 , 0.01 , 0.1, 1, 10 , 100 , 1000 }: the gap is larger at small σ and becomes small at large σ. Across λ, the curves can be non-monotonic because both η and ∥E[Q] − E[T ]∥ change with truncation level. 22 Figure 6: Empirical truncation bias and asymptotic leading term under different σ values and density thresholds λ (with dynamic η). 
+
+F.2 Empirical Behavior of Estimation Bias under Different σ and λ
+
+To complement Lemma 2, we evaluate ∥μQ − ˆμU ∥H on the same 2D Gaussian setting ( P = N (0 , I )), varying s, with fixed δ = 0 .01 , multiple λ, and σ ∈ { 10 −3, 10 −2, 10 −1, 1, 10 , 100 , 1000 }. Figure 7 uses a log-y scale and shows that empirical estimation bias decreases with s and follows the upper-bound trend 1+ √2 ln(1 /δ ) 
+
+> √s
+
+up to sampling fluctuation. Experimentally, for each (σ, λ, s ) setting, we first form Q by thresholding the same Gaussian sample pool, then repeatedly draw s points U
+
+from Q to build ˆμU and compute ∥μQ − ˆμU ∥H. The solid curve is the trial mean, and the shaded band is mean ± one standard deviation across repeated trials, so the standard deviation quantifies Monte Carlo sampling variability under a fixed setting. 
+
+Figure 7: Empirical estimation bias versus s under different σ and λ, with fixed δ = 0 .01 , compared to the theoretical upper bound (log-y scale). 
+
+F.3 Empirical Behavior of Core Bias under Different τ (fixed σ = 1 )
+
+To complement Lemma 3, we evaluate ∥ˆμU − ˆμG∥H on the same 2D Gaussian setting with fixed 
+
+σ = 1 , varying τ , multiple λ, and different s. Figure 8 compares empirical core bias with the bound 
+
+r/σ + B using a log-y scale; the empirical curves remain below the bound across tested settings. For 23 each (τ, λ, s ) setting, we repeatedly sample s points U from Q, construct G as the largest τ -connected component, and compute both ∥ˆμU − ˆμG∥H and r/σ + B. The empirical curve reports the trial mean, while the shaded band is mean ± one standard deviation over trials; this standard deviation reflects randomness from repeated subset sampling (and the induced core extraction) under fixed parameters. 
+
+Figure 8: Core-bias validation with fixed σ = 1 and varying τ : empirical core bias versus the bound 
+
+r/σ + B under different λ and s (log-y scale). 
+
+F.4 Std Results corresponding to Figure 2 
+
+For KBC, we report the detailed mean and std values corresponding to Figure 2 in Table 2. Table 2: KBC Mean ± std over 10 trials across all datasets and sample sizes. Metric Dataset n = 50 n = 100 n = 200 n = 500 n = 1000 n = 2000 n = 5000 n = 10000 
+
+NMI Two-Moons 0.203 ±0.017 0.329 ±0.000 0.889 ±0.000 0.966 ±0.000 0.926 ±0.000 0.942 ±0.002 0.958 ±0.002 0.836 ±0.279 
+
+Concentric-Rings 0.005 ±0.005 0.003 ±0.000 1.000 ±0.000 1.000 ±0.000 1.000 ±0.000 1.000 ±0.000 0.900 ±0.300 1.000 ±0.000 
+
+G-Strip 0.610 ±0.119 1.000 ±0.000 1.000 ±0.000 1.000 ±0.000 1.000 ±0.000 1.000 ±0.000 1.000 ±0.000 1.000 ±0.000 
+
+EqSize-Gauss 0.772 ±0.144 0.728 ±0.000 0.797 ±0.000 0.569 ±0.000 0.811 ±0.000 0.754 ±0.084 0.764 ±0.045 0.761 ±0.082 
+
+Imbal-Gauss 1.000 ±0.000 0.724 ±0.230 1.000 ±0.000 1.000 ±0.000 0.990 ±0.000 0.987 ±0.002 0.985 ±0.003 0.988 ±0.001 
+
+Total Error Two-Moons 0.796 ±0.013 0.680 ±0.004 0.307 ±0.000 0.002 ±0.000 0.001 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+Concentric-Rings 0.575 ±0.000 0.284 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+G-Strip 0.274 ±0.006 0.126 ±0.000 0.084 ±0.000 0.002 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+EqSize-Gauss 0.087 ±0.000 0.638 ±0.012 0.572 ±0.010 0.462 ±0.000 0.346 ±0.000 0.261 ±0.000 0.057 ±0.000 0.022 ±0.000 
+
+Imbal-Gauss 0.116 ±0.000 0.054 ±0.000 0.014 ±0.000 0.007 ±0.000 0.003 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+Estimation Bias Two-Moons 0.606 ±0.136 0.245 ±0.042 0.034 ±0.000 0.000 ±0.000 0.001 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+Concentric-Rings 0.378 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+G-Strip 0.056 ±0.003 0.011 ±0.000 0.000 ±0.000 0.002 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+EqSize-Gauss 0.087 ±0.000 0.411 ±0.104 0.267 ±0.089 0.135 ±0.000 0.104 ±0.000 0.074 ±0.000 0.024 ±0.000 0.010 ±0.000 
+
+Imbal-Gauss 0.024 ±0.000 0.018 ±0.000 0.007 ±0.000 0.003 ±0.000 0.001 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+Core Bias Two-Moons 0.796 ±0.013 0.680 ±0.004 0.307 ±0.000 0.002 ±0.000 0.001 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+Concentric-Rings 0.575 ±0.000 0.284 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+G-Strip 0.274 ±0.006 0.126 ±0.000 0.084 ±0.000 0.002 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+EqSize-Gauss 0.087 ±0.000 0.638 ±0.012 0.572 ±0.010 0.462 ±0.000 0.346 ±0.000 0.261 ±0.000 0.057 ±0.000 0.022 ±0.000 
+
+Imbal-Gauss 0.116 ±0.000 0.054 ±0.000 0.014 ±0.000 0.007 ±0.000 0.003 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+Truncation Bias Two-Moons 0.606 ±0.136 0.245 ±0.042 0.034 ±0.000 0.000 ±0.000 0.001 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+Concentric-Rings 0.378 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+G-Strip 0.056 ±0.003 0.011 ±0.000 0.000 ±0.000 0.002 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+EqSize-Gauss 0.087 ±0.000 0.411 ±0.104 0.267 ±0.089 0.135 ±0.000 0.104 ±0.000 0.074 ±0.000 0.024 ±0.000 0.010 ±0.000 
+
+Imbal-Gauss 0.024 ±0.000 0.018 ±0.000 0.007 ±0.000 0.003 ±0.000 0.001 ±0.000 0.001 ±0.000 0.000 ±0.000 0.000 ±0.000 
+
+F.5 Clustering Result Visualization 
+
+We show the clustering result of KBC and the best clustering result of KKM in Figure 9. 24 Figure 9: Clustering Results. 
+
+F.6 Sensitivity of Core Bias 
+
+This subsection examines how the Stage 1 threshold τ in KBC affects core quality and, consequently, the final clustering performance of KBC. Across the five datasets, the experiments show that core bias is highly sensitive to τ , and that the values of τ yielding lower core bias usually also produce higher or near-highest NMI. In particular, excessively small τ may make the threshold graph overly connected and prevent the extraction of k valid cores, especially on non-convex datasets. Overall, these results confirm that the effectiveness of the assignment step depends critically on the quality of the extracted cores, making τ selection a central issue rather than a minor implementation detail. To complement this sensitivity analysis, we further introduce a simple unsupervised heuristic for selecting τ directly from the connected components produced in the first step of KBC. The heuristic favors candidate thresholds that yield connected components with large coverage, strong internal cohesion, and balanced sizes, thereby reflecting the structural quality of the extracted cores without using label information. Empirically, the resulting τ values are well aligned with the best-performing choices on most datasets, indicating that the proposed criterion provides a practical and effective rule for threshold selection in KBC. 25 Figure 10: Sensitivity of one-pass KBC to the core extraction threshold τ across five datasets. For each dataset, we report the mean and standard deviation of core bias and final NMI over 10 subsamples. The gray area means that the invalid τ values (small τ ) makes the connected component contain all the points and hence core bias can not be computed. The sigma here is selected via common median heuristic. 
+
+F.6.1 Results on Synthetic Datasets 
+
+To evaluate the importance of core quality, we study the sensitivity of KBC to the threshold parameter 
+
+τ used in Stage 1 for core extraction. For each dataset and each value of τ , we repeat the subsampling procedure 10 times using 70% random subsamples, disable post-processing, and measure both the resulting core bias and the final one-pass NMI. The top row of Fig. 10 reports the mean RKHS discrepancy between each true cluster and its matched extracted core, while the bottom row reports the corresponding clustering performance. Several consistent patterns emerge. 1. First, the choice of τ has a direct and often substantial effect on core quality, confirming that core extraction is a determining factor in the overall method. 2. Second, on most datasets, the range of τ values that minimizes core bias also yields the highest or near-highest NMI, showing that better cores lead to better one-pass assignments. 3. Third, the gray regions on non-convex datasets such as Two-Moons and Concentric-Rings indicate that small τ values can make the threshold graph overly connected, preventing the extraction of k valid cores. Overall, these results reinforce the central message of the theory: optimal assignment is meaningful only relative to the extracted cores, and therefore the quality of the cores is itself a crucial object of analysis . The sensitivity of the core bias could be mitigated via specific kernel choices, as shown in Figure A3 in [31], which uses a more complicated Isolation Kernel. 
+
+A heuristic for choosing τ based on connected components. To select τ without using labels, we score each candidate τ by the quality of the top-k connected components returned by the first step of KBC. Let Xsub be the subsample used in Step 1, and let G1(τ ), . . . , G k(τ ) denote the k largest connected components extracted from the kernel-threshold graph under parameter τ . We define 
+
+Sheur (τ ) := Cov( τ ) Coh( τ ) pBal( τ ),
+
+where 
+
+Cov( τ ) := 
+
+Pkj=1 |Gj (τ )||Xsub | , Bal( τ ) := min 1≤j≤k |Gj (τ )|
+
+max 1≤j≤k |Gj (τ )| ,
+
+and 
+
+Coh( τ ) := 1
+
+k
+
+> k
+
+X
+
+> j=1
+
+1
+
+|Gj (τ )|
+
+X  
+
+> x∈Gj(τ)
+
+K(δ(x), G j (τ )) ,
+
+26 where K is distributional kernel, Cov( τ ) quantifies the coverage of the subsample by the extracted top-k connected components, Coh( τ ) quantifies their average within-component cohesion in terms of the distribution kernel, and Bal( τ ) quantifies the size balance among these components. The square root is introduced to soften the effect of the balance term, so that it discourages severely imbalanced connected components while still allowing coverage and cohesion to remain the primary factors in selecting τ .Equivalently, 
+
+Coh( τ ) = 1
+
+k
+
+> k
+
+X
+
+> j=1
+
+1
+
+|Gj (τ )|2
+
+X  
+
+> x,g ∈Gj(τ)
+
+k(x, g ).
+
+The heuristic choice of τ is then 
+
+τheur ∈ arg max   
+
+> τ∈T
+
+Sheur (τ ),
+
+where T is the candidate set of threshold parameters. Intuitively, this criterion prefers values of τ
+
+that produce connected components with large coverage, strong internal cohesion, and balanced component sizes. Empirically, the proposed connected-component heuristic yields τ values that are well aligned with the best empirical choices. Overall, the heuristic offers an effective unsupervised rule for choosing τ
+
+in KBC, as shown in Figure 10. 
+
+F.6.2 Results on Real Datasets 
+
+Figure 11 highlights the relationship between the heuristic-guided parameter choice and the true clustering optimum (w.r.t NMI) in the feasible (τ, σ ) region. The main point is that Best is defined as the feasible parameter pair achieving the highest NMI over the grid, not the pair with the largest heuristic score. This distinction is crucial because it separates the role of the heuristic as a selection proxy from the actual evaluation criterion used to determine the best clustering result. For P ENDIGITS , the NMI optimal point is (0 .93 , 1.12) with NMI 0.71 , whereas the heuristic-selected point is (0 .94 , 1.22) with NMI 0.70 . For COIL20, the NMI optimal point is (0 .84 , 9.61) with NMI 
+
+0.7944 , while the heuristic-selected point is (0 .94 , 14 .77) with NMI 0.77 . In both cases, the heuristic choice lies near the optimal region w.r.t NMI and achieves competitive performance, although it does not exactly coincide with the NMI maximizer. Figure 11 examines whether the proposed heuristic can identify a useful hyperparameter region without directly optimizing NMI. On both Pendigits and COIL20, the heuristic-selected point lies close to the best feasible region under the ground-truth NMI grid. The selected pair does not exactly coincide with the NMI maximizer, but its performance loss is small: about 2.0% on Pendigits and 2.7% on COIL20 relative to the best observed NMI. This suggests that the heuristic captures the similar qualitative structure as the grid search. The aligned heatmaps also show that low total error and high NMI tend to occur in nearby regions, supporting the link between core approximation quality and downstream assignment performance. However, the match is not perfect, which is expected on real datasets. Thus, Figure 11 should be read as practical evidence that the heuristic can localize good parameter choices. 
+
+F.7 Empirical validation of another CaD clustering method: GDKC 
+
+Figure 12 reports the Total Error and NMI on five synthetic datasets. For non-convex and strip clusters, total error decreases monotonically with n while NMI approaches 1.0. For Gaussian clusters the error converges to a positive constant, as the density peak core is structurally a strict subset of the Gaussian component; nevertheless NMI remains stable ( ≈0.80 ), confirming that irreducible core bias does not impair clustering accuracy. The grow traces (bottom row) show monotone error reduction for non-convex data and a brief non-monotone transient for Gaussian data before settling at the respective plateau. For the two Gaussian datasets (EqSize-Gauss, Imbal-Gauss), the total error does not vanish as n
+
+increases, because the seeds favor high density areas and the seeds are not distributed in all clusters, resulting in a persistent distributional gap. The NMI is also lower due to bad cores. The NMI on 27 Figure 11: Refined feasible-region analysis of KBC on P ENDIGITS and COIL20 with MinMax normalization. Each column shows the local (τ, σ ) search region using three aligned heatmaps: NMI, total error, and heuristic value. Best denotes the feasible grid point with the maximum NMI in the refined search region, while Heur. denotes the feasible grid point with the maximum heuristic value. Hence, Best is selected strictly by clustering performance rather than by the heuristic criterion. On both datasets, the heuristic optimum is close to the NMI-optimal point, showing that the heuristic can effectively localize a strong parameter region even when it does not exactly match the NMI maximizer. imbal-Gauss is rather high because the largest cluster takes 8/11 of the mass. So the cluster results of the top two small Gaussian clusters have a smaller effect on the NMI. 
+
+## G On the use of Large Language Models 
+
+Large Language Models (LLMs) were utilized in the polishing phase of this paper’s preparation. Specifically, LLMs were employed to optimize linguistic clarity, enhance stylistic coherence, and correct minor grammatical or syntactical inconsistencies. All core intellectual content, including conceptual frameworks, empirical observations, argumentative structure, and citation alignment, was developed, curated, and validated exclusively by the human authors. Portions of the code in this project were developed with the assistance of large language models (LLMs), including support for code scaffolding, debugging, and documentation refinement. All LLM-generated or LLM-modified content was manually reviewed, tested, and revised as necessary 28 Figure 12: Results of GDKC on five synthetic datasets. Top row : Total Error and NMI vs. dataset size n, averaged over 10 trials. Middle row : Total Error across grow iterations at n = 1000 , showing how the τ -decay growth phase reduces the total error. Bottom row : seed selection score and selected seeds at n = 1000 . δ is selected using the heuristic method without the Cov term, because the core clusters are growing subsets rather than fixed ones in KBC. by the authors. The authors take full responsibility for the correctness and reliability of the final code and the resulting research outcomes. 29
