@@ -1,0 +1,93 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-01T20:51:04.398916+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.24943v1",
+      "source": "arxiv",
+      "title": "Multiclass Classification without Labels via Posterior Simplex Geometry",
+      "abstract": "In many classification problems, reliable instance-level labels are unavailable. However, it is often possible to construct weakly enriched unlabeled samples: datasets selected by different cuts, sources, populations, or experimental conditions that change latent class proportions without revealing them. Classification without Labels (CWoLa) shows that, in the binary case ($K=2$), a classifier trained to distinguish two impure mixtures with different class proportions can recover an optimal class discriminator without knowing the mixture proportions. We extend this principle to multiclass learning from several unlabeled mixtures ($K>2$), where the learner observes only mixture identity and neither latent class labels nor class-prior matrices. We prove that, for a multiclass mixture model, the Bayes-optimal mixture classifier $g^\\star$ maps data points into a $(K-1)$-simplex embedded in mixture-posterior space. The $K$ vertices of this simplex are induced by the latent classes through the unknown mixing matrix. Leveraging this geometry, we propose prior-free procedures that train a standard classifier to distinguish mixture identities and then extract latent class structure using either post-hoc simplex fitting or a bottleneck architecture. Experiments on MNIST, CIFAR-10, and Galaxy10 DECaLS show that mixture identity alone can recover latent classes and their fractions in the mixture. By narrowing the gap between weakly supervised and fully supervised performance, we provide a mathematically grounded, scalable tool for multiclass discovery in label-scarce domains.",
+      "authors": [
+        "Raphaël Bonnet-Guerrini",
+        "Johann Ioannou-Nikolaides",
+        "Troels Petersen",
+        "Vincenzo Piuri"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "astro-ph.GA",
+        "cs.AI",
+        "stat.ML"
+      ],
+      "published": "2026-07-27T18:01:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.24943v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "extends Classification without Labels (CWoLa) to multiclass learning from several unlabeled mixtures, discovering class discriminators without labels or prior matrices",
+      "llm_evidence_cn": "将无标签分类(CWoLa)扩展到从多个无标签混合体中学习多类，无需标签或先验矩阵即可发现类判别器",
+      "llm_evidence": "将无标签分类(CWoLa)扩展到从多个无标签混合体中学习多类，无需标签或先验矩阵即可发现类判别器",
+      "canonical_evidence": "将无标签分类(CWoLa)扩展到从多个无标签混合体中学习多类，无需标签或先验矩阵即可发现类判别器",
+      "llm_tldr_en": "Proposes multiclass CWoLa, enabling discovery of optimal class discriminators from multiple unlabeled mixtures with different class proportions, without knowing mixture proportions, through posterior simplex geometry.",
+      "llm_tldr_cn": "针对多类无标签分类问题，将原有的CWoLa原理从二分类推广到多类，利用多个具有不同类比例但无标签的混合数据集训练分类器。理论证明在单纯形几何条件下可恢复最优判别器，实验在合成和真实数据上验证了其有效性。该方法为无需精确标注的类别发现和广义类别发现提供了新的理论框架和简洁算法。",
+      "llm_tldr": "针对多类无标签分类问题，将原有的CWoLa原理从二分类推广到多类，利用多个具有不同类比例但无标签的混合数据集训练分类器。理论证明在单纯形几何条件下可恢复最优判别器，实验在合成和真实数据上验证了其有效性。该方法为无需精确标注的类别发现和广义类别发现提供了新的理论框架和简洁算法。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.24583v1",
+      "source": "arxiv",
+      "title": "PYPM-GGD: Pitman-Yor Process Mixture with Generalized Gaussian Density using ADAM",
+      "abstract": "Large scale Bayesian nonparametrics (BNP) learner such as Stochastic Variational Inference (SVI) can handle datasets with large class number and large training size at fractional cost. Like its predecessor, SVI rely on the assumption of conjugate variational posterior to approximate the true posterior. A more challenging problem is to consider large scale learning on non-conjugate posterior. Recent works in this direction are mostly associated with using Monte Carlo methods for approximating the learner. However, these works are usually demonstrated on non-BNP related task and less complex models such as logistic regression, due to higher computational complexity. In order to overcome the issue faced by SVI, we develop a novel approach based on the recently proposed constant stepsize stochastic gradient ascent to allow large scale learning on non-conjugate posterior. Unlike SVI, our new learner does not require closed- form expression for the variational posterior expectatations. Our only requirement is that the variational posterior is differentiable. In order to ensure convergence in stochastic settings, SVI rely on decaying step-sizes to slow its learning. Inspired by SVI and Adam, we propose the novel use of adaptive stepsizes in our method to significantly improve its learning. We show that our proposed methods is compatible with ResNet features when applied to large class number datasets such as MIT67 and SUN397. Finally, we compare our proposed learner with several recent works such as deep clustering algorithms and showed we were able to produce on-par or outperform the state-of-the-art methods in terms of clustering measures.",
+      "authors": [
+        "Kart-Leong Lim"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-27T15:50:57+00:00",
+      "link": "https://arxiv.org/pdf/2607.24583v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Bayesian nonparametric model with Pitman-Yor process can handle unknown number of classes, relevant for generalized category discovery.",
+      "llm_evidence_cn": "带Pitman-Yor过程的贝叶斯非参数模型可处理未知类别数量，与通用类别发现相关。",
+      "llm_evidence": "带Pitman-Yor过程的贝叶斯非参数模型可处理未知类别数量，与通用类别发现相关。",
+      "canonical_evidence": "带Pitman-Yor过程的贝叶斯非参数模型可处理未知类别数量，与通用类别发现相关。",
+      "llm_tldr_en": "Develops a scalable Bayesian nonparametric mixture model using Pitman-Yor process and ADAM optimization for large datasets with unknown class numbers.",
+      "llm_tldr_cn": "该论文针对大规模贝叶斯非参数学习中非共轭后验难以扩展的问题，提出基于Pitman-Yor过程混合模型与广义高斯密度，并利用ADAM优化进行变分推断的方法，能够高效处理类别数未知的大规模数据集，为开放世界中自动发现新类别提供了可扩展的技术基础。",
+      "llm_tldr": "该论文针对大规模贝叶斯非参数学习中非共轭后验难以扩展的问题，提出基于Pitman-Yor过程混合模型与广义高斯密度，并利用ADAM优化进行变分推断的方法，能够高效处理类别数未知的大规模数据集，为开放世界中自动发现新类别提供了可扩展的技术基础。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

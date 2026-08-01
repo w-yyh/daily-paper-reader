@@ -1,0 +1,809 @@
+Title: Multiclass Classification without Labels via Posterior Simplex Geometry
+
+URL Source: https://arxiv.org/pdf/2607.24943v1
+
+Published Time: Wed, 29 Jul 2026 00:07:32 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Multiclass Classification without Labels via Posterior Simplex Geometry 
+
+Raphaël Bonnet-Guerrini ∗
+
+Computer Science Department Università degli Studi di Milano Istituto Nazionale di Fisica Nucleare 20133 Milano, Italy 
+
+raphael.bonnet-guerrini@unimi.it 
+
+Johann Ioannou-Nikolaides ∗
+
+Niels Bohr Institute University of Copenhagen Copenhagen, 2100 
+
+johann.nikolaides@nbi.ku.dk 
+
+Troels Petersen †
+
+Niels Bohr Institute University of Copenhagen Copenhagen, 2100 
+
+Vincenzo Piuri †
+
+Computer Science Department Università degli Studi di Milano Milan, MI, 20133 
+
+Abstract 
+
+In many classification problems, reliable instance-level labels are unavailable. However, it is often possible to construct weakly enriched unlabeled samples: datasets selected by different cuts, sources, populations, or experimental conditions that change latent class proportions without revealing them. Classification without Labels (CWoLa) shows that, in the binary case ( K = 2 ), a classifier trained to distinguish two impure mixtures with different class proportions can recover an optimal class discriminator without knowing the mixture proportions. We extend this principle to multiclass learning from several unlabeled mixtures ( K > 2), where the learner observes only mixture identity and neither latent class labels nor class-prior matrices. We prove that, for a multiclass mixture model, the Bayes-optimal mixture classifier g⋆ maps data points into a (K − 1) -simplex embedded in mixture-posterior space. The K vertices of this simplex are induced by the latent classes through the unknown mixing matrix. Leveraging this geometry, we propose prior-free procedures that train a standard classifier to distinguish mixture identities and then extract latent class structure using either post-hoc simplex fitting or a bottleneck architecture. Experiments on MNIST, CIFAR-10, and Galaxy10 DECaLS show that mixture identity alone can recover latent classes and their fractions in the mixture. By narrowing the gap between weakly supervised and fully supervised performance, we provide a mathematically grounded, scalable tool for multiclass discovery in label-scarce domains. 
+
+1 Introduction 
+
+Deep neural networks have achieved strong empirical performance across a wide range of do-mains [Lecun et al., 2015]. In classification, however, these gains often rely on large datasets with reliable instance-level labels, a requirement that remains a major bottleneck in practice [Russakovsky et al., 2014, Ratner et al., 2017]. This limitation is especially acute in scientific and clinical domains,               
+
+> ∗Primary authors - ordered alphabetically, contributed equally. Led the project, developed the methodology, implemented the experiments, analyzed the results, and wrote the manuscript.
+> †Supervising authors. Preprint. arXiv:2607.24943v1 [cs.LG] 27 Jul 2026 Unlabeled mixtures observed:xi, Si = m M-way mixture classifier
+> gθ(x) ≈P(S | X=x)
+> Mixture-posterior simplex
+> {g θ(x i)} ⊂ΔM−1
+> Prior-free latent recovery
+> D1D2DM
+> ⋮⋮
+> use S, not Y hidden:Y iunknown: Π
+> 12··· M
+> train on mixture ID only
+> loss: −log g θ(x)
+
+## v 1
+
+# v 2 v3g*(x) = V α(x)        
+
+> α(x) ∈ΔK−1schematic K=3 classes map to (K −1)-simplex
+> R1: post-hoc simplex fit
+> • estimate V ̂
+> • barycentric decode αθ(x)
+> R2: bottleneck head
+> gθ(x) = V αθ(x)
+> latent predictor
+> α(x) ^123
+> ⋮⋮
+> K^
+
+Figure 1: Overview of posterior simplex geometry via multiclass CWoLa. From unlabeled mixtures with observed mixture identities only, we train an M -way classifier and use its source-posterior geometry to recover latent class structure. The learned posterior cloud lies in a (K −1) -simplex whose vertices correspond to the latent classes. Prior-free recovery is performed either by post-hoc simplex fitting or by an architectural bottleneck. Colors indicate latent classes for schematic illustration only and are not used during training. where labels may require large-scale expert annotation or human inspection [Darg et al., 2010, Wang et al., 2020] (e.g., community annotations from Zooniverse are scalable but weak). Several paradigms reduce the dependence on clean instance-level labels, but under different assump-tions. Self-supervised methods learn useful representations from unlabeled data, yet typically require task-specific labels to define semantic classes [Chen et al., 2020, He et al., 2021]. Robust-learning methods tolerate corrupted labels, but still assume instance-level labels are observed during train-ing [Han et al., 2018]. Closest to our setting, multiclass learning from multiple unlabeled datasets exploits variation in class proportions across mixtures, but typically assumes that these proportions are known [Tang et al., 2022, Wei et al., 2024]. We study a setting with K latent classes and M observed mixtures. Each example has an unobserved class y ∈ { 1, . . . , K } and an observed mixture identity m ∈ { 1, . . . , M }. Mixture m has density 
+
+qm(x) = PKk=1 πmk pk(x), where the class-conditionals pk are shared across mixtures and the mixing weights πmk are unknown. The learner observes x and m, but not y or the mixing matrix 
+
+Π = ( πmk ). The mixtures may arise naturally across data-collection contexts, or be deliberately induced by weak cuts that enrich or deplete latent classes. Importantly, they do not need to be clean, calibrated, nor high-purity. In many applications, the key quantity is not only an instance-level label but the latent composition of each mixture itself. Recovering the posterior simplex identifies the hidden mixing matrix, enabling estimation of mixture-level class proportions without observing them. This setting is inspired by Classification without Labels (CWoLa). In the binary case, CWoLa shows that, given two mixtures of the same two latent classes with different class proportions, the optimal classifier trained to distinguish the mixtures is also optimal for distinguishing the underlying classes, up to the orientation of the score [Metodiev et al., 2017]. Thus, CWoLa turns mixture discrimination into class discrimination without requiring instance-level labels or mixture proportions. However, the original guarantee is binary and does not directly provide a multiclass extension when several mixtures contain different proportions of more than two latent classes. In this work, we develop a prior-free framework for multiclass CWoLa. Our starting point is simple: train a classifier to predict the mixture identity of each example. Our main contributions are: • We show that the Bayes-optimal mixture posterior g⋆(x) = P(m | x) lies in a (K − 1) -simplex inside ∆M −1, whose vertices are induced by the latent classes through the unknown rectangular mixing matrix. 2• We prove that this posterior geometry is sufficient to recover both the latent class posterior and the mixture composition matrix, up to permutation and prior reweighting, without observing instance-level labels or mixture proportions. • We propose prior-free recovery procedures based on post-hoc simplex fitting and an architec-tural bottleneck, and evaluate them on MNIST, Fashion-MNIST, CIFAR-10, and Galaxy10 DECaLS. To facilitate the application of our methods beyond the experiments considered here, we release 
+
+MultiCWoLa , a reusable library implementing both the post-hoc and bottleneck approaches and designed to simplify their integration into other application-specific learning pipelines. 3
+
+Note added While finalizing our analysis, we learned of [de la Fuente and Thaler, 2026], which also proposes a simplex method for demixing multiple unlabeled samples and applies it to light-flavor jet identification at colliders. The overall mathematical framework is consistent with ours, though we use complementary strategies for identifying the simplex geometry: simplex regularization via loss terms in [de la Fuente and Thaler, 2026] versus post-hoc simplex fitting and architectural bottlenecks in Sec. 3 below. 
+
+2 Related Work 
+
+Classification without Labels. Our work is most directly inspired by Classification without Labels (CWoLa) [Metodiev et al., 2017], which shows in the binary case that mixture discrimination can recover the optimal class discriminator without clean labels or known mixture proportions. CWoLa has been used in high-energy physics for classification from impure samples, including quark– gluon discrimination and resonance/anomaly searches [Komiske et al., 2018, Collins et al., 2018]. Existing guarantees, however, are fundamentally binary: they yield a one-dimensional class ordering rather than a multiclass representation. Rather than reducing the problem to one-vs-rest (OvR) classifiers [Rifkin and Klautau, 2004], we study the full M -way mixture posterior and show that it contains a latent simplex geometry. 
+
+Learning from label proportions and multiple unlabeled datasets. Learning from label proportions (LLP) and multiclass classification from multiple unlabeled datasets also exploit variation in class proportions across bags or sources [Scott and Zhang, 2020, Tang et al., 2022, Wei et al., 2024]. These methods typically assume that each bag is accompanied by its class-proportion vector, or that the class-prior matrix is known, enabling unbiased or consistent risk estimators. Our setting removes this supervision: the learner observes only mixture identity, with neither instance-level labels nor mixture proportions. We therefore include known-prior methods as informative references, but not as direct fair competitors. 
+
+Simplex geometry, separable NMF, and topic models. The simplex structure we identify is related to separable nonnegative matrix factorization and topic modeling, where latent components become identifiable as extreme rays, anchors, or vertices of a simplicial structure [Cutler and Breiman, 1994, Donoho and Stodden, 2003, Arora et al., 2011, 2012b,a, Ke and Wang, 2017]. Our separability assumption plays an analogous role in mixture-posterior space. The contribution is not a new vertex-identifiability principle in isolation, but the identification of the relevant discriminative object for multiclass CWoLa: the Bayes-optimal mixture posterior g⋆(x) = P (m | x). Unlike topic models, where the simplex is built from word-document statistics, our simplex emerges from a classifier trained only to predict observable mixture identity (See Fig. 1). Anchor-free topic models and minimum-volume methods in hyperspectral unmixing show that simplex recovery may be possible beyond pure-anchor or pure-pixel assumptions [Tordesillas and How, 2020, Bioucas-Dias et al., 2012, Huang et al., 2016]; our post-hoc fitting methods - in particular the constrained- ˆΠ and spread-initialised archetypal variants - are designed with this in mind. 
+
+Decontamination and mutual contamination. Our setting is also related to mutual contamination, mixture-proportion estimation, and decontamination, which study when base distributions or contam-ination proportions can be recovered from contaminated samples [Katz-Samuels et al., 2017, Scott and Zhang, 2020]. 
+
+> 3MultiCWoLa repository
+
+3Learning with class-conditional label noise. In label-noise learning, a noisy label is generated from the clean label through an unknown transition matrix [Scott et al., 2013, Liu and Tao, 2016]. Recent methods estimate the transition matrix directly from noisy data, via total-variation regu-larization [Zhang et al., 2021] or by minimizing the volume of the simplex enclosing the noisy posteriors [Li et al., 2021]. When M = K, our setting is closely related to class-conditional label noise if mixture identity is interpreted as a noisy label. In both cases, the observable-label posterior has a latent simplex structure, but our formulation additionally allows rectangular, overcomplete mixtures ( M > K ) with no label semantics. Unlike methods that rely on a dominant clean-label component, our mixtures need not contain a dominant class: latent classes are identified through variation in their proportions across mixtures, connecting the setting to enrichment-based anomaly detection [Metodiev et al., 2017, Collins et al., 2018]. 
+
+3 Multiclass CWoLa 
+
+We develop the theoretical core of multiclass CWoLa by addressing two questions: (Q1) What is the geometry of the optimal mixture-identity classifier? and (Q2) How do we extract this geometry from data? We show that the optimal source posterior is constrained to a (K − 1) -simplex inside ∆M −1,allowing us to recover latent posteriors via post-hoc vertex hunting or end-to-end bottlenecks. 
+
+Setup and Assumptions. We observe M unlabeled mixtures Dm composed of K latent classes with densities p1, . . . , p K . Following the mixture model, the observed density of mixture m is: 
+
+qm(x) = 
+
+> K
+
+X
+
+> k=1
+
+πmk pk(x) (1) where Π = ( πmk ) ∈ RM ×K is a row-stochastic mixing matrix. Let S ∈ { 1, . . . , M } denote the mixture identity and Y ∈ { 1, . . . , K } the latent class. We define the Bayes-optimal mixture posterior 
+
+g⋆ : X → ∆M −1 as g⋆m(x) := P(S = m | X = x) and the latent posterior h⋆ : X → ∆K−1
+
+as h⋆k(x) := P(Y = k | X = x). Our goal is to recover h⋆ (up to a permutation) from samples 
+
+{(xi, m i)}ni=1 .Our analysis relies on four conditions: (A1) Shared class-conditionals : pk is independent of m;
+
+(A2) Full column rank : rank(Π) = K, implying M ≥ K; (A3) Separability : each class k has an anchor region Xk carrying positive class-conditional mass, P(X ∈ X k | Y = k) > 0, on which 
+
+pk(x) > 0 and pj̸ =k(x) = 0 ; (A4) Uniform sampling : P(S = m) = 1 /M . These conditions are standard in topic modeling [Arora et al., 2012b] and mixture-label theory [Katz-Samuels et al., 2017]. A1 makes the problem well posed. A2 ensures the simplex covers K − 1 dimensions, while A3 guarantees the data points reach its vertices. A4 is a normalization convenience rather than a substantive restriction: if the mixtures have unequal sizes, every statement below holds with the observed sampling frequencies P(S = m) in place of 1/M , at the cost of slightly heavier notation. 
+
+3.1 Posterior simplex geometry 
+
+This section addresses Q1 by characterizing the relationship between the observed mixture posterior 
+
+g⋆ and the latent class posterior h⋆. We show that the image of g⋆ is geometrically constrained to a simplex whose vertices reveal the hidden mixing matrix Π. The proofs can be found in Appendices B.1, B.2, B.3. 
+
+Theorem 1 (Posterior Simplex Theorem). Under A1, A2, and A4, define the class abundances 
+
+ck := PMm=1 πmk , the class vertices vk := 1 
+
+> ck
+
+Π:,k ∈ ∆M −1, and the barycentric weights 
+
+αk(x) := ck pk(x)
+
+PKℓ=1 cℓ pℓ(x) , which satisfy αk(x) ∈ [0 , 1] ,
+
+> K
+
+X
+
+> k=1
+
+αk(x) = 1 .
+
+Then, for μX -almost every x ∈ X ,
+
+g⋆(x) = 
+
+> K
+
+X
+
+> k=1
+
+αk(x) vk. (2) 4In matrix form, g⋆(x) = V α (x) where V = [ v1, . . . , v K ] ∈ RM ×K . The vertices vk are affinely independent, so their convex hull S := conv {v1, . . . , v K } is a (K − 1) -simplex in ∆M −1 containing the image of g⋆. Moreover α(x) is exactly the latent class posterior of the pooled training population (Theorem 2). 
+
+Theorem 2 (Multiclass CWoLa Optimality). Under A1, A2, and A4, let ¯h⋆(x) := (α1(x), . . . , α K (x)) ⊤. Then ¯h⋆ is the latent posterior under the prior ¯πk := ck/M , and 
+
+g⋆(x) = V ¯h⋆(x). Because V has full column rank, ¯h⋆ is recoverable via the linear map: 
+
+¯h⋆(x) = ( V ⊤V )−1V ⊤g⋆(x). (3) We call ¯π the effective prior as it is not an extra modeling choice but simply the class prior of the pooled training population, ¯πk = P(Y = k) when the M mixtures are pooled with equal weights, so ¯h⋆k(x) = P(Y = k | X = x) on the data one actually trains on. The posterior h⋆ under any other class prior (e.g., a deployment population with different class frequencies) is a coordinate-wise reweighting of ¯h⋆. In particular h⋆ is a deterministic function of g⋆, so Y ⊥ X | g⋆(X): g⋆(x) is predictively (Bayes-) sufficient for the latent class Y , and the optimal latent-class classifier can be recovered from the optimal mixture classifier g⋆(x).
+
+Theorem 3 (Vertex Identifiability). Let g⋆
+
+> #
+
+μX denote the distribution of g⋆(X) when X ∼ μX (the pooled data distribution), and supp( g⋆
+
+> #
+
+μX ) its support, i.e. the smallest closed set carrying the full probability mass of the posterior cloud. Under A1-A4: (i) for μX -almost every anchor point x ∈ X k,
+
+g⋆(x) = vk; (4) 
+
+(ii) the vertices {vk}Kk=1 are exactly the extreme points of the convex hull of supp( g⋆
+
+> #
+
+μX ), whose hull is the smallest closed simplex containing supp( g⋆
+
+> #
+
+μX ). Consequently, V is identifiable up to a permutation of its columns from the population law of g⋆(X), and Π follows: the abundances are the unique solution of the linear system V c = 1M , and Π = V diag( c).4
+
+Geometric Intuition. The image g⋆(X ) is confined to a (K − 1) -dimensional simplex S embedded in the larger (M − 1) -dimensional source-posterior space. The simplex representation contains the same information as the optimal latent-class classifier. When A3 (Separability) holds, the data points in the anchor regions lie directly on the corners of this simplex. This transforms the problem of learning labels into a problem of vertex hunting. After finding the corners vk of the cloud of points g⋆(xi), Eq. 3 provides the labels. The same vertices also determine the hidden mixing matrix via rescaling of the vertex points with the class abundances, and therefore recover the latent class proportions within each mixture. In summary, the geometric perspective simultaneously enables recovery of the latent class posteriors and the hidden class composition of each mixture. 
+
+3.2 Practical Recovery and Limitations 
+
+In practice we estimate g⋆ by training an M -way classifier gθ via the cross-entropy loss. Once a gθ is fit, two complementary procedures convert gθ into a K-class predictor: 
+
+(R1) Post-hoc simplex fitting. Train an unconstrained M -way classifier gθ : X → ∆M −1. Apply a vertex-hunting algorithm to the cloud {gθ (xi)}ni=1 to estimate vertices ˆV , and decode each example by barycentric coordinates against ˆV .
+
+(R2) Architectural bottleneck. Parameterize gθ (x) = ˆV α θ (x) with ˆV ∈ RM ×K column-stochastic and αθ (x) ∈ ∆K−1, so that the simplex factorization is enforced at training time. The columns of 
+
+ˆV are the candidate vertices. The mixing matrix is then read off as ˆΠ = ˆV diag(ˆ c) with ˆc solving 
+
+ˆV ˆc = 1M , mirroring Theorem 3. The M -way classifier of the post-hoc fitting procedure is trained independently, and the specific fitter choice can improve the performance on real data. The architectural bottleneck provides a strong inductive bias that aids recovery with weak trunks (e.g., frozen backbones), and avoids potential failure modes of fitters, though it may be prone to local minima in ˆV when using highly expres-sive models. We analyze empirical evidence in Fig. 2. Algorithm 1 summarizes the prior-free pipeline. 
+
+> 4The identifiability statement is the posterior-space analogue of the residue-operator result in [Katz-Samuels et al., 2017].
+
+5Algorithm 1 Multiclass CWoLa 
+
+Require: Unlabeled mixtures D1, . . . , DM , target class K ≤ M , recovery mode ∈ { R1 , R2 } 
+
+> 1:
+
+Form the supervised dataset {(xi, m i)} where mi is the mixture identity  
+
+> 2:
+
+if mode is R1 then  
+
+> 3:
+
+Train an M -way classifier gθ : X → ∆M −1 via cross-entropy  
+
+> 4:
+
+Compute ui = gθ (xi) 
+
+> 5:
+
+Fit ˆV = bV({ui}) via vertex hunting  
+
+> 6:
+
+Decode ˆα(x) = arg min α∈∆K−1 ∥gθ (x) − ˆV α ∥22 
+
+> 7:
+
+else if mode is R2 then  
+
+> 8:
+
+Train gθ (x) = ˆV α θ (x) end-to-end via cross-entropy with bottleneck warm-up, ˆV column-stochastic  
+
+> 9:
+
+Set ˆα(x) = αθ (x) 
+
+> 10:
+
+end if  
+
+> 11:
+
+Recover ˆΠ = ˆV diag(ˆ c) with ˆc the solution of ˆV ˆc = 1M 
+
+> 12:
+
+return latent-class predictor ˆα (or hϕ) and recovered mixing matrix ˆΠ
+
+Scope and Failure Modes. The validity of multiclass CWoLa relies on our core assumptions. We identify three primary failure modes: (i) If rank(Π) < K , the simplex collapses to a dimension less than K − 1. (ii) If A3 is violated, the data support does not reach the vertices vk and h⋆ is not identifiable. (iii) If class-conditionals pk vary across mixtures, A1 fails, the shared factorization V
+
+does not exist, and recovery is ill-posed. Our identifiability analysis relies on the anchor condition A3. In the square case M = K, the factorization gθ = ˆV α θ imposes no dimensionality reduction and matches the factorized network of VolMinNet [Li et al., 2021], which achieves identifiability through an explicit volume regularizer under a weaker sufficiently scattered condition. The factorization acts as a genuine bottleneck only for M > K ; whether sufficiently-scattered conditions extend to this rectangular regime is an open question. 
+
+4 Experiments and analysis 
+
+4.1 Experimental setup 
+
+We evaluate on MNIST [LeCun and Cortes, 2005], Fashion-MNIST [Xiao et al., 2017], CIFAR-10 [Krizhevsky et al., 2010], and Galaxy10 DECaLS [Lintott et al., 2008, Walmsley et al., 2022]. MNIST and Fashion-MNIST provide controlled grayscale benchmarks, CIFAR-10 serves as the main scaling benchmark, and Galaxy10 provides a real-world morphology dataset with K = 10 classes. All inputs are scaled to [0 , 1] . Galaxy10 images are resized to 224 × 224 and ImageNet-normalised inside the backbone Deng et al. [2009]. For each experiment, we construct M unlabeled mixture datasets from a labeled pool, hiding class la-bels during training. The mixing matrix Π ∈ RM ×K is sampled row-wise as πm ∼ Dirichlet( α1K ),with α = 0 .8 for MNIST, Fashion-MNIST, and CIFAR-10, and α = 0 .5 for Galaxy10. When 
+
+M ≥ K, the Dirichlet draw is stabilized by blending each row with a fixed cyclic identity-like template before row renormalization (Appendix D). Each mixture Dm is then generated by sampling 
+
+k ∼ πm and drawing an example uniformly from the class-k training pool. Only mixture identity m
+
+is observed by prior-free methods; labels are used only for post-hoc alignment and evaluation. For the purity study we use cyclic-purity mixtures. Each mixture m is dominated by one class 
+
+c(m) = m mod K, with πm,c (m) = ρ, while the remaining mass is split uniformly across the other 
+
+K − 1 classes as πm,k = (1 − ρ)/(K − 1) for k̸ = c(m). Thus ρ = 1 gives single-class mixtures and ρ = 1 /K gives identical uniform mixtures. For MNIST, Fashion-MNIST, and CIFAR-10, all methods use the same four-layer CNN with channel widths (64 , 128 , 256 , 512) and a 512-dimensional embedding. For Galaxy10, we use a frozen ImageNet-pretrained ResNet50 He et al. [2015] trunk and train a projection head (2048 → 512) with ReLU. Models are trained with AdamW, cosine annealing with linear warm-up, and early stopping on validation mixture accuracy. 6The empirical analysis is organized around the main claims of the paper. We first visualize the learned mixture posterior to test the predicted simplex geometry when the learned classifier gθ (x)
+
+only approximates g⋆(x). We then compare prior-free design choices, including post-hoc simplex fitting, the architectural bottleneck, and vertex-spread regularization, on MNIST, Fashion-MNIST, and CIFAR-10. CIFAR-10 is used for robustness comparisons against supervised, prior-aware, and other weakly-supervised prior-free baseline methods, measuring aligned latent accuracy across both K = M scaling and fixed-K scaling with varying M . In our context, accuracy is computed with respect to the mixture identity and so is informative while aligned accuracy corresponds to the accuracy with respect to the latent label. For Galaxy10 purity experiments, we use a frozen ImageNet-pretrained ResNet50 trunk and train a projection head (2048 → 512) with ReLU. The final Galaxy10 comparison in Table 1 additionally reports a finetuned variant in which the backbone is unfrozen. 
+
+4.2 Posterior simplex geometry and method analysis (a) raw gθ (x) + post-hoc fit (b) bottleneck αθ (x) ˆV 
+
+> Recovered simplex Oracle embedded simplex
+
+Figure 2: Posterior-simplex geometry in source-posterior space for CIFAR-10 with K = 3 and 
+
+M = 6 . Points are plotted in ∆M −1 and shown through a shared two-dimensional PCA projection. Colors indicate latent class structure for visualization only, not training supervision. In panel (a), the cloud is the raw source posterior gθ (x) from a regular mixture classifier; the solid simplex is the post-hoc fitted simplex, and the dashed simplex is the oracle embedded simplex. In panel (b), points are bottleneck reconstructions αθ (x) ˆV and the solid simplex is the learned matrix from the bottleneck, namely the columns of ˆV .We first examine whether the mixture posterior learned from mixture identities exhibits the simplex geometry predicted by the theory. Figure 2 visualizes the object characterized by the posterior-simplex theorem: although the network is trained only to predict mixture identity, its source-posterior outputs organize around a (K − 1) -dimensional simplex embedded in the larger (M − 1) -dimensional mixture-posterior space. The post-hoc method recovers this simplex after training by fitting vertices to the source-posterior cloud, while the bottleneck method imposes the same factorization during training and maps examples through αθ (x) ˆV .The plot supports the central geometric claim: although the model is trained only to predict mixture identity, the learned posteriors organise around a low-dimensional simplex whose vertices correspond to latent classes. Most examples concentrate near one of the oracle vertices, while ambiguous or harder examples occupy the simplex edges and interior. The oracle simplex boundaries recover the dominant organiza-tion of the examples, with most points of each latent class concentrated in the corresponding simplex region. The remaining overlap is expected: the learned source classifier is only an empirical approx-imation to the Bayes-optimal posterior. This is the empirical signature required by our demixing 7argument: latent classes are not observed directly, but they become recoverable as extreme points of the source-posterior geometry. We then compare the two principled recovery methods we exposed in Sec. 3 to exploit this geometry. The first is a simplex fitting approach: train a source classifier, treat its posterior cloud as fixed, and fit a simplex to recover the latent vertices. This separates representation learning from geometric recovery and gives a direct diagnostic of whether the learned posterior has the predicted shape. Fig. 2 (a) illustrates this strategy. The fitted simplex closely tracks the oracle simplex, indicating that the class vertices can be recovered from the posterior cloud without using labels during training. The second approach is a bottleneck approach: instead of fitting a simplex after training, the model is constrained architecturally so that source prediction factors through a K-dimensional latent bottleneck. This encourages the latent representation itself to align with the simplex vertices. Fig. 2 (b) shows that the bottleneck head also produces vertex-concentrated posteriors aligned with the oracle simplex. Because of regularization, entropy penalties, slack variables, temperature smoothing, or constraints that make the factorization numerically stable, the bottleneck is discouraged to predict extreme one-hot αθ (x). Explaining why the data cloud stays inside the learned simplex instead of reaching the corners. Thus, both approaches use the same theoretical object—the posterior simplex—but in different ways: post-hoc fitting recovers the simplex after learning, while the bottleneck head builds the simplex structure into the learning problem. We next test whether prior-free recovery is sensitive to the choice of simplex extraction method. The fitter-robustness analysis in Fig. 6 and Fig. 7 shows that simplex recovery is not an artifact of a particular post-hoc fitting rule. Across datasets and mixture regimes, several fitters recover simplexes close to the known-prior demixing oracle, supporting the geometric interpretation that the posterior cloud contains a stable signal of the hidden mixing structure. This matters beyond aligned classification accuracy: stable vertex recovery also allows latent class proportions estimation within mixtures, which may be the primary scientific target in composition-focused applications. 
+
+4.3 Robustness and baseline comparisons 4 6 8 10           
+
+> K=M
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> Aligned Accuracy
+> (a)
+> 20 40 60 80 100
+> Mat fixed K=10
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> Aligned Accuracy
+> (b)
+> Oracle Oracle simplex Wei-CCM OvR KSBS-Demix Simplex Bottleneck
+
+Figure 3: Performance as a function of mixture complexity on CIFAR-10. Left: aligned accuracy versus the balanced setting K=M, where the number of latent classes and mixtures increase jointly. Right: aligned accuracy versus the number of mixtures M at fixed K=10. Shaded regions denote one standard error across random seeds. Solid lines represent methods that receives the same amount of information as our methods. We next compare our prior-free methods to existing baselines as the number of classes and mixtures increases. Fig. 3 reports aligned accuracy on CIFAR-10 in two regimes: balanced scaling with 
+
+K = M , and fixed K = 10 with increasing M . The supervised oracle gives an upper reference, while 8the oracle simplex and Wei-CCM/RCM baselines assume access to mixture proportions [Tang et al., 2022, Wei et al., 2024]. Among methods without class priors, OvR is the main fair reference [Rifkin and Klautau, 2004], together with the prior-free KSBS-Demix baseline [Katz-Samuels et al., 2017]. However, OvR comes at the heavy computational cost of having to train M − 1 classifiers for M
+
+mixtures. Across both regimes, our methods are substantially more stable than the prior-free demixing baseline. In the balanced setting K = M , all weakly supervised methods degrade as the number of classes grows, but the simplex and bottleneck variants remain close to the known-prior simplex oracle reference and overtake OvR in the harder high-K regimes. At fixed K = 10 , increasing the number of mixtures improves the geometry fitting: the simplex variant rises from 0.55 at M = 10 to about 
+
+0.65 for M ∈ { 30 , 50 }, nearly matching the known-prior simplex oracle. This supports the geometric interpretation that additional mixtures provide redundant constraints for estimating the latent simplex. The main gap that remains is to the fully supervised oracle, which uses labels unavailable to all weakly supervised methods. By contrast, the gap to the known-prior simplex is small in the overcomplete regime, showing that most of the performance loss comes from not observing labels, rather than from estimating the simplex without priors. 0.0 0.2 0.4 0.6 0.8 
+
+> Purity
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> Aligned Accuracy  Oracle Oracle simplex Wei-CCM Simplex OvR Bottleneck
+
+Figure 4: Robustness to mixture purity on Galaxy10 DECaLS. We construct cyclic-purity mixtures with K = M = 10 while keeping the image data, backbone, and augmentation profile fixed. Low purity corresponds to weak class enrichment and approaches the unidentifiable regime; high purity gives mixtures with clearer anchor structure. Accuracy increases with purity for all mixture-based methods. Our simplex and bottleneck variants outperform the no-prior OvR baseline at moderate and high purity, while approaching the known-prior simplex and Wei-CCM references. Finally, we set ourselves in a real data context. For that, we tested how the method behaves when the mixtures themselves become less informative using real data. First, we confirm similar robustness across M at fixed K = 10 as with the other dataset (see Fig. 8). Then in applications, constructing mixtures with strong class-specific enrichment may be difficult, so the relevant question is not only whether demixing works under ideal mixtures, but how gracefully it degrades as mixture purity decreases. We study this on Galaxy10 using real astronomical images and controlled cyclic-purity mixtures with K = M = 10 .To avoid tuning specifically for this diagnostic, we use the same fixed ImageNet-pretrained ResNet50 backbone and symmetry-only augmentation profile throughout. Thus, the experiment isolates the effect of mixture quality rather than improvements from task-specific finetuning or stronger aug-mentation. Fig. 4 shows the expected behaviour: when purity is near zero, the mixtures carry little class-specific information and all weakly supervised methods approach the unidentifiable regime. As purity increases, accuracy improves monotonically and our bottleneck/simplex variants approach the known-prior simplex and Wei-CCM references. Similar trends are confirmed on CIFAR-10 in Fig. 9. The comparison to OvR is especially informative. OvR is a fair no-prior baseline but is more costly because it requires solving multiple binary reductions. At moderate and high purity, our methods open a clear gap over OvR while remaining close to the oracle-prior methods. This suggests that the 9posterior-simplex structure is not only visible in controlled image benchmarks, but also provides a useful and computationally lighter recovery mechanism on real astronomical data. Technique Method Accuracy ECE Supervised Oracle 0.802 ± 0.023 0.032 ± 0.004 
+
+Wei CCM 0.686 ± 0.015 0.069 ± 0.046 
+
+Prior-aware Wei RCM 0.577 ± 0.013 0.371 ± 0.020 
+
+Oracle Simplex 0.661 ± 0.012 0.116 ± 0.025 
+
+OvR 0.476 ± 0.034 0.272 ± 0.034 
+
+Prior-free Bottleneck 0.503 ± 0.021 0.197 ± 0.052 
+
+Simplex 0.584 ± 0.051 0.123 ± 0.031 
+
+Table 1: Finetuned Galaxy10 comparison at K = 10 and M = 20 . Results are reported as mean ±
+
+standard deviation over three random seeds. Accuracy is permutation-aligned latent accuracy; ECE is expected calibration error, where lower is better. Oracle is fully supervised. Wei CCM and Wei RCM assume access to class-prior information, and Oracle Simplex uses the true mixture proportions. OvR, Bottleneck, and Simplex are prior-free. Simplex is the strongest prior-free method, improving substantially over OvR in both accuracy and calibration. As a final real-data evaluation, we ask whether the same prior-free recovery remains competitive when the representation is allowed to adapt to Galaxy10. Unlike the purity diagnostic above, which keeps the ResNet backbone fixed to isolate the effect of mixture quality, this experiment uses 180 ◦-rotations and horizontal/vertical flips as data augmentation, and unfreezes the backbone model weights. Table 1 reports both aligned accuracy and calibration. The same study on frozen model can be found in Table 3. Among prior-free methods, Simplex fitting performs best, improving over OvR by 10 .8 accuracy points and substantially reducing calibration error. The bottleneck variant is also competitive with OvR in accuracy, but the post-hoc Simplex fitter gives the strongest overall improvement. Prior-aware methods remain stronger, as expected, because they use additional class-prior information unavailable to fully prior-free methods. Overall, the result shows that the posterior-simplex recovery remains effective beyond the frozen-backbone diagnostic and gives a strong prior-free baseline on real astronomical images. So far, the implementations implicitly assume that the exact number of true latent classes K is known a priori. However, our simplex fitting framework does not require this. Because the direct M -way classification pipeline only introduces the target class count K inside the post-hoc simplex fitter, 
+
+K can be treated as a discoverable quantity once the calibrated source posteriors are in hand. In Appendix C we demonstrate this empirically for the Galaxy10 dataset. 
+
+5 Discussion and conclusion 
+
+We have shown that multiclass classification without instance-level labels admits a geometric solution when supervision is limited to mixture identity. Under standard mixture assumptions, the Bayes-optimal mixture posterior forms a latent simplex whose vertices identify both the class posterior and the hidden mixing matrix, enabling recovery of instance-level predictions as well as mixture-level class proportions. We instantiate this idea with two prior-free procedures: post-hoc vertex hunting and a bottleneck architecture enforcing gθ = ˆV α θ . Experiments on MNIST, Fashion-MNIST, CIFAR-10, and Galaxy10 DECaLS show that these methods approach the oracle simplex baseline, especially in overcomplete-mixture regimes. Unlike binary CWoLa [Metodiev et al., 2017], which separates two classes, multiclass CWoLa can separate K ≤ M classes. Both LLP and prior multiclass mixture-classification methods [Tang et al., 2022, Wei et al., 2024], require known class proportions while for our approach mixture identity alone suffices alongside the recovered geometry of gθ .10 The main limitations are that weak anchors shrink the simplex and degrade identification, while violations of the shared-class-conditionals assumption A1 can make recovered classes reflect mixture-specific artifacts rather than semantic categories. In practice, recovered classes should therefore be validated on held-out labels, especially before high-stakes use. In many real-world applications, data are collected under heterogeneous conditions that naturally produce mixtures with different latent class compositions. By reducing dependence on exhaustive instance-level annotation, weakly-supervised methods may lower the cost of multiclass learning in domains requiring scarce expert labour, such as medicine, astronomy, and particle physics, and may reduce the human burden of large-scale annotation pipelines. This benefit does not remove the need for expert validation, calibration, and auditing. Future work includes relaxing anchor assumptions, studying how biased mixtures that violate the shared class-conditionals assumption can be integrated, and extending the framework to partial or noisy labels. 
+
+Acknowledgments and Disclosure of Funding 
+
+The idea of exploring a multiclass extension of CWoLa originated with J. I.-N. during his exchange in Tobias Golling’s group, following inspiring discussions with Jesse Thaler during his concurrent visit to the Geneva group. We are grateful to Tobias and his group for the warm hospitality and to both Jesse and Tobias for valuable insights during this period. This work was supported by the European Union’s Horizon Europe research and innovation pro-gramme under the Marie Skłodowska-Curie grant agreement No. 101168829, Challenging AI with Challenges from Physics: How to solve fundamental problems in Physics by AI and vice versa (AIPHY). We thank the University of Copenhagen’s SCIENCE AI Centre for access to the centre’s GPU cluster. 
+
+References 
+
+Sanjeev Arora, Rong Ge, Ravi Kannan, and Ankur Moitra. Computing a nonnegative matrix factorization – provably. ArXiv , abs/1111.0952, 2011. URL https://api.semanticscholar. org/CorpusID:15579971 .Sanjeev Arora, Rong Ge, Yoni Halpern, David Mimno, Ankur Moitra, David A. Sontag, Yichen Wu, and Michael Zhu. A practical algorithm for topic modeling with provable guarantees. ArXiv ,abs/1212.4777, 2012a. URL https://api.semanticscholar.org/CorpusID:9220219 .Sanjeev Arora, Rong Ge, and Ankur Moitra. Learning topic models – going beyond svd. 2012 IEEE 53rd Annual Symposium on Foundations of Computer Science , pages 1–10, 2012b. URL 
+
+https://api.semanticscholar.org/CorpusID:10004443 .José M. Bioucas-Dias, Antonio J. Plaza, Nicolas Dobigeon, Mario Parente, Qian Du, Paul D. Gader, and Jocelyn Chanussot. Hyperspectral unmixing overview: Geometrical, statistical, and sparse regression-based approaches. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , 5:354–379, 2012. URL https://api.semanticscholar.org/CorpusID: 11112426 .Ting Chen, Simon Kornblith, Mohammad Norouzi, and Geoffrey E. Hinton. A simple framework for contrastive learning of visual representations. ArXiv , abs/2002.05709, 2020. URL https: //api.semanticscholar.org/CorpusID:211096730 .Jack H. Collins, Kiel Howe, and Benjamin Philip Nachman. Cwola hunting: Extending the bump hunt with machine learning. arXiv: High Energy Physics - Phenomenology , 2018. URL https: //api.semanticscholar.org/CorpusID:126361005 .Adele Cutler and Leo Breiman. Archetypal analysis. Technometrics , 36(4):338–347, 1994. ISSN 00401706. URL http://www.jstor.org/stable/1269949 .D. W. Darg et al. Galaxy Zoo: the fraction of merging galaxies in the SDSS and their morphologies. 
+
+Mon. Not. Roy. Astron. Soc. , 401:1043, 2010. doi: 10.1111/j.1365-2966.2009.15686.x. 11 Gregorio de la Fuente and Jesse Thaler. Simplex demixing: Disentangling multiple light-flavor jets at colliders, 2026. to appear. Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hier-archical image database. In 2009 IEEE Conference on Computer Vision and Pattern Recognition ,pages 248–255, 2009. doi: 10.1109/CVPR.2009.5206848. David Donoho and Victoria Stodden. When does non-negative matrix factorization give a correct decomposition into parts? In Proceedings of the 17th International Conference on Neural Information Processing Systems , NIPS’03, pages 1141–1148, Cambridge, MA, USA, 2003. MIT Press. Bo Han, Quanming Yao, Xingrui Yu, Gang Niu, Miao Xu, Weihua Hu, Ivor Wai-Hung Tsang, and Masashi Sugiyama. Co-teaching: Robust training of deep neural networks with extremely noisy labels. In Neural Information Processing Systems , 2018. URL https://api.semanticscholar. org/CorpusID:52065462 .Kaiming He, X. Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. 
+
+2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , pages 770–778, 2015. URL https://api.semanticscholar.org/CorpusID:206594692 .Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Doll’ar, and Ross B. Girshick. Masked autoencoders are scalable vision learners. 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 15979–15988, 2021. URL https://api.semanticscholar. org/CorpusID:243985980 .Kejun Huang, Xiao Fu, and N. Sidiropoulos. Anchor-free correlated topic modeling: Identifiability and algorithm. ArXiv , abs/1611.05010, 2016. URL https://api.semanticscholar.org/ CorpusID:5255990 .Julian Katz-Samuels, Gilles Blanchard, and Clayton D. Scott. Decontamination of mutual contamina-tion models. J. Mach. Learn. Res. , 20:41:1–41:57, 2017. URL https://api.semanticscholar. org/CorpusID:88515763 .Zheng Tracy Ke and Minzhe Wang. Using svd for topic modeling. Journal of the American Statistical Association , 119:434 – 449, 2017. URL https://api.semanticscholar.org/CorpusID: 251928821 .Patrick T. Komiske, Eric M. Metodiev, Benjamin Philip Nachman, and Matthew D. Schwartz. Learning to classify from impure samples with high-dimensional data. Physical Review D , 2018. URL https://api.semanticscholar.org/CorpusID:54019676 .Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton. Cifar-10 (canadian institute for advanced research). URL http://www.cs.toronto.edu/kriz/cifar. html , 5(4):1, 2010. Yann LeCun and Corinna Cortes. The mnist database of handwritten digits, 2005. URL https: //api.semanticscholar.org/CorpusID:60282629 .Yann Lecun, Yoshua Bengio, and Geoffrey Hinton. Deep learning. Nature , 521(7553):436–444, May 2015. doi: 10.1038/nature14539. URL https://hal.science/hal-04206682 .Xuefeng Li, Tongliang Liu, Bo Han, Gang Niu, and Masashi Sugiyama. Provably end-to-end label-noise learning without anchor points. ArXiv , abs/2102.02400, 2021. URL https://api. semanticscholar.org/CorpusID:231802306 .Chris J. Lintott, Kevin Schawinski, Anže Slosar, Kate R. Land, Steven Bamford, Daniel Thomas, M. Jordan Raddick, Robert C. Nichol, Alexander S. Szalay, Daniel Andreescu, P. G. Murray, and Jan van den Berg. Galaxy zoo: morphologies derived from visual inspection of galaxies from the sloan digital sky survey. Monthly Notices of the Royal Astronomical Society , 389:1179–1189, 2008. URL https://api.semanticscholar.org/CorpusID:15279243 .Tongliang Liu and Dacheng Tao. Classification with noisy labels by importance reweighting. IEEE Trans. Pattern Anal. Mach. Intell. , 38(3):447–461, March 2016. ISSN 0162-8828. doi: 10.1109/ TPAMI.2015.2456899. URL https://doi.org/10.1109/TPAMI.2015.2456899 .12 Eric M. Metodiev, Benjamin Nachman, and Jesse Thaler. Classification without labels: Learning from mixed samples in high energy physics. JHEP , 10:174, 2017. doi: 10.1007/JHEP10(2017)174. Alexander J. Ratner, Stephen H. Bach, Henry R. Ehrenberg, Jason Alan Fries, Sen Wu, and Christo-pher Ré. Snorkel: Rapid training data creation with weak supervision. Proceedings of the VLDB Endowment. International Conference on Very Large Data Bases , 11 3:269–282, 2017. URL 
+
+https://api.semanticscholar.org/CorpusID:6730236 .Ryan M. Rifkin and Aldebaro Klautau. In defense of one-vs-all classification. J. Mach. Learn. Res. ,5:101–141, 2004. URL https://api.semanticscholar.org/CorpusID:13391792 .Olga Russakovsky, Jia Deng, Hao Su, Jonathan Krause, Sanjeev Satheesh, Sean Ma, Zhiheng Huang, Andrej Karpathy, Aditya Khosla, Michael S. Bernstein, Alexander C. Berg, and Li Fei-Fei. Imagenet large scale visual recognition challenge. International Journal of Computer Vision , 115: 211 – 252, 2014. URL https://api.semanticscholar.org/CorpusID:2930547 .Clayton Scott and Jianxin Zhang. Learning from label proportions: A mutual contamination frame-work. ArXiv , abs/2006.07330, 2020. URL https://api.semanticscholar.org/CorpusID: 263786144 .Clayton Scott, Gilles Blanchard, and Gregory Handy. Classification with asymmetric label noise: Consistency and maximal denoising. In Shai Shalev-Shwartz and Ingo Steinwart, editors, Proceed-ings of the 26th Annual Conference on Learning Theory , volume 30 of Proceedings of Machine Learning Research , pages 489–511. PMLR, 2013. URL https://proceedings.mlr.press/ v30/Scott13.html .Yuting Tang, Nan Lu, Tianyi Zhang, and Masashi Sugiyama. Multi-class classification from multiple unlabeled datasets with partial risk regularization. In Asian Conference on Machine Learning ,2022. URL https://api.semanticscholar.org/CorpusID:252918114 .Jesus Tordesillas and Jonathan P. How. MINVO basis: Finding simplexes with minimum volume enclosing polynomial curves. CoRR , abs/2010.10726, 2020. URL https://arxiv.org/abs/ 2010.10726 .Mike Walmsley, Chris Lintott, Tobias Géron, Sandor Kruk, Coleman Krawczyk, Kyle W Willett, Steven Bamford, Lee S Kelvin, Lucy Fortson, Yarin Gal, William Keel, Karen L Masters, Vihang Mehta, Brooke D Simmons, Rebecca Smethurst, Lewis Smith, Elisabeth M Baeten, and Christine Macmillan. Galaxy zoo decals: Detailed visual morphology measurements from volunteers and deep learning for 314 000 galaxies. Monthly Notices of the Royal Astronomical Society ,509(3):3966–3988, 01 2022. ISSN 0035-8711. doi: 10.1093/mnras/stab2093. URL https: //doi.org/10.1093/mnras/stab2093 .Shanshan Wang, Cheng Li, Rongpin Wang, Zaiyi Liu, Meiyun Wang, Hongna Tan, Yaping Wu, Xinfeng Liu, Hui Sun, Rui Yang, Xin Liu, Jie Chen, Hui-Chong Zhou, Ismail Ben Ayed, and Hairong Zheng. Annotation-efficient deep learning for automatic medical image segmentation. 
+
+Nature Communications , 12, 2020. URL https://api.semanticscholar.org/CorpusID: 237604951 .Zixi Wei, Senlin Shu, Yuzhou Cao, Hongxin Wei, Bo An, and Lei Feng. Consistent multi-class classification from multiple unlabeled datasets. In The Twelfth International Conference on Learning Representations , 2024. URL https://openreview.net/forum?id=fW7DOHDQvF .Han Xiao, Kashif Rasul, and Roland Vollgraf. Fashion-mnist: a novel image dataset for bench-marking machine learning algorithms. ArXiv , abs/1708.07747, 2017. URL https://api. semanticscholar.org/CorpusID:702279 .Yivan Zhang, Gang Niu, and Masashi Sugiyama. Learning noise transition matrix from only noisy labels via total variation regularization. In International Conference on Machine Learning , 2021. URL https://api.semanticscholar.org/CorpusID:231802334 .13 A Technical Details for Experiments 
+
+Experiments Statistical Significance. All error bars reported in the paper are the 1 σ standard deviations calculated over 3 independent runs with different random seeds. We assume approximately normally distributed errors for the reported metrics. 
+
+Compute Resources. All experiments for MNIST were run on local CPUs. FashionMNIST, CIFAR-10, and Galaxy10 DECaLS were executed on a shared internal cluster using a single A100 GPU with 40GB VRAM. Each individual experimental run completed in less than 6 hours. Total compute for the project, including preliminary and failed experiments, is estimated at less than 100 GPU-hours. 
+
+Code Availability. We release MultiCWoLa , a reusable library implementing the post-hoc and bottleneck approaches introduced in this work. The library is designed to facilitate the transfer and integration of these methods into new datasets, models, and application domains, and is publicly available here MultiCWoLa repository .
+
+LLM Resources. The authors acknowledge the use of the paid Claude Code Pro and GitHub Copilot for code implementation, debugging, and initial drafting/editing of ideas derived by the authors. 
+
+Dataset Licenses and Assets. The datasets and pre-trained models used in this study are all publicly available. 
+
+B Proofs for Sec. 3 
+
+This appendix collects the proofs of the three theorems of Sec. 3. Throughout, ck := PMm=1 πmk is the class abundance, V := [ v1, . . . , v K ] ∈ RM ×K is the vertex matrix with vk = Π :,k /c k, and ¯h⋆ is the latent posterior under the effective prior ¯πk = ck/M .
+
+B.1 Proof of Theorem 1 (Posterior Simplex Theorem) 
+
+Proof. For any x ∈ X the optimal mixture posterior is given under A4 via Bayes’ rule by 
+
+g⋆m(x) = P(S = m | X = x) = qm(x) P(S = m)
+
+PMj=1 qj (x) P(S = j) = qm(x)
+
+PMj=1 qj (x) . (5) By Eq. 1 and A1 (which makes pk independent of m), 
+
+g⋆m(x) = 
+
+PKk=1 πmk pk(x)
+
+PMj=1 
+
+PKk=1 πjk pk(x) =
+
+PKk=1 πmk pk(x)
+
+PKk=1 ck pk(x) , (6) where we use PMj=1 πjk = ck. To show that the mixture posterior lives on a convex hull we define 
+
+αk(x) := ckpk(x)/ P 
+
+> ℓ
+
+cℓpℓ(x). Then αk(x) ≥ 0, P 
+
+> k
+
+αk(x) = 1 , and using (vk)m = πmk /c k,
+
+> K
+
+X
+
+> k=1
+
+αk(x) ( vk)m =
+
+> K
+
+X
+
+> k=1
+
+ck pk(x)
+
+P 
+
+> ℓ
+
+cℓ pℓ(x) · πmk 
+
+ck
+
+=
+
+PKk=1 πmk pk(x)
+
+P 
+
+> ℓ
+
+cℓ pℓ(x) = g⋆m(x). (7) Hence g⋆(x) = P 
+
+> k
+
+αk(x)vk = V α (x) is constrained to a convex hull. To show that g⋆(x) is constrained to a (K − 1) simplex we note that each vk = Π :,k /c k is a positive rescaling of the k-th column of Π. Suppose P 
+
+> k
+
+βkvk = 0 with P 
+
+> k
+
+βk = 0 . Then P
+
+> k
+
+(βk/c k) Π :,k = 0 , and A2 forces βk/c k = 0 for all k, i.e. βk = 0 . Thus v1, . . . , v K are affinely independent in RM , and conv {v1, . . . , v K } is a (K − 1) -simplex. Vertices lie in ∆M −1. Each vk
+
+has nonnegative entries and P
+
+> m
+
+(vk)m = c−1
+
+> k
+
+P 
+
+> m
+
+πmk = 1 . So vk ∈ ∆M −1 and S ⊂ ∆M −1.
+
+B.2 Proof of Theorem 2 (Multiclass CWoLa Optimality) 
+
+Proof. Let ¯h⋆k(x) := αk(x) and thus g⋆(x) = V ¯h⋆(x). Under uniform mixture sampling, the marginal density factorizes as 
+
+μX (x) = 1
+
+M
+
+> M
+
+X
+
+> m=1
+
+qm(x) = 1
+
+M
+
+> K
+
+X
+
+> k=1
+
+ck pk(x) = 
+
+> K
+
+X
+
+> k=1
+
+¯πk pk(x), (8) 14 with ¯πk = ck/M . Bayes’ rule under this prior gives 
+
+P¯π (Y = k | X = x) = ¯πk pk(x)
+
+P 
+
+> ℓ
+
+¯πℓ pℓ(x) = ¯h⋆k(x), (9) So ¯h⋆ is the latent posterior under the effective prior ¯π.From Theorem 1, g⋆(x) = V ¯h⋆(x). Since V = Π C−1 with C = diag( c1, . . . , c K ) positive definite and rank(Π) = K (A2), we have rank( V ) = K. Hence V ⊤V is positive definite and the Moore–Penrose left inverse V + = ( V ⊤V )−1V ⊤ satisfies V +V = IK , giving 
+
+¯h⋆(x) = V +g⋆(x) = ( V ⊤V )−1V ⊤g⋆(x). (10) For the actual class prior πYk := P(Y = k), Bayes’ rule gives h⋆k(x) = πYk pk(x)/ P 
+
+> ℓ
+
+πYℓ pℓ(x).Eliminating pk(x) via ¯h⋆k(x) ∝ ck pk(x) yields the coordinate-wise reweighting 
+
+h⋆k(x) = (πYk /c k) ¯h⋆k(x)
+
+P
+
+> ℓ
+
+(πYℓ /c ℓ) ¯h⋆ℓ (x) , (11) which is invertible because πYk /c k > 0 for all k.Combining the two displays, h⋆ is a deterministic function of g⋆: h⋆(x) = ψ(g⋆(x)) for a fixed measurable map ψ (the linear map V + followed by the coordinate-wise reweighting). The tower property then makes the sufficiency claim precise: for every k,
+
+E1{Y = k} | g⋆(X) = EE[1{Y = k} | X]
+
+| {z }   
+
+> =h⋆k(X)= ψk(g⋆(X))
+
+g⋆(X) = ψk(g⋆(X)) = P(Y = k | X) a.s. ,
+
+so P(Y = k | X) = P(Y = k | g⋆(X)) almost surely, i.e. Y ⊥ X | g⋆(X). Hence any Bayes-optimal classifier of Y from X can be expressed as a function of g⋆(X) without loss; in this Bayes/predictive sense, g⋆ is a sufficient statistic for Y given X.
+
+Remark 1 (On the effective prior) . ¯π is not an additional assumption or a free parameter: the factorization μX = P 
+
+> k
+
+¯πkpk above says precisely that ¯πk = P(Y = k) in the pooled training population, so ¯h⋆ is the honest Bayes posterior of the data one actually trains on, and it is available without any prior input. External information enters only through the reweighting step, and only when predictions must be reported under a class prior πY that differs from ¯π (e.g., the class frequencies of a deployment population); such a πY is not identifiable from the training data and must be supplied by the user. 
+
+B.3 Proof of Theorem 3 (Vertex Identifiability) 
+
+Proof. (i) Anchor points map to vertices. Fix k and let x ∈ X k. By A3, pj (x) = 0 for j̸ = k, and Xk
+
+has positive mass under pk, so the formula in Theorem 1 reduces to 
+
+αj (x) = cj · 0
+
+ck pk(x) = 0 (j̸ = k), αk(x) = ck pk(x)
+
+ck pk(x) = 1 . (12) Hence g⋆(x) = vk for μX -a.e. x ∈ X k.
+
+(ii) Vertices are extreme points of conv supp( g⋆
+
+> #
+
+μX ). Let G := supp( g⋆
+
+> #
+
+μX ) ⊆ ∆M −1 be the set of all mixture classifier outputs. We show G ⊆ conv {v1, . . . , v K } and vk ∈ G for each k, then conclude using affine independence. 
+
+Containment. By Theorem 1, g⋆(x) ∈ conv {v1, . . . , v K } for μX -a.e. x, and conv {v1, . . . , v K } is closed; the support of the pushforward is contained in this closed set, so G ⊆ conv {v1, . . . , v K }.
+
+Each vertex is hit. The marginal mass on Xk is 
+
+μX (Xk) = 1
+
+M
+
+X
+
+> m
+
+qm(Xk) = 1
+
+M
+
+X
+
+> m
+
+πmk P(X ∈ X k | Y = k) = ck
+
+M P(X ∈ X k | Y = k) > 0,
+
+(13) where the second equality uses A3 (only class k contributes on Xk) and the inequality uses that Xk
+
+has positive class-conditional mass. Combined with (i), vk ∈ G .15 Extreme points. By Theorem 1 the vk are affinely independent, so each vk is an extreme point of conv {v1, . . . , v K }. Since {v1, . . . , v K } ⊆ G ⊆ conv {v1, . . . , v K }, the convex hulls of G and of 
+
+{v1, . . . , v K } coincide, and the extreme points of this common hull are exactly {v1, . . . , v K }.
+
+Identifiability of Π. Extreme points of a finite-dimensional convex set are determined by the set, hence by the population law of g⋆(X). Recovering {v1, . . . , v K } as an unordered set determines 
+
+{Π:,k = ckvk} once the abundances are known, and these are pinned down exactly: row-stochasticity of Π reads, row by row, P
+
+> k
+
+(vk)m ck = P 
+
+> k
+
+πmk = 1 , i.e. c solves the linear system V c = 1M ,whose solution is unique because rank( V ) = K (so c = V +1M ). The familiar constraint P 
+
+> k
+
+ck =
+
+M is then automatic rather than an input: multiplying V c = 1M by 1⊤ 
+
+> M
+
+and using that the columns of V sum to one gives P 
+
+> k
+
+ck = M . The labelling of which vertex corresponds to which class index is not identifiable. 
+
+C Latent Class Cardinality (K) Discovery 
+
+Once the multiclass CWoLa classifier has been trained and the posteriors for all data points are computed, one does not need to know the true number of latent classes, but can discover them through the topology of the data points. In practice, to determine the correct cardinality without prior knowledge, we fit a (K − 1) -simplex for each candidate K within the range [2 , M ]. To counter the trivial complexity bias that naturally drives reconstruction error down as K increases, we combine complementary selection signals: (1) held-out reconstruction error scored on a validation split after fitting on the training split, which ceases to improve once K > K true as extra vertices begin fitting training noise, and (2) a gap statistic computed against B extra simplices fit on column-wise-shuffled posteriors (destroying joint structure while preserving marginals). Empirically, this joint strategy successfully discovers the true latent class cardinality. We demonstrate this robust recovery on the Galaxy10 dataset with M = 20 mixtures across three separate random seeds (see Figure 5 for the individual seed trajectories). we also evaluated it on the MNIST dataset across a wide sweep of configurations, examining multiple target classes ( K ∈ { 3, 5, 7, 10 }) under balanced ( M = K), moderately overcomplete ( M = K + 2 ), and highly overcomplete ( M = 2 K)mixture conditions. Qualitatively, the results on MNIST confirm the reliability of the approach. In the balanced setting ( M = K), both the held-out validation error and the gap statistic are precise, identifying the exact true cardinality across almost all seeds. In the more complex overcomplete regimes ( M > K ), the held-out validation error occasionally exhibits a mild tendency to overestimate 
+
+K as the model fits residual noise, while, the column-shuffled gap statistic slightly underestimated 
+
+Ktrue .
+
+D Implementation details 
+
+Mixture instantiation. After fixing Π, each mixture Dm is generated by drawing y ∼ πm and then sampling an example uniformly from the class-y training pool. Sampling is independent across mixtures, so the same underlying image may appear in multiple mixtures. Only m is observed by prior-free methods; ground-truth labels are used solely for permutation alignment and reporting. 
+
+Mixture construction. Regular mixture construction draws each row from a symmetric Dirichlet. If M ≥ K, each Dirichlet row is blended with a fixed cyclic identity-like template 
+
+Πfinal = (1 − λ)Π Dir + λC, (14) and then renormalized. Purity sweeps use cyclic purity mode, in which the dominant class receives weight ρ and the remaining 1 − ρ mass is distributed equally across the other K − 1 classes. We use 
+
+λ = 0 .35 for MNIST/Fashion-MNIST/CIFAR-10 and λ = 0 .25 for Galaxy10. We confirm in Fig. 4 and Fig. 9 that performance remains stable when the abundance of the dominant class per mixture satisfies max k πmk > 0.4.
+
+Alignment and metrics. Latent class identities are recoverable only up to permutation. We compute the Hungarian assignment between predicted and true classes on a held-out split, and report aligned accuracy after this assignment. ECE is computed on the same aligned predictions. The same protocol is used for all methods whose outputs are permutation-invariant. 16 2 4 6 8 10 12 14 16 18 20                 
+
+> candidate K
+> 0.02
+> 0.04
+> 0.06
+> 0.08
+> 0.10
+> 0.12
+> 0.14
+> L2 residual
+> 246810 12 14 16 18 20
+> candidate K
+> −0.5
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> log (shuffled null ) − log (data )
+> seeds mean +/ - seed SEM held-out mean gap mean selected optimum
+
+Figure 5: Latent Class Cardinality Fitting on the Galaxy10 DECaLS dataset for Ktrue = 10 classes and M = 20 mixtures. The left plot shows the fitted latent class cardinality using the reconstruction error on a held-out validation sample, which overestimates Ktrue . The right plot shows the gap statistic, which recovers Ktrue .
+
+Baselines. Supervised oracle : trained directly on y. Oracle simplex : vertex hunting on gθ with 
+
+Π known. Wei-CCM/RCM [Wei et al., 2024] and the [Tang et al., 2022] demixer are known-prior multiclass methods. OvR [Rifkin and Klautau, 2004] is the only prior-free baseline besides ours; it uses the same backbone and training budget. Our prior-free configurations (Bottleneck and Simplex) observe only m.
+
+Hyperparameter control. Within each dataset, all compared methods share the same backbone, optimiser (AdamW), cosine-with-warm-up schedule, validation criterion (mixture-classification accuracy on a held-out 10% split for prior-free methods; class accuracy on the same split for the oracle), and stopping rule. Only the demixing component differs. 
+
+Prior-free simplex fitting configurations. Table 2 summarises the simplex fitting mechanisms. Post-hoc variants connect to classical simplex/vertex methods [Cutler and Breiman, 1994, Arora et al., 2012b, Tordesillas and How, 2020]; the regularised and bottleneck variants instantiate the posterior-simplex factorisation of §3.1. The “Simplex” configuration in Tab. 1 and Fig. 4 corresponds to “Regular + constr. ˆΠ.” 
+
+Configuration Mechanism Closest related family Regularizer Training-time regularisation This work Regular + constr. ˆΠ Post-hoc ˆΠ-constrained simplex fit Simplex unmixing [Tordesillas and How, 2020] Regular + arch. corner Post-hoc anchor-pool vertex recovery Anchor/vertex methods [Arora et al., 2012b] Regular + arch. spread Post-hoc archetypal simplex fit Archetypal analysis [Cutler and Breiman, 1994] Bottleneck Architectural factorisation This work 
+
+Table 2: Prior-free recovery configurations. Post-hoc variants fit the simplex after training, whereas regularised and bottleneck variants impose the geometry during training. Arch. corner and arch. spread use the same ALS refinement but differ in initialisation: low-entropy near-pure posterior points versus radial extremes of the posterior cloud. 17 E Results details 
+
+Figure 6 compares simplex fitters across MNIST, Fashion-MNIST, and CIFAR-10. All configurations remain close to the known-prior demixing oracle, with mean gaps between 0.046 and 0.058 , and their confidence intervals largely overlap. No single fitter uniformly dominates, indicating that the posterior-simplex signal is stable across several recovery mechanisms. In this work we measure the distance to the oracle simplex using 
+
+doracle =
+
+vuut 1
+
+K min 
+
+> σ∈SK
+> K
+
+X
+
+> k=1
+
+∥ˆθk − θσ(k)∥2.
+
+Figure 7 shows that variation is driven more by the mixture regime than by the fitter itself. The square settings K = M are often the most fragile, especially near K = M = 5 , whereas overcomplete settings with M > K provide redundant geometric constraints and are typically easier. This robustness makes post-hoc fitters practically useful: after training one mixture classifier, several simplex recovery rules can be tested cheaply on the same posterior cloud, without changing the architecture or retraining. Regular  + constr. ˆ Π              
+
+> Regularizer Regular  + arch. corner Regular  + arch. spread Bottleneck
+> Candidate prior-free configuration
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> Permutation-aligned latent accuracy
+> ∆=0.050 ∆=0.055 ∆=0.055 ∆=0.058 ∆=0.046
+
+Figure 6: Aggregate robustness of candidate prior-free recovery configurations. Each row corre-sponds to one recovery strategy, averaged over MNIST, Fashion-MNIST, and CIFAR-10 across the evaluated (K, M ) settings. Small points show individual dataset–configuration means, while large markers show the overall mean with standard deviation. Text labels report the mean accuracy gap to the known-prior demixing oracle, ∆ = Acc known -prior − Acc method , where smaller is better. The overlapping intervals indicate that performance is robust to the precise recovery choice. Figure 8 extends the fixed-K scaling study to Galaxy10. As on CIFAR-10, increasing the number of mixtures generally improves the quality of prior-free recovery, consistent with the view that additional mixtures provide extra geometric constraints on the latent simplex. The gain is clearest for the simplex-based methods, which remain above the no-prior OvR baseline and move closer to the known-prior references at larger M .18 K = 3/M = 3                                                                                                                                                                     
+
+> K = 3/M = 6
+> K = 5/M = 5
+> K = 5/M = 10
+> K = 10 /M = 10
+> K = 10 /M = 20 Regular +arch. corner Regular +arch. spread Regular +constr. ˆ Π
+> Regularizer Bottleneck
+> 0.91 0.87 0.88 0.98 0.91 0.98 0.91 0.87 0.87 0.98 0.89 0.98 0.88 0.98 0.87 0.99 0.92 0.98 0.91 1.00 0.82 0.99 0.88 0.99 0.90 0.89 0.92 0.87 0.92 0.97
+> MNIST
+> K = 3/M = 3
+> K = 3/M = 6
+> K = 5/M = 5
+> K = 5/M = 10
+> K = 10 /M = 10
+> K = 10 /M = 20
+> 0.93 0.96 0.72 0.89 0.79 0.88 0.93 0.96 0.66 0.89 0.82 0.88 0.85 0.96 0.74 0.90 0.83 0.88 0.88 0.97 0.72 0.91 0.80 0.89 0.89 0.87 0.80 0.77 0.85 0.87
+> Fashion-MNIST
+> K = 3/M = 3
+> K = 3/M = 6
+> K = 5/M = 5
+> K = 5/M = 10
+> K = 10 /M = 10
+> K = 10 /M = 20
+> 0.81 0.76 0.42 0.71 0.57 0.63 0.80 0.76 0.42 0.71 0.57 0.63 0.76 0.74 0.50 0.69 0.57 0.64 0.80 0.75 0.40 0.71 0.57 0.63 0.79 0.72 0.46 0.59 0.60 0.62
+> CIFAR-10
+> K = 3/M = 3
+> K = 3/M = 6
+> K = 5/M = 5
+> K = 5/M = 10
+> K = 10 /M = 10
+> K = 10 /M = 20
+> K/Mpair
+> Regular +arch. corner Regular +arch. spread Regular +constr. ˆ Π
+> Regularizer Bottleneck
+> -0.02 0.13 0.11 0.01 0.07 0.00 -0.02 0.13 0.12 0.01 0.09 0.00 0.01 0.01 0.12 0.00 0.06 0.00 -0.01 0.00 0.16 0.01 0.10 -0.00 0.03 0.01 0.06 0.07 0.05 0.01
+> K = 3/M = 3
+> K = 3/M = 6
+> K = 5/M = 5
+> K = 5/M = 10
+> K = 10 /M = 10
+> K = 10 /M = 20
+> K/Mpair
+> 0.00 0.00 0.12 0.02 0.09 -0.00 0.00 0.00 0.18 0.02 0.06 -0.00 0.07 0.00 0.10 0.02 0.05 0.00 0.03 -0.00 0.12 0.00 0.08 -0.00 0.03 -0.01 0.09 0.06 0.03 0.01
+> K = 3/M = 3
+> K = 3/M = 6
+> K = 5/M = 5
+> K = 5/M = 10
+> K = 10 /M = 10
+> K = 10 /M = 20
+> K/Mpair
+> 0.01 0.10 0.23 0.01 0.08 0.03 0.01 0.10 0.23 0.01 0.08 0.03 0.05 0.12 0.15 0.03 0.08 0.02 0.01 0.10 0.27 0.02 0.08 0.02 0.01 0.04 0.21 0.06 0.05 0.02
+> 0.5 0.6 0.7 0.8 0.9
+> Mean aligned accuracy
+> −0.2
+> −0.1 0.0 0.1 0.2
+> Gap to known-prior demix
+
+Figure 7: Per-dataset decomposition of the prior-free recovery comparison. Top: mean permutation-aligned latent accuracy for each recovery configuration on MNIST, Fashion-MNIST, and CIFAR-10. 
+
+Bottom: accuracy gap to the known-prior demixing reference, ∆ = Acc known-prior −Acc method (positive = the method is worse than the known-prior reference). Columns vary (K, M ). Square settings 
+
+K = M = 5 are the most fragile, most clearly on CIFAR-10; overcomplete settings M > K shrink the oracle gap, consistent with the redundancy argument in Sec. 3.1. 20 40 60 80 100 
+
+M at fixed K = 10 
+
+0.3 
+
+0.4 
+
+0.5 
+
+0.6 
+
+> Aligned Accuracy
+
+Oracle Oracle simplex Wei-CCM Simplex OvR Bottleneck 
+
+Figure 8: Scaling with the number of mixtures on Galaxy10 DECaLS. We fix the number of latent classes to K = 10 and increase the number of mixtures M while keeping the image data, backbone, and augmentation profile fixed. Larger values of M provide additional mixture diversity and improve identifiability of the latent simplex structure. Performance generally improves as the number of mixtures increases, particularly for simplex-based approaches. Our simplex and bottleneck variants consistently outperform the no-prior OvR baseline and approach the known-prior simplex and Wei-CCM references at larger M . For computational reasons, the OvR and fully supervised oracle baselines are only evaluated up to M = 50 .Figure 9 isolates the effect of mixture informativeness on CIFAR-10. When the cyclic-purity parameter is small, the mixtures are nearly indistinguishable and the weakly supervised methods approach the expected non-identifiable regime. As purity increases, the simplex and bottleneck variants improve rapidly and approach the known-prior baselines, indicating that the limiting factor is mixture separability rather than the simplex fitting step itself. Table 3 reports the corresponding Galaxy10 comparison with a frozen backbone. In this lower-capacity setting, the bottleneck gives the best prior-free accuracy, while the post-hoc simplex fit gives the best prior-free calibration. This contrasts with the finetuned setting in Table 1, where post-19 0.2 0.4 0.6 0.8 1.0 
+
+> Purity
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> Aligned Accuracy  Oracle Oracle simplex Wei-CCM OvR KSBS-Demix Simplex Bottleneck
+
+Figure 9: Robustness to mixture purity on CIFAR-10. We construct cyclic-purity mixtures with K =
+
+M = 10 while keeping the image data and training protocol fixed. Low purity corresponds to weak class enrichment and approaches the unidentifiable regime, whereas high purity produces mixtures with clearer anchor structure. Accuracy improves with purity across all mixture-based methods. Our simplex-based approach consistently outperforms the no-prior OvR baseline at moderate and high purity, while approaching the known-prior simplex and Wei-CCM reference methods in the high-purity regime. Technique Method Accuracy ECE Supervised Oracle 0.600 ± 0.015 0.045 ± 0.010 
+
+Prior-aware Wei CCM 0.578 ± 0.033 0.044 ± 0.017 
+
+Wei RCM 0.455 ± 0.030 0.270 ± 0.032 
+
+Oracle Simplex 0.484 ± 0.042 0.082 ± 0.037 
+
+Prior-free OvR 0.423 ± 0.031 0.222 ± 0.033 
+
+Bottleneck 0.454 ± 0.024 0.154 ± 0.051 
+
+Simplex 0.439 ± 0.026 0.111 ± 0.059 
+
+Table 3: Galaxy10 comparison on the non fine-tune model. Results are reported as mean ±
+
+standard deviation over three random seeds. Accuracy is permutation-aligned latent accuracy; ECE is expected calibration error, where lower is better. Oracle is fully supervised. Wei CCM and Wei RCM assume access to class-prior information [Wei et al., 2024], and Oracle Simplex uses the true mixture proportions. OvR [Rifkin and Klautau, 2004], Bottleneck, and Simplex are prior-free. Bottleneck achieves the strongest prior-free accuracy, while Simplex provides the best calibration among prior-free methods. hoc simplex recovery gives the strongest prior-free tradeoff, suggesting that the preferred recovery mechanism can depend on representation quality. 20
