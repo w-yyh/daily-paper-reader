@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-02T20:58:05.770200+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.24237v1",
+      "source": "arxiv",
+      "title": "Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory",
+      "abstract": "Many existing clustering methods are designed based on a set-oriented definition---a cluster is a set of similar points---relying a point-to-point similarity function to find similar points. This works well for compact clusters, but clustering performance can deteriorate badly when cluster shapes are irregular, and densities or sizes vary between clusters. Recent `Cluster-as-Distribution' (CaD) clustering has been shown to discover these generic types of clusters in practice by treating each cluster as a set of independent and identically distributed points generated from some unknown distribution via a greedy search, achieving a clustering objective equivalent to that of Spectral Clustering, but with better clustering outcomes without eigen-decomposition. However, a theoretical analysis of this phenomenon is still lacking. Our analyses are from two angles. First, we analyze the approximation error between the true and empirical distribution embeddings. Second, we show that the greedy search employed to achieve the CaD clustering objective can be mapped to a partition matroid---yielding greedy optimality. These yield a near-optimality guarantee for the CaD clustering objective, with regret controlled by the approximation error. This is the first analysis that explains why CaD clustering via greedy search can discover clusters of arbitrary shapes, densities and sizes (where all set-oriented clustering methods have failed to discover) when the estimated cluster embeddings faithfully approximate the underlying cluster distributions.",
+      "authors": [
+        "Kai Ming Ting",
+        "Kaifeng Zhang",
+        "Sanjay Chawla"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-27T10:15:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.24237v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Proposes a greedy search clustering method that can discover clusters of arbitrary shapes, useful for grouping novel categories",
+      "llm_evidence_cn": "提出一种贪婪搜索聚类方法，可发现任意形状的簇，可用于新类别分组发现",
+      "llm_evidence": "提出一种贪婪搜索聚类方法，可发现任意形状的簇，可用于新类别分组发现",
+      "canonical_evidence": "提出一种贪婪搜索聚类方法，可发现任意形状的簇，可用于新类别分组发现",
+      "llm_tldr_en": "Explains why greedy search in cluster-as-distribution clustering yields optimal outcomes, enabling robust clustering of irregular and varying-density clusters, useful for novel category discovery tasks.",
+      "llm_tldr_cn": "该论文针对现有聚类方法在处理不规则形状和不同密度聚类时的不足，提出了一种基于聚类即分布的贪婪搜索方法，并解释了其最优性理论。实验表明该方法在多种数据集上优于谱聚类等经典方法，特别适合发现复杂分布的新类别，为开放世界中的类别分组发现提供了有效工具。",
+      "llm_tldr": "该论文针对现有聚类方法在处理不规则形状和不同密度聚类时的不足，提出了一种基于聚类即分布的贪婪搜索方法，并解释了其最优性理论。实验表明该方法在多种数据集上优于谱聚类等经典方法，特别适合发现复杂分布的新类别，为开放世界中的类别分组发现提供了有效工具。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "category-grouped class discovery approach for clustering novel categories",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

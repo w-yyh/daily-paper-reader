@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-02",
+  "date": "2026-08-02",
+  "generated_at": "2026-08-02T20:59:16",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/02/2607.24237v1-why-does-greedy-search-produce-optimal-clustering-outcomes-a-fixed-core-assignment-theory",
+      "section": "quick",
+      "title_en": "Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory",
+      "authors": "Kai Ming Ting, Kaifeng Zhang, Sanjay Chawla",
+      "date": "2026-07-27",
+      "pdf": "https://arxiv.org/pdf/2607.24237v1",
+      "score": "6.0",
+      "evidence": "提出一种贪婪搜索聚类方法，可发现任意形状的簇，可用于新类别分组发现",
+      "tldr": "传统聚类方法基于点对点相似度的集合定义，难以处理形状不规则、密度与大小各异的簇。Cluster-as-Distribution (CaD) 聚类将每个簇建模为未知分布生成的独立同分布点集，并通过贪婪搜索实现与谱聚类等价的目标，展现出更强泛化能力。本文首次从分布嵌入近似误差与贪婪搜索的划分拟阵结构两个角度，建立了CaD聚类的近最优性理论保证，遗憾由近似误差控制。该分析揭示了当簇嵌入准确逼近真实分布时，贪婪搜索能发现任意形状、密度与大小的簇的内在机理。",
+      "tags": "query:cgcd",
+      "abstract_en": "Many existing clustering methods are designed based on a set-oriented definition---a cluster is a set of similar points---relying a point-to-point similarity function to find similar points. This works well for compact clusters, but clustering performance can deteriorate badly when cluster shapes are irregular, and densities or sizes vary between clusters. Recent `Cluster-as-Distribution' (CaD) clustering has been shown to discover these generic types of clusters in practice by treating each cluster as a set of independent and identically distributed points generated from some unknown distribution via a greedy search, achieving a clustering objective equivalent to that of Spectral Clustering, but with better clustering outcomes without eigen-decomposition. However, a theoretical analysis of this phenomenon is still lacking. Our analyses are from two angles. First, we analyze the approximation error between the true and empirical distribution embeddings. Second, we show that the greedy search employed to achieve the CaD clustering objective can be mapped to a partition matroid---yielding greedy optimality. These yield a near-optimality guarantee for the CaD clustering objective, with regret controlled by the approximation error. This is the first analysis that explains why CaD clustering via greedy search can discover clusters of arbitrary shapes, densities and sizes (where all set-oriented clustering methods have failed to discover) when the estimated cluster embeddings faithfully approximate the underlying cluster distributions.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

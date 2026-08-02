@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-08-02 <!--dpr-date:20260802-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/02/2607.24237v1-why-does-greedy-search-produce-optimal-clustering-outcomes-a-fixed-core-assignment-theory" data-sidebar-item="{&quot;title&quot;: &quot;Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.24237v1-why-does-greedy-search-produce-optimal-clustering-outcomes-a-fixed-core-assignment-theory&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;提出一种贪婪搜索聚类方法，可发现任意形状的簇，可用于新类别分组发现&quot;}">Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory</a>
   * 2026-08-01 <!--dpr-date:20260801-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/01/2607.24943v1-multiclass-classification-without-labels-via-posterior-simplex-geometry" data-sidebar-item="{&quot;title&quot;: &quot;Multiclass Classification without Labels via Posterior Simplex Geometry&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.24943v1-multiclass-classification-without-labels-via-posterior-simplex-geometry&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;将无标签分类(CWoLa)扩展到从多个无标签混合体中学习多类，无需标签或先验矩阵即可发现类判别器&quot;}">Multiclass Classification without Labels via Posterior Simplex Geometry</a>
