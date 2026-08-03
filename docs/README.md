@@ -6,26 +6,22 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-02
-- 运行时间：2026-08-02 20:59:03 UTC
+- 最新运行日期：2026-08-03
+- 运行时间：2026-08-03 20:59:00 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：0
 - 精读区：0
-- 速读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-速读了一篇理论论文，揭示了贪婪搜索能获得最优聚类结果的原因——关键在于一种“固定核心分配”机制。  
-最值得关注：该理论证明了简单的贪婪策略也能在聚类问题中实现全局最优，打破了“近似算法总是妥协”的直觉。  
-建议阅读原始示例来理解“固定核心”如何避免局部陷阱，这或许会改变你对经典算法的看法。
-- 详情：[/202608/02/README](/202608/02/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202608/03/README](/202608/03/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory](/202608/02/2607.24237v1-why-does-greedy-search-produce-optimal-clustering-outcomes-a-fixed-core-assignment-theory)  
-   标签：评分：6.0/10、query:cgcd
-   evidence：提出一种贪婪搜索聚类方法，可发现任意形状的簇，可用于新类别分组发现
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
