@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-08-05 <!--dpr-date:20260805-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/05/2607.27620v1-medxplore-towards-reliable-and-unbiased-generalized-category-discovery-in-medical-imaging" data-sidebar-item="{&quot;title&quot;: &quot;MedXplore: Towards Reliable and Unbiased Generalized Category Discovery in Medical Imaging&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.27620v1-medxplore-towards-reliable-and-unbiased-generalized-category-discovery-in-medical-imaging&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;提出MedXplore，一个用于医学影像中可靠无偏广义类别发现的框架&quot;}">MedXplore: Towards Reliable and Unbiased Generalized Category Discovery in Medical Imaging</a>
   * 2026-08-02 <!--dpr-date:20260802-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/02/2607.24237v1-why-does-greedy-search-produce-optimal-clustering-outcomes-a-fixed-core-assignment-theory" data-sidebar-item="{&quot;title&quot;: &quot;Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.24237v1-why-does-greedy-search-produce-optimal-clustering-outcomes-a-fixed-core-assignment-theory&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;提出一种贪婪搜索聚类方法，可发现任意形状的簇，可用于新类别分组发现&quot;}">Why does Greedy Search produce Optimal Clustering Outcomes? A Fixed-Core Assignment Theory</a>

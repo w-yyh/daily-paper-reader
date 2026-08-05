@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-05",
+  "date": "2026-08-05",
+  "generated_at": "2026-08-05T20:10:47",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/05/2607.27620v1-medxplore-towards-reliable-and-unbiased-generalized-category-discovery-in-medical-imaging",
+      "section": "deep",
+      "title_en": "MedXplore: Towards Reliable and Unbiased Generalized Category Discovery in Medical Imaging",
+      "authors": "Jianwei He, Kailin Lyu, Junhao Dong, Long Xiao, Wenjie Hou, Jingze Lu, Di Wu, Lin Shu, Jie Hao",
+      "date": "2026-07-30",
+      "pdf": "https://arxiv.org/pdf/2607.27620v1",
+      "score": "9.0",
+      "evidence": "提出MedXplore，一个用于医学影像中可靠无偏广义类别发现的框架",
+      "tldr": "医学图像分析中闭世界假设常不成立，标注昂贵且旧类偏误影响广义类别发现（GCD）可靠性。MedXplore框架从感知与决策双层面优化，提出频率域注意力一致性模块FAAC与自适应余弦角边距ACAM，分别增强病变语义锚定和类间分离。实验表明平均全类别准确率提升8.5%，Kvasir上假旧错误从14.50%降至0.80%，为开放医学图像分析提供鲁棒无偏方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Deep learning has shown strong potential in medical image analysis, but most existing methods rely on large-scale annotations and a closed-world assumption that rarely holds in clinical practice. Although Generalized Category Discovery (GCD) has advanced rapidly on natural images, it remains underexplored in medical imaging. To address this issue, we propose MedXplore, a unified framework for reliable and unbiased medical GCD, optimizing from both perceptual and decision levels. Specifically, at the perceptual level, taking a frequency domain perspective, Frequency-SNR Adaptive Attention and Consistency (FAAC) performs learnable full-spectrum filtering and global-local energy contrast activation to not only highlight local abnormal signals relative to the global context, but also provide reliable semantic anchors for patch consistency learning. At the decision level, Adaptive Cosine-Angular Margin (ACAM) adjusts angular margins using semantic difficulty and feature confidence to balance intra-class compactness and inter-class separability. Together, the two modules improve lesion-sensitive representation learning and mitigate old-class bias. Experiments on multiple benchmarks show an average \\textbf{8.5\\%} gain in \\textit{All} accuracy over the strongest competing methods. On Kvasir, MedXplore reduces false-old errors from 14.50\\% to 0.80\\%, demonstrating strong robustness under severe old-new ambiguity.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
