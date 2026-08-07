@@ -6,23 +6,19 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-05
-- 运行时间：2026-08-05 20:10:38 UTC
+- 最新运行日期：2026-08-07
+- 运行时间：2026-08-07 01:10:33 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：1
+- 本次总论文数：0
+- 精读区：0
 - 速读区：0
 
 ### 今日简报（AI）
-今日精读了一篇关于医学影像中广义类别发现的论文，提出了更可靠无偏的探索新类别方法。  
-该研究发现借助模型约束与自适应采样，能显著缓解医学数据中已知类与未知类的识别偏差。  
-建议关注其开源工具包，尝试将无偏类别发现思路迁移到你手头的图像分类任务中。
-- 详情：[/202608/05/README](/202608/05/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202608/07/README](/202608/07/README)
 
 ### 精读区论文标签
-1. [MedXplore: Towards Reliable and Unbiased Generalized Category Discovery in Medical Imaging](/202608/05/2607.27620v1-medxplore-towards-reliable-and-unbiased-generalized-category-discovery-in-medical-imaging)  
-   标签：评分：9.0/10、query:cgcd
-   evidence：提出MedXplore，一个用于医学影像中可靠无偏广义类别发现的框架
+- 本次无精读推荐。
 
 ### 速读区论文标签
 - 本次无速读推荐。
