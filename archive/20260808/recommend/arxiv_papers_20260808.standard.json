@@ -1,0 +1,91 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-08T20:34:24.217092+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.00966v1",
+      "source": "arxiv",
+      "title": "AgenTag: Attribution of AI Coding Agents from Behavioral Fingerprints",
+      "abstract": "AI coding agents increasingly author pull requests (PRs), often under developers' own accounts, obscuring who actually produced a change. Reliable attribution is important for repository governance, empirical studies of AI-assisted software development, and measuring the impact of AI coding agents. Existing work focuses on closed-set identification of known agents, leaving the practical limits of open-world AI coding agent attribution largely unexplored. In this paper, we present AgenTag, a multimodal framework for open-world AI coding agent attribution, evaluated on AIDev, comprising 33,580 PRs from five AI coding agents and 6,618 human-authored PRs. We represent each PR using textual, behavioral, and code-based modalities, and compare conventional classification with supervised contrastive learning for open-set recognition and few-shot enrollment of previously unseen agents. AgenTag identifies authoring agents with a weighted F1 of 0.96 (macro F1 of 0.84), distinguishes AI- from human-authored PRs with a balanced F1 of 0.89, and detects previously unseen agents with an AUC of 0.84. We further show that PR descriptions and commit messages provide nearly all of the attribution signal, whereas code diffs contribute little across multiple representations, indicating that coding agents are distinguished primarily by how they communicate changes rather than by the code they generate. Moreover, these behavioral fingerprints persist after removing explicit self-disclosed markers, demonstrating that attribution relies largely on latent stylistic characteristics. These findings show that reliable attribution of AI coding agents is feasible and clarify the practical trade-offs between attribution accuracy and the information required to achieve it.",
+      "authors": [
+        "Taher A. Ghaleb"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE"
+      ],
+      "published": "2026-08-02T03:35:25+00:00",
+      "link": "https://arxiv.org/pdf/2608.00966v1",
+      "tags": [
+        "keyword:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "addresses open-world attribution with unknown AI coding agents, using open-set recognition to handle novel classes",
+      "llm_evidence_cn": "针对开放世界中的未知AI编码代理归属问题，使用开集识别技术处理新类",
+      "llm_evidence": "针对开放世界中的未知AI编码代理归属问题，使用开集识别技术处理新类",
+      "canonical_evidence": "针对开放世界中的未知AI编码代理归属问题，使用开集识别技术处理新类",
+      "llm_tldr_en": "The paper tackles open-world attribution of AI coding agents, where unknown agents may appear, by proposing a multimodal framework that uses open-set recognition methods to distinguish known agents, new agents, and humans.",
+      "llm_tldr_cn": "该工作针对AI编码代理在开放世界中未知代理的归属问题，提出多模态框架AgenTag，利用开集识别技术区分已知代理、新代理和人类。在包含5种AI代理和人类作者的数据集上验证，显示该方法在开放世界场景下优于传统封闭集方法，为代码仓库治理和AI辅助开发影响评估提供了可靠归属依据。",
+      "llm_tldr": "该工作针对AI编码代理在开放世界中未知代理的归属问题，提出多模态框架AgenTag，利用开集识别技术区分已知代理、新代理和人类。在包含5种AI代理和人类作者的数据集上验证，显示该方法在开放世界场景下优于传统封闭集方法，为代码仓库治理和AI辅助开发影响评估提供了可靠归属依据。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.05996v1",
+      "source": "arxiv",
+      "title": "Convergent Evolution in Neural Representation Space: Emergent Order in Deep Belief Networks",
+      "abstract": "Deep Belief Networks (DBNs) learn hierarchical generative models without class supervision. Here, we ask whether this purely unsupervised process nevertheless organizes internal representations according to the unknown data classes. We analyze successive layers of DBNs trained on MNIST, Fashion-MNIST, and KMNIST using the Generalized Discrimination Value (GDV), supervised probes applied only after training, a reconstruction-based measure of abstraction distance, effective dimensionality, and free sample generation. Remarkably, class-specific clustering generally increases with depth across datasets and network widths, although no label information is available during DBN training. Control experiments show that this effect depends on the learned feature structure and cannot be explained by random transformations, weight marginals, dimensionality reduction, or sigmoid saturation. The first hidden layers also frequently make class identity more accessible to linear and nonlinear probes. With greater depth, representations become increasingly compact and prototype-like as neurons acquire correlated feature directions. At the same time, GDV and probe accuracy reveal complementary aspects of class structure: improved average clustering can coexist with reduced accessibility for a few difficult class pairs. These findings demonstrate that layer-wise generative learning can spontaneously uncover and progressively amplify class-related structure in unlabeled data.",
+      "authors": [
+        "Patrick Krauss",
+        "Achim Schilling",
+        "Andreas Maier",
+        "Thomas Kinfe",
+        "Claus Metzner"
+      ],
+      "primary_category": "q-bio.NC",
+      "categories": [
+        "q-bio.NC",
+        "cs.NE"
+      ],
+      "published": "2026-08-06T13:05:37+00:00",
+      "link": "https://arxiv.org/pdf/2608.05996v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Unsupervised DBNs reveal cluster structure without class labels, relevant to generalized category discovery from unlabeled data.",
+      "llm_evidence_cn": "无监督深度信念网络自动按未知类别组织表征，适用于从无标签数据中发现新类。",
+      "llm_evidence": "无监督深度信念网络自动按未知类别组织表征，适用于从无标签数据中发现新类。",
+      "canonical_evidence": "无监督深度信念网络自动按未知类别组织表征，适用于从无标签数据中发现新类。",
+      "llm_tldr_en": "Deep Belief Networks trained purely unsupervised on image data develop internal representations that cluster by class identity, showing hierarchical generative models can automatically discover category structure without labels.",
+      "llm_tldr_cn": "该工作探究了深度信念网络在完全无监督训练下是否能自发地按照未知类别组织内部表征。分析发现，随着网络深度增加，类别特定的聚类现象更加明显，即便训练时从未使用标签信息。这表明层次生成模型具有自动发现数据中类别结构的能力，为基于无监督学习的新类发现提供了启示。",
+      "llm_tldr": "该工作探究了深度信念网络在完全无监督训练下是否能自发地按照未知类别组织内部表征。分析发现，随着网络深度增加，类别特定的聚类现象更加明显，即便训练时从未使用标签信息。这表明层次生成模型具有自动发现数据中类别结构的能力，为基于无监督学习的新类发现提供了启示。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

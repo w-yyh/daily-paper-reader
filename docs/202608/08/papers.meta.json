@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-08",
+  "date": "2026-08-08",
+  "generated_at": "2026-08-08T20:37:44",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/08/2608.00966v1-agentag-attribution-of-ai-coding-agents-from-behavioral-fingerprints",
+      "section": "quick",
+      "title_en": "AgenTag: Attribution of AI Coding Agents from Behavioral Fingerprints",
+      "authors": "Taher A. Ghaleb",
+      "date": "2026-08-02",
+      "pdf": "https://arxiv.org/pdf/2608.00966v1",
+      "score": "7.0",
+      "evidence": "针对开放世界中的未知AI编码代理归属问题，使用开集识别技术处理新类",
+      "tldr": "AI编码代理常使用开发者账号提交PR，导致变更归属不清，影响仓库治理与影响评估。本文提出AgenTag多模态框架，利用文本、行为与代码特征进行开放世界归因识别，在包含3.3万AI及6千人类PR的AIDev数据集上评估。AgenTag识别已知代理的加权F1达0.96，区分AI与人类PR的平衡F1为0.89，检测未知代理AUC为0.84，并发现PR描述与提交消息提供绝大部分归因信号，代码差异作用有限。研究证实了可靠归因的可行性，并揭示了行为指纹在去除显式标记后仍持续存在。",
+      "tags": "query:cgcd",
+      "abstract_en": "AI coding agents increasingly author pull requests (PRs), often under developers' own accounts, obscuring who actually produced a change. Reliable attribution is important for repository governance, empirical studies of AI-assisted software development, and measuring the impact of AI coding agents. Existing work focuses on closed-set identification of known agents, leaving the practical limits of open-world AI coding agent attribution largely unexplored. In this paper, we present AgenTag, a multimodal framework for open-world AI coding agent attribution, evaluated on AIDev, comprising 33,580 PRs from five AI coding agents and 6,618 human-authored PRs. We represent each PR using textual, behavioral, and code-based modalities, and compare conventional classification with supervised contrastive learning for open-set recognition and few-shot enrollment of previously unseen agents. AgenTag identifies authoring agents with a weighted F1 of 0.96 (macro F1 of 0.84), distinguishes AI- from human-authored PRs with a balanced F1 of 0.89, and detects previously unseen agents with an AUC of 0.84. We further show that PR descriptions and commit messages provide nearly all of the attribution signal, whereas code diffs contribute little across multiple representations, indicating that coding agents are distinguished primarily by how they communicate changes rather than by the code they generate. Moreover, these behavioral fingerprints persist after removing explicit self-disclosed markers, demonstrating that attribution relies largely on latent stylistic characteristics. These findings show that reliable attribution of AI coding agents is feasible and clarify the practical trade-offs between attribution accuracy and the information required to achieve it.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/08/2608.05996v1-convergent-evolution-in-neural-representation-space-emergent-order-in-deep-belief-networks",
+      "section": "quick",
+      "title_en": "Convergent Evolution in Neural Representation Space: Emergent Order in Deep Belief Networks",
+      "authors": "Patrick Krauss, Achim Schilling, Andreas Maier, Thomas Kinfe, Claus Metzner",
+      "date": "2026-08-06",
+      "pdf": "https://arxiv.org/pdf/2608.05996v1",
+      "score": "6.0",
+      "evidence": "无监督深度信念网络自动按未知类别组织表征，适用于从无标签数据中发现新类。",
+      "tldr": "深度信念网络作为无监督生成模型，其内部表征能否自发反映数据类别尚待探索。本文分析多数据集上训练的DBN，发现随着层数加深，无监督的表征中类特异性聚类普遍增强，首次隐藏层即可提升探针可读性。深层神经元呈现紧凑的原型特征，GDV与监督探针揭示互补类别结构。该结果证明逐层生成学习能无标签地渐进发现并放大类别信息，为理解无监督表征涌现提供了新见解。",
+      "tags": "query:cgcd",
+      "abstract_en": "Deep Belief Networks (DBNs) learn hierarchical generative models without class supervision. Here, we ask whether this purely unsupervised process nevertheless organizes internal representations according to the unknown data classes. We analyze successive layers of DBNs trained on MNIST, Fashion-MNIST, and KMNIST using the Generalized Discrimination Value (GDV), supervised probes applied only after training, a reconstruction-based measure of abstraction distance, effective dimensionality, and free sample generation. Remarkably, class-specific clustering generally increases with depth across datasets and network widths, although no label information is available during DBN training. Control experiments show that this effect depends on the learned feature structure and cannot be explained by random transformations, weight marginals, dimensionality reduction, or sigmoid saturation. The first hidden layers also frequently make class identity more accessible to linear and nonlinear probes. With greater depth, representations become increasingly compact and prototype-like as neurons acquire correlated feature directions. At the same time, GDV and probe accuracy reveal complementary aspects of class structure: improved average clustering can coexist with reduced accessibility for a few difficult class pairs. These findings demonstrate that layer-wise generative learning can spontaneously uncover and progressively amplify class-related structure in unlabeled data.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
