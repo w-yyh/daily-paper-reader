@@ -6,29 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-08
-- 运行时间：2026-08-08 20:37:31 UTC
+- 最新运行日期：2026-08-09
+- 运行时间：2026-08-09 19:51:31 UTC
 - 运行状态：成功
 - 本次总论文数：2
 - 精读区：0
 - 速读区：2
 
 ### 今日简报（AI）
-今日速读两篇AI前沿论文，聚焦代码代理行为溯源与深度网络自组织规律。  
-值得关注：利用行为指纹为AI编程代理“验明正身”，以及深度信念网络中自发涌现的神经表征趋同秩序。  
-若对AI安全溯源或网络内在结构感兴趣，可先精读《AgenTag》了解代理归因新范式。
-- 详情：[/202608/08/README](/202608/08/README)
+今日速览两篇聚类前沿工作，分别针对不平衡表格数据与二进制程序分析。  
+其中，集成无监督深度学习与检索增强学习各自为解决特定数据场景提供了可行方案。  
+建议关注这两类方法在真实业务数据上的迁移实验，先从小规模复现开始验证适应性。
+- 详情：[/202608/09/README](/202608/09/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [AgenTag: Attribution of AI Coding Agents from Behavioral Fingerprints](/202608/08/2608.00966v1-agentag-attribution-of-ai-coding-agents-from-behavioral-fingerprints)  
-   标签：评分：7.0/10、query:cgcd
-   evidence：针对开放世界中的未知AI编码代理归属问题，使用开集识别技术处理新类
-2. [Convergent Evolution in Neural Representation Space: Emergent Order in Deep Belief Networks](/202608/08/2608.05996v1-convergent-evolution-in-neural-representation-space-emergent-order-in-deep-belief-networks)  
+1. [Ensemble of Unsupervised Deep Learning for Clustering Imbalanced Tabular Data](/202608/09/2608.00346v1-ensemble-of-unsupervised-deep-learning-for-clustering-imbalanced-tabular-data)  
    标签：评分：6.0/10、query:cgcd
-   evidence：无监督深度信念网络自动按未知类别组织表征，适用于从无标签数据中发现新类。
+   evidence：用于不平衡数据的深度聚类集成
+2. [Self-Supervised Representations for Binary Program Clustering: From Empirical Study to Retrieval-Augmented Learning](/202608/09/2608.02348v1-self-supervised-representations-for-binary-program-clustering-from-empirical-study-to-retrieval-augmented-learning)  
+   标签：评分：6.0/10、query:cgcd
+   evidence：自监督对比聚类方法
 
 
 <div class="dpr-home-promo-card">

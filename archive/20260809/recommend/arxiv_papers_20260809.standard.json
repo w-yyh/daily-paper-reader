@@ -1,0 +1,92 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-09T19:49:23.794858+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.00346v1",
+      "source": "arxiv",
+      "title": "Ensemble of Unsupervised Deep Learning for Clustering Imbalanced Tabular Data",
+      "abstract": "Data imbalance poses a major challenge in supervised classification, where the majority-class bias contributes to false negatives and overestimates classification accuracy. Unsupervised deep clustering can be immune to class imbalance because representation learning for clustering is performed without class labels. Deep clustering has been proposed for images, languages, and graphs, while its application to tabular data has only emerged recently. This paper is among the first to examine the performance of state-of-the-art deep clustering methods under varying levels of data imbalance. We introduce two novel cluster ensemble approaches: one aggregates deep clustering assignments across different embedding dimensions, and the other applies majority voting to the best-performing clustering algorithms. Experiments on 16 binary tabular datasets with varying and artificially induced levels of imbalance reveal distinct strengths of different deep clustering methods. On average, our ensemble methods outperform individual clustering methods in ACC, NMI, and ARI scores, offering greater resilience to data imbalance when identifying ground-truth classes without supervision. Therefore, in an imbalanced data scenario, deep clustering can serve as a strong alternative to supervised classification.",
+      "authors": [
+        "Pulock Das",
+        "Yina Hou",
+        "Md. Kamrozzaman Bhuiyan",
+        "Manar D. Samad"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-31T23:28:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.00346v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Deep clustering ensemble for handling imbalanced data",
+      "llm_evidence_cn": "用于不平衡数据的深度聚类集成",
+      "llm_evidence": "用于不平衡数据的深度聚类集成",
+      "canonical_evidence": "用于不平衡数据的深度聚类集成",
+      "llm_tldr_en": "Proposes ensemble methods for unsupervised deep clustering on imbalanced tabular data, aggregating across dimensions or applying majority voting.",
+      "llm_tldr_cn": "针对表格数据的不平衡聚类问题，提出两种集成方法：一种聚合不同嵌入维度的聚类结果，另一种采用多数投票机制。实验表明，深度聚类集成能有效缓解不平衡影响，提升聚类精度，为无监督学习在不平衡场景的应用提供了可靠方案。",
+      "llm_tldr": "针对表格数据的不平衡聚类问题，提出两种集成方法：一种聚合不同嵌入维度的聚类结果，另一种采用多数投票机制。实验表明，深度聚类集成能有效缓解不平衡影响，提升聚类精度，为无监督学习在不平衡场景的应用提供了可靠方案。",
+      "llm_tags": [
+        "query:cgcd:composite"
+      ],
+      "matched_query_tag": "query:cgcd:composite",
+      "matched_query_text": "Papers central to 开放世界新类发现与CGCD方向论文检索, especially work that connects or combines: methods for discovering novel classes in open world settings; learning algorithms that handle open world scenarios with unknown classes; category-grouped class discovery approach for clustering novel categories; generalized category discovery for unlabeled data with unknown classes; Category Grouped Class Discovery for open world novel class discovery; novel category discovery in open world setting using contrastive clustering; open world learning with group based class discovery and self supervision.",
+      "matched_requirement_id": "req-composite-cgcd",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.02348v1",
+      "source": "arxiv",
+      "title": "Self-Supervised Representations for Binary Program Clustering: From Empirical Study to Retrieval-Augmented Learning",
+      "abstract": "Malware clustering is a critical task in cybersecurity that helps discover threats and analyze evolving malware families. While self-supervised learning (SSL) and tabular representation learning (TRL) have achieved breakthroughs in other domains, their application to binary program clustering (the task of clustering all incoming samples regardless of label) remains largely unexplored. This study presents the first systematic investigation of SSL and TRL methods for binary program clustering, conducted in two phases on the public Ember and Bodmas datasets. In Phase 1, we establish a performance ceiling by adapting prominent vision-based SSL models (BYOL, SimSiam, Barlow Twins, VICReg) for tabular data with supervised pair generation, finding that BYOL and SimSiam achieve performance comparable to fully supervised models, while Barlow Twins and VICReg significantly underperform. In Phase 2, we evaluate purely unsupervised TRL methods against strong baselines (PCA, Autoencoder, UMAP), demonstrating that VIME establishes a new state of the art for binary program clustering. Informed by these findings, we propose VIME-R, a retrieval-augmented extension of VIME that replaces random marginal-distribution corruption with retrieval-based augmentation to generate more informative training pairs. VIME-R further improves upon VIME, achieving 2.7\\%-5.8\\% higher Homogeneity on both datasets. Our results highlight retrieval-augmented tabular representation learning as a promising direction for enhancing automated malware analysis. Code will be made available.",
+      "authors": [
+        "Martin Mocko",
+        "Daniela Chudá"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.LG"
+      ],
+      "published": "2026-08-03T15:01:00+00:00",
+      "link": "https://arxiv.org/pdf/2608.02348v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Self-supervised contrastive clustering approach",
+      "llm_evidence_cn": "自监督对比聚类方法",
+      "llm_evidence": "自监督对比聚类方法",
+      "canonical_evidence": "自监督对比聚类方法",
+      "llm_tldr_en": "Investigates self-supervised learning for binary program clustering, adapting vision SSL models to tabular data for improved malware clustering.",
+      "llm_tldr_cn": "针对二进制程序聚类，研究了自监督学习方法的适用性，将视觉自监督模型适配到表格数据，以提升恶意软件聚类性能。本文通过实验评估了多种自监督方法，并提出了检索增强学习策略，为无监督聚类提供了新思路。",
+      "llm_tldr": "针对二进制程序聚类，研究了自监督学习方法的适用性，将视觉自监督模型适配到表格数据，以提升恶意软件聚类性能。本文通过实验评估了多种自监督方法，并提出了检索增强学习策略，为无监督聚类提供了新思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "novel category discovery in open world setting using contrastive clustering",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

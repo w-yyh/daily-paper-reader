@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-09",
+  "date": "2026-08-09",
+  "generated_at": "2026-08-09T19:51:44",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/09/2608.00346v1-ensemble-of-unsupervised-deep-learning-for-clustering-imbalanced-tabular-data",
+      "section": "quick",
+      "title_en": "Ensemble of Unsupervised Deep Learning for Clustering Imbalanced Tabular Data",
+      "authors": "Pulock Das, Yina Hou, Md. Kamrozzaman Bhuiyan, Manar D. Samad",
+      "date": "2026-07-31",
+      "pdf": "https://arxiv.org/pdf/2608.00346v1",
+      "score": "6.0",
+      "evidence": "用于不平衡数据的深度聚类集成",
+      "tldr": "针对表格数据的不平衡聚类问题，提出两种集成方法：一种聚合不同嵌入维度的聚类结果，另一种采用多数投票机制。实验表明，深度聚类集成能有效缓解不平衡影响，提升聚类精度，为无监督学习在不平衡场景的应用提供了可靠方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Data imbalance poses a major challenge in supervised classification, where the majority-class bias contributes to false negatives and overestimates classification accuracy. Unsupervised deep clustering can be immune to class imbalance because representation learning for clustering is performed without class labels. Deep clustering has been proposed for images, languages, and graphs, while its application to tabular data has only emerged recently. This paper is among the first to examine the performance of state-of-the-art deep clustering methods under varying levels of data imbalance. We introduce two novel cluster ensemble approaches: one aggregates deep clustering assignments across different embedding dimensions, and the other applies majority voting to the best-performing clustering algorithms. Experiments on 16 binary tabular datasets with varying and artificially induced levels of imbalance reveal distinct strengths of different deep clustering methods. On average, our ensemble methods outperform individual clustering methods in ACC, NMI, and ARI scores, offering greater resilience to data imbalance when identifying ground-truth classes without supervision. Therefore, in an imbalanced data scenario, deep clustering can serve as a strong alternative to supervised classification.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/09/2608.02348v1-self-supervised-representations-for-binary-program-clustering-from-empirical-study-to-retrieval-augmented-learning",
+      "section": "quick",
+      "title_en": "Self-Supervised Representations for Binary Program Clustering: From Empirical Study to Retrieval-Augmented Learning",
+      "authors": "Martin Mocko, Daniela Chudá",
+      "date": "2026-08-03",
+      "pdf": "https://arxiv.org/pdf/2608.02348v1",
+      "score": "6.0",
+      "evidence": "自监督对比聚类方法",
+      "tldr": "恶意软件聚类作为二进制程序聚类任务，对网络安全威胁发现至关重要，但自监督学习和表格表示学习在此领域研究甚少。本研究分两阶段：先将视觉SSL模型适配表格数据评估性能上限，再评估无监督TRL，发现VIME最优，进而提出检索增强VIME-R，以检索增强替代随机破坏生成训练对。在Ember和Bodmas数据集上，VIME-R的Homogeneity提升2.7%-5.8%，验证了检索增强表格表示学习对自动化恶意软件分析的有效性。",
+      "tags": "query:cgcd",
+      "abstract_en": "Malware clustering is a critical task in cybersecurity that helps discover threats and analyze evolving malware families. While self-supervised learning (SSL) and tabular representation learning (TRL) have achieved breakthroughs in other domains, their application to binary program clustering (the task of clustering all incoming samples regardless of label) remains largely unexplored. This study presents the first systematic investigation of SSL and TRL methods for binary program clustering, conducted in two phases on the public Ember and Bodmas datasets. In Phase 1, we establish a performance ceiling by adapting prominent vision-based SSL models (BYOL, SimSiam, Barlow Twins, VICReg) for tabular data with supervised pair generation, finding that BYOL and SimSiam achieve performance comparable to fully supervised models, while Barlow Twins and VICReg significantly underperform. In Phase 2, we evaluate purely unsupervised TRL methods against strong baselines (PCA, Autoencoder, UMAP), demonstrating that VIME establishes a new state of the art for binary program clustering. Informed by these findings, we propose VIME-R, a retrieval-augmented extension of VIME that replaces random marginal-distribution corruption with retrieval-based augmentation to generate more informative training pairs. VIME-R further improves upon VIME, achieving 2.7\\%-5.8\\% higher Homogeneity on both datasets. Our results highlight retrieval-augmented tabular representation learning as a promising direction for enhancing automated malware analysis. Code will be made available.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
