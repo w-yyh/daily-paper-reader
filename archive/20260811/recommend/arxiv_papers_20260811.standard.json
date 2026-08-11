@@ -1,0 +1,94 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-11T21:05:43.781900+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2608.08963v1",
+      "source": "arxiv",
+      "title": "Fourier Self-Supervision for Fine-Grained Generalized Category Discovery",
+      "abstract": "Generalized Category Discovery aims to recognize known categories while identifying novel ones within unlabeled data. Existing methods, typically based on self-supervision and contrastive learning, often struggle to capture fine-grained distinctions, relying on superficial visual cues rather than the intrinsic attributes humans use for categorization. We introduce Fourier Self-Supervision, that leverages the Fourier transform of images to enhance the discrimination of subtle differences and support the discovery of new categories. Our method employs a dual frequency filtering strategy: a low-pass filter first extracts broad, abstract attributes that capture high-level category information, while a high-pass filter emphasizes fine details such as edges and textures that are essential for fine-grained recognition. Each operates on a dedicated latent space, and their overlapping representations together yield a richer, more complete feature space. This dual-frequency approach not only refines feature extraction to identify novel categories, but also strengthens the model's discriminative power in fine-grained category discovery. Experiments on multiple fine-grained datasets show that incorporating Fourier Self-Supervision outperforms state-of-the-art methods, even when the number of classes is unknown, demonstrating its effectiveness for Generalized Category Discovery. Our code is available at: https://github.com/SarahRastegar/FourEx.",
+      "authors": [
+        "Sarah Rastegar",
+        "Mina Ghadimi Atigh",
+        "Pascal Mettes",
+        "Yuki M. Asano",
+        "Cees G. M. Snoek"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-08-09T23:54:22+00:00",
+      "link": "https://arxiv.org/pdf/2608.08963v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "directly addresses generalized category discovery, identifying novel categories in unlabeled data",
+      "llm_evidence_cn": "直接解决广义类别发现问题，从未标注数据中识别新类别",
+      "llm_evidence": "直接解决广义类别发现问题，从未标注数据中识别新类别",
+      "canonical_evidence": "直接解决广义类别发现问题，从未标注数据中识别新类别",
+      "llm_tldr_en": "Generalized Category Discovery aims to recognize known and novel categories in unlabeled data, but existing methods struggle with fine-grained distinctions. This paper introduces Fourier Self-Supervision, which applies dual frequency filtering to images: low-pass for high-level attributes and high-pass for fine details. This enhances discrimination of subtle differences, leading to improved novel category discovery. Experiments show superiority over prior self-supervised and contrastive approaches.",
+      "llm_tldr_cn": "针对现有广义类别发现方法难以捕获细粒度区别的问题，本文提出傅里叶自监督方法。该方法通过低通滤波器提取高层类别信息的抽象属性，同时利用高通滤波器强调边缘等细节，从而增强模型对细微差异的判别能力，支持新类别的发现。实验证明该方法在细粒度场景下优于现有自监督和对比学习方法，为开放世界中的新类别挖掘提供了更有效的途径。",
+      "llm_tldr": "针对现有广义类别发现方法难以捕获细粒度区别的问题，本文提出傅里叶自监督方法。该方法通过低通滤波器提取高层类别信息的抽象属性，同时利用高通滤波器强调边缘等细节，从而增强模型对细微差异的判别能力，支持新类别的发现。实验证明该方法在细粒度场景下优于现有自监督和对比学习方法，为开放世界中的新类别挖掘提供了更有效的途径。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.08308v1",
+      "source": "arxiv",
+      "title": "Open-World Semantic Segmentation with Sensitivity Modeling",
+      "abstract": "Modern vision systems must operate in \"open-world\" settings, where models must recognize known categories and detect unseen or anomalous content. Conventional semantic segmentation models operate under a \"closed-world\" assumption, often producing overconfident misclassifications on novel content. We address open-world semantic segmentation, the joint task of segmenting known classes while detecting and grouping novel or anomalous content without additional supervision, by extending a dual-decoder baseline with a third, complementary decoder within a unified encoder-decoder design. The first decoder performs closed-set segmentation using Gaussian prototypes for known categories. The second uses contrastive feature learning to isolate unknown regions in embedding space. The third, our key contribution, is a sensitivity decoder that captures fine-grained texture irregularities and activation instabilities indicative of semantic uncertainty, which neither semantic prototypes nor contrastive norms can reliably detect. The three decoders provide genuinely complementary signals: class-level OOD distance in logit space, global feature energy in embedding space, and local activation instability across encoder scales. Experiments on Cityscapes and BDD-Anomaly show that our method improves anomaly segmentation and novel-class discovery while maintaining competitive closed-set accuracy, with gains of +2.4% AUROC and a 2.5 pp. reduction in FPR@95TPR on BDD-Anomaly over the baseline.",
+      "authors": [
+        "Anastasios Romanos Varvarigos",
+        "Nikos Giakoumoglou",
+        "Tania Stathaki"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-08T19:37:02+00:00",
+      "link": "https://arxiv.org/pdf/2608.08308v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "open-world semantic segmentation detects and groups novel classes via contrastive feature learning and Gaussian prototypes",
+      "llm_evidence_cn": "开放世界语义分割通过对比特征学习和高斯原型检测并分组新类别",
+      "llm_evidence": "开放世界语义分割通过对比特征学习和高斯原型检测并分组新类别",
+      "canonical_evidence": "开放世界语义分割通过对比特征学习和高斯原型检测并分组新类别",
+      "llm_tldr_en": "Extends open-world segmentation with a third decoder for sensitivity modeling to detect and group novel objects, achieving state-of-the-art without additional supervision.",
+      "llm_tldr_cn": "针对现有语义分割模型在开放世界中无法有效发现新类别的问题，本文提出一种基于灵敏度建模的开放世界语义分割方法，在双解码器基线基础上增加第三个解码器，结合高斯原型封闭集分割和对比特征学习来隔离未知区域，并通过灵敏度正则化增强泛化。实验表明，该方法在已知类别分割和新类别发现上均取得领先性能，无需额外标注即可处理开放世界中的新异物体。",
+      "llm_tldr": "针对现有语义分割模型在开放世界中无法有效发现新类别的问题，本文提出一种基于灵敏度建模的开放世界语义分割方法，在双解码器基线基础上增加第三个解码器，结合高斯原型封闭集分割和对比特征学习来隔离未知区域，并通过灵敏度正则化增强泛化。实验表明，该方法在已知类别分割和新类别发现上均取得领先性能，无需额外标注即可处理开放世界中的新异物体。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "novel category discovery in open world setting using contrastive clustering",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}
