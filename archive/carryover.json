@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-08-12T19:53:06.284112+00:00",
-  "updated_date": "20260812",
+  "generated_at": "2026-08-13T19:50:15.873223+00:00",
+  "updated_date": "20260813",
   "carryover_days": 9,
   "tag_states": {
     "CGCD": {
-      "updated_date": "20260812",
+      "updated_date": "20260813",
       "carryover_days": 9,
       "items": []
     }

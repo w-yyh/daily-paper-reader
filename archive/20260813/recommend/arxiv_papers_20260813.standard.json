@@ -1,0 +1,56 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-13T19:50:15.872631+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.11681v1",
+      "source": "arxiv",
+      "title": "Learning from Multimodal Pseudo-Labels for Robust Open-Vocabulary Instance and Panoptic Segmentation",
+      "abstract": "This work addresses the challenge of open-vocabulary instance segmentation (OVIS) and open-set panoptic segmentation (OSPS), which aim to recognize both predefined and unseen object categories without exhaustive human annotations. Existing methods often suffer from noisy pseudo-masks, limited visual-textual grounding, and difficulty handling synonyms or out-of-vocabulary (OOV) words. To overcome these challenges, we propose a multimodal framework that leverages pre-trained vision-language models for automatic pseudo-label generation, CLIP-guided synonym filtering, and GPT-based caption reconstruction. In our target-vocabulary-assisted pseudo-labeling setting, the framework first constructs pseudo segmentation masks, descriptive captions, and semantically aligned synonym sets using Grounded SAM, LLaVA, and CLIP, providing multimodal supervision without manual annotation. We then enhance visual-textual alignment through three complementary training objectives: an extended grounding loss that incorporates visually grounded synonyms, a semantic consistency loss, and a generative caption reconstruction loss. Extensive experiments on the COCO dataset demonstrate that the proposed method consistently outperforms previous state-of-the-art approaches under this protocol, achieving substantial improvements on both OVIS and OSPS benchmarks.",
+      "authors": [
+        "Duy Tran Thanh",
+        "Yeejin Lee",
+        "Byeongkeun Kang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.MM"
+      ],
+      "published": "2026-08-12T05:39:57+00:00",
+      "link": "https://arxiv.org/pdf/2608.11681v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "open-vocabulary/open-set panoptic segmentation recognizes unseen categories without exhaustive annotations",
+      "llm_evidence_cn": "开放词汇/开放集全景分割在无需详尽标注情况下识别未见类别",
+      "llm_evidence": "开放词汇/开放集全景分割在无需详尽标注情况下识别未见类别",
+      "canonical_evidence": "开放词汇/开放集全景分割在无需详尽标注情况下识别未见类别",
+      "llm_tldr_en": "This paper tackles open-vocabulary instance segmentation and open-set panoptic segmentation, aiming to recognize predefined and unseen object categories without exhaustive annotations. It proposes a multimodal framework using pre-trained vision-language models for pseudo-label generation, CLIP-guided synonym filtering, and GPT-based caption reconstruction. Experiments show improved robustness to noisy pseudo-masks and vocabulary gaps, advancing open-world unknown class handling.",
+      "llm_tldr_cn": "该论文针对开放词汇实例分割与开放集全景分割在缺乏详尽标注时识别未见类别的挑战，提出多模态框架，利用预训练视觉语言模型生成伪标签，并通过CLIP引导的同义词过滤和GPT生成标题重建。实验表明该方法能有效处理噪声伪掩码和词汇外问题，提升对未知类别的鲁棒性，为开放世界未知类处理提供了新思路。",
+      "llm_tldr": "该论文针对开放词汇实例分割与开放集全景分割在缺乏详尽标注时识别未见类别的挑战，提出多模态框架，利用预训练视觉语言模型生成伪标签，并通过CLIP引导的同义词过滤和GPT生成标题重建。实验表明该方法能有效处理噪声伪掩码和词汇外问题，提升对未知类别的鲁棒性，为开放世界未知类处理提供了新思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

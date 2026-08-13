@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-08-13 <!--dpr-date:20260813-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/13/2608.11681v1-learning-from-multimodal-pseudo-labels-for-robust-open-vocabulary-instance-and-panoptic-segmentation" data-sidebar-item="{&quot;title&quot;: &quot;Learning from Multimodal Pseudo-Labels for Robust Open-Vocabulary Instance and Panoptic Segmentation&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2608.11681v1-learning-from-multimodal-pseudo-labels-for-robust-open-vocabulary-instance-and-panoptic-segmentation&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;开放词汇/开放集全景分割在无需详尽标注情况下识别未见类别&quot;}">Learning from Multimodal Pseudo-Labels for Robust Open-Vocabulary Instance and Panoptic Segmentation</a>
   * 2026-08-11 <!--dpr-date:20260811-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/11/2608.08963v1-fourier-self-supervision-for-fine-grained-generalized-category-discovery" data-sidebar-item="{&quot;title&quot;: &quot;Fourier Self-Supervision for Fine-Grained Generalized Category Discovery&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2608.08963v1-fourier-self-supervision-for-fine-grained-generalized-category-discovery&quot;, &quot;score&quot;: &quot;10.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;直接解决广义类别发现问题，从未标注数据中识别新类别&quot;}">Fourier Self-Supervision for Fine-Grained Generalized Category Discovery</a>

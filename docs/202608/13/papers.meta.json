@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-13",
+  "date": "2026-08-13",
+  "generated_at": "2026-08-13T19:51:58",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/13/2608.11681v1-learning-from-multimodal-pseudo-labels-for-robust-open-vocabulary-instance-and-panoptic-segmentation",
+      "section": "quick",
+      "title_en": "Learning from Multimodal Pseudo-Labels for Robust Open-Vocabulary Instance and Panoptic Segmentation",
+      "authors": "Duy Tran Thanh, Yeejin Lee, Byeongkeun Kang",
+      "date": "2026-08-12",
+      "pdf": "https://arxiv.org/pdf/2608.11681v1",
+      "score": "7.0",
+      "evidence": "开放词汇/开放集全景分割在无需详尽标注情况下识别未见类别",
+      "tldr": "开放词汇实例与全景分割需识别未见类别，现有方法受噪声伪掩码、视觉文本对齐弱及同义词处理困难限制。本文提出多模态伪标签框架，利用Grounded SAM、LLaVA和CLIP自动生成分割掩码、字幕及同义词集，并通过扩展grounding损失、语义一致性损失和字幕重建损失增强对齐。在COCO数据集上，该方法在OVIS和OSPS基准上均显著超越先前最优方法，无需人工标注即可实现鲁棒分割。",
+      "tags": "query:cgcd",
+      "abstract_en": "This work addresses the challenge of open-vocabulary instance segmentation (OVIS) and open-set panoptic segmentation (OSPS), which aim to recognize both predefined and unseen object categories without exhaustive human annotations. Existing methods often suffer from noisy pseudo-masks, limited visual-textual grounding, and difficulty handling synonyms or out-of-vocabulary (OOV) words. To overcome these challenges, we propose a multimodal framework that leverages pre-trained vision-language models for automatic pseudo-label generation, CLIP-guided synonym filtering, and GPT-based caption reconstruction. In our target-vocabulary-assisted pseudo-labeling setting, the framework first constructs pseudo segmentation masks, descriptive captions, and semantically aligned synonym sets using Grounded SAM, LLaVA, and CLIP, providing multimodal supervision without manual annotation. We then enhance visual-textual alignment through three complementary training objectives: an extended grounding loss that incorporates visually grounded synonyms, a semantic consistency loss, and a generative caption reconstruction loss. Extensive experiments on the COCO dataset demonstrate that the proposed method consistently outperforms previous state-of-the-art approaches under this protocol, achieving substantial improvements on both OVIS and OSPS benchmarks.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
