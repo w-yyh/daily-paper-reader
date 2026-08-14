@@ -1,0 +1,131 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-14T21:04:04.807040+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2608.12698v1",
+      "source": "arxiv",
+      "title": "Class Geometry as Supervision for Sample-Efficient Open-World Detection",
+      "abstract": "Open-world object detection requires models to recognize known categories, reject unfamiliar objects, and incorporate new classes over time. This is especially challenging in scarce-data settings such as biomedical and scientific imaging, where rare categories may have only a few annotated examples and fine-grained classes differ by subtle morphology. Prototype-based detectors are natural for this regime, but they typically learn class prototypes as independent anchors, ignoring relational structure among classes. We propose class-geometry supervision (CGS), a general framework that constrains learned prototype or class-representation spaces to preserve visual or semantic class dissimilarities estimated from training data. CGS introduces a dissimilarity-preserving objective that aligns pairwise distances among learned class representations with a target class-geometry matrix while retaining the standard task loss. We instantiate the same objective across prototype recognition, few-shot biomedical object detection, open-set detection, novel-class insertion, and OWOD adaptation on COCO. Experiments show that CGS improves sample efficiency in recognition and ova detection, substantially strengthens novel-class insertion, and improves unknown recall on COCO while retaining much of the known-class detection performance. Ablations show that meaningful visual geometry provides the most reliable gains, while random geometry can help novel separation but is less consistent for few-shot detection. These results suggest that relational class geometry is an effective supervisory signal for building calibrated and extensible open-world detectors under limited supervision.",
+      "authors": [
+        "Akash Rao",
+        "Zhou Chen",
+        "Revanth Reddy Palem",
+        "Udhav Ramachandran",
+        "Ruth Scimeca",
+        "Sathyanarayanan N. Aakur"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-13T01:20:47+00:00",
+      "link": "https://arxiv.org/pdf/2608.12698v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "open-world detection learns known and novel classes with class-geometry supervision",
+      "llm_evidence_cn": "开放世界检测利用类几何监督学习已知与新颖类别",
+      "llm_evidence": "开放世界检测利用类几何监督学习已知与新颖类别",
+      "canonical_evidence": "开放世界检测利用类几何监督学习已知与新颖类别",
+      "llm_tldr_en": "For open-world detection with scarce data, prototype detectors often ignore class relational structure. The paper proposes class-geometry supervision (CGS) to constrain class representations to preserve dissimilarities, improving known-class recognition, unknown rejection, and new-class incorporation. CGS is a general sample-efficient framework.",
+      "llm_tldr_cn": "开放世界目标检测在数据稀缺时面临挑战，原型检测器往往忽略类别间关系结构。本文提出类几何监督框架（CGS），约束原型或类别表征空间保持从训练数据估计的视觉或语义类间不相似度。该方法提升已知类识别、未知类拒绝和新类纳入能力，是一种通用的样本高效开放世界检测框架，尤其适用于生物医学和科学成像中细粒度类别差异细微、稀有类别标注极少的场景。",
+      "llm_tldr": "开放世界目标检测在数据稀缺时面临挑战，原型检测器往往忽略类别间关系结构。本文提出类几何监督框架（CGS），约束原型或类别表征空间保持从训练数据估计的视觉或语义类间不相似度。该方法提升已知类识别、未知类拒绝和新类纳入能力，是一种通用的样本高效开放世界检测框架，尤其适用于生物医学和科学成像中细粒度类别差异细微、稀有类别标注极少的场景。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "methods for discovering novel classes in open world settings",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.12714v1",
+      "source": "arxiv",
+      "title": "Towards Sparsely Annotated Open-World Object Detection",
+      "abstract": "Real-world object detection operates under ambiguous supervision, where unlabeled regions may correspond to missing annotations of known objects or genuinely unknown categories. These challenges have been addressed separately in Sparsely Annotated Object Detection (SAOD) and Open-World Object Detection (OWOD). In practice, their co-occurrence remains an open problem. To address this problem, we introduce Sparsely Annotated Open-World Object Detection (SA-OWOD), a new task that jointly considers sparse supervision and the presence of unseen categories. We propose Dual-Perspective Object Discovery (DPOD), a unified framework that jointly models unlabeled known and unknown instances via two complementary mechanisms. The Known Target Recovery Module (KTRM) recovers supervision for unlabeled known instances and explicitly regularizes the feature space to separate known and unknown representations. Complementarily, the Dual-Disagreement Target Generator (DDTG) identifies reliable unknown candidates through cross-view semantic inconsistency. By integrating these modules, DPOD resolves contradictory supervision signals caused by ambiguous unlabeled regions. As a result, it prevents misclassification between known and unknown objects and stabilizes the decision boundaries. Experimental results on sparsely annotated open-world benchmarks demonstrate that the proposed method outperforms existing open-world detection methods, particularly in detecting unknown objects.",
+      "authors": [
+        "HeeJu Han",
+        "AJeong Kim",
+        "Jinsun Park"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-13T01:59:00+00:00",
+      "link": "https://arxiv.org/pdf/2608.12714v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "jointly handles sparse annotation and open-world unseen categories via dual-perspective object discovery",
+      "llm_evidence_cn": "通过双视角对象发现联合处理稀疏标注和开放世界未见类别",
+      "llm_evidence": "通过双视角对象发现联合处理稀疏标注和开放世界未见类别",
+      "canonical_evidence": "通过双视角对象发现联合处理稀疏标注和开放世界未见类别",
+      "llm_tldr_en": "Real-world detection suffers from missing annotations and unseen categories, but existing SAOD and OWOD are studied separately. This paper introduces SA-OWOD and proposes Dual-Perspective Object Discovery (DPOD), with modules to recover known annotations and discover unknown instances. DPOD unifies sparse supervision and open-world class discovery.",
+      "llm_tldr_cn": "真实世界目标检测面临缺失标注与未知类别的双重挑战，但稀疏标注检测和开放世界检测常被分别研究。本文提出稀疏标注开放世界目标检测新任务，并设计双视角对象发现框架DPOD，包含已知目标恢复模块和未知实例发现机制。该方法统一处理稀疏监督与未见类别，为开放世界学习提供新方案。",
+      "llm_tldr": "真实世界目标检测面临缺失标注与未知类别的双重挑战，但稀疏标注检测和开放世界检测常被分别研究。本文提出稀疏标注开放世界目标检测新任务，并设计双视角对象发现框架DPOD，包含已知目标恢复模块和未知实例发现机制。该方法统一处理稀疏监督与未见类别，为开放世界学习提供新方案。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.08418v1",
+      "source": "arxiv",
+      "title": "Learning Deep Modality-Shared Self-Expressiveness for Image Clustering with Textual Information",
+      "abstract": "Leveraging textual information for image clustering has emerged as a promising direction, largely owing to the powerful representations learned by Vision-Language Models (VLMs). Existing approaches typically retrieve a textual counterpart for each image and then refine multimodal representations by directly enforcing cross-modal agreement, e.g., maximizing image-text similarity inherited from pretrained VLMs. However, such a strategy aligns heterogeneous representations across modalities without explicitly modeling the intrinsic structure within each modality and thus might yield unreliable alignment or distort modality-specific structures that are crucial for clustering. In this paper, we propose a simple but principled approach, termed deep modality-shared self-expressive model (DeepMORSE), which discovers cross-modal structures via a modality-shared self-expressive model and simultaneously learns structured representations that conform to a union of modality-specific subspaces. Moreover, we theoretically justify that the modality-shared self-expressive coefficients suppress inter-class noise towards a subspace-preserving solution, and show that mini-batch optimization procedure introduces an implicit regularization onto the self-expressive model. We evaluate our DeepMORSE on six widely used image clustering benchmarks and observe performance improvements exceeding 3% on the UCF-101, DTD-47, and ImageNet-Dogs datasets. In addition, we demonstrate the strong transferability of the learned representations by achieving state-of-the-art performance on downstream tasks such as image retrieval and zero-shot classification---without requiring any task-specific losses or post-processing. The code is available at: https://github.com/mengxianghan123/DeepMORSE.",
+      "authors": [
+        "Xianghan Meng",
+        "Wei He",
+        "Zhiyuan Huang",
+        "Chun-Guang Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-09T02:23:49+00:00",
+      "link": "https://arxiv.org/pdf/2608.08418v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "deep modality-shared self-expressiveness for image clustering with textual information",
+      "llm_evidence_cn": "利用文本信息的深度模态共享自表达方法进行图像聚类",
+      "llm_evidence": "利用文本信息的深度模态共享自表达方法进行图像聚类",
+      "canonical_evidence": "利用文本信息的深度模态共享自表达方法进行图像聚类",
+      "llm_tldr_en": "Proposes a deep multimodal clustering method that learns shared self-expressiveness across image and text modalities, improving clustering of unlabeled images.",
+      "llm_tldr_cn": "针对现有基于VLM的图像聚类方法仅强制跨模态对齐而忽略模态内结构的问题，提出深度模态共享自表达方法。该方法显式建模每个模态内的内在结构，并利用文本信息增强聚类。实验表明该方法能提升图像聚类性能，为无监督类别发现提供支持。",
+      "llm_tldr": "针对现有基于VLM的图像聚类方法仅强制跨模态对齐而忽略模态内结构的问题，提出深度模态共享自表达方法。该方法显式建模每个模态内的内在结构，并利用文本信息增强聚类。实验表明该方法能提升图像聚类性能，为无监督类别发现提供支持。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "generalized category discovery for unlabeled data with unknown classes",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

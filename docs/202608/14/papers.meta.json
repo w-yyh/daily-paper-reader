@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-14",
+  "date": "2026-08-14",
+  "generated_at": "2026-08-14T21:10:02",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/14/2608.12698v1-class-geometry-as-supervision-for-sample-efficient-open-world-detection",
+      "section": "deep",
+      "title_en": "Class Geometry as Supervision for Sample-Efficient Open-World Detection",
+      "authors": "Akash Rao, Zhou Chen, Revanth Reddy Palem, Udhav Ramachandran, Ruth Scimeca, Sathyanarayanan N. Aakur",
+      "date": "2026-08-13",
+      "pdf": "https://arxiv.org/pdf/2608.12698v1",
+      "score": "9.0",
+      "evidence": "开放世界检测利用类几何监督学习已知与新颖类别",
+      "tldr": "开放世界对象检测在稀缺数据场景（如生物医学影像）中尤其困难，现有原型检测器将类原型视为独立锚点，忽略了类间关系结构。本文提出类几何监督（CGS），通过不相似性保持目标对齐学习类表示之间的成对距离与目标类几何矩阵，同时保留标准任务损失。在少样本生物医学检测、开放集检测、新类插入和COCO OWOD适应上提升样本效率与未知召回，显著增强新类插入。结果表明关系类几何是有效监督信号，有助于构建校准和可扩展的开放世界检测器。",
+      "tags": "query:cgcd",
+      "abstract_en": "Open-world object detection requires models to recognize known categories, reject unfamiliar objects, and incorporate new classes over time. This is especially challenging in scarce-data settings such as biomedical and scientific imaging, where rare categories may have only a few annotated examples and fine-grained classes differ by subtle morphology. Prototype-based detectors are natural for this regime, but they typically learn class prototypes as independent anchors, ignoring relational structure among classes. We propose class-geometry supervision (CGS), a general framework that constrains learned prototype or class-representation spaces to preserve visual or semantic class dissimilarities estimated from training data. CGS introduces a dissimilarity-preserving objective that aligns pairwise distances among learned class representations with a target class-geometry matrix while retaining the standard task loss. We instantiate the same objective across prototype recognition, few-shot biomedical object detection, open-set detection, novel-class insertion, and OWOD adaptation on COCO. Experiments show that CGS improves sample efficiency in recognition and ova detection, substantially strengthens novel-class insertion, and improves unknown recall on COCO while retaining much of the known-class detection performance. Ablations show that meaningful visual geometry provides the most reliable gains, while random geometry can help novel separation but is less consistent for few-shot detection. These results suggest that relational class geometry is an effective supervisory signal for building calibrated and extensible open-world detectors under limited supervision.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/14/2608.12714v1-towards-sparsely-annotated-open-world-object-detection",
+      "section": "deep",
+      "title_en": "Towards Sparsely Annotated Open-World Object Detection",
+      "authors": "HeeJu Han, AJeong Kim, Jinsun Park",
+      "date": "2026-08-13",
+      "pdf": "https://arxiv.org/pdf/2608.12714v1",
+      "score": "9.0",
+      "evidence": "通过双视角对象发现联合处理稀疏标注和开放世界未见类别",
+      "tldr": "真实世界目标检测常同时面临稀疏标注和未知类别带来的模糊监督，但现有方法多分别处理二者。本文提出新任务稀疏标注开放世界目标检测（SA-OWOD），并设计统一框架DPOD。DPOD通过已知目标恢复模块（KTRM）和双分歧目标生成器（DDTG）联合建模未标记已知与未知实例，解决矛盾监督信号。在稀疏标注开放世界基准上，DPOD优于现有开放世界检测方法，尤其提升未知对象检测。该工作为现实场景中的开放世界检测提供了有效途径。",
+      "tags": "query:cgcd",
+      "abstract_en": "Real-world object detection operates under ambiguous supervision, where unlabeled regions may correspond to missing annotations of known objects or genuinely unknown categories. These challenges have been addressed separately in Sparsely Annotated Object Detection (SAOD) and Open-World Object Detection (OWOD). In practice, their co-occurrence remains an open problem. To address this problem, we introduce Sparsely Annotated Open-World Object Detection (SA-OWOD), a new task that jointly considers sparse supervision and the presence of unseen categories. We propose Dual-Perspective Object Discovery (DPOD), a unified framework that jointly models unlabeled known and unknown instances via two complementary mechanisms. The Known Target Recovery Module (KTRM) recovers supervision for unlabeled known instances and explicitly regularizes the feature space to separate known and unknown representations. Complementarily, the Dual-Disagreement Target Generator (DDTG) identifies reliable unknown candidates through cross-view semantic inconsistency. By integrating these modules, DPOD resolves contradictory supervision signals caused by ambiguous unlabeled regions. As a result, it prevents misclassification between known and unknown objects and stabilizes the decision boundaries. Experimental results on sparsely annotated open-world benchmarks demonstrate that the proposed method outperforms existing open-world detection methods, particularly in detecting unknown objects.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/14/2608.08418v1-learning-deep-modality-shared-self-expressiveness-for-image-clustering-with-textual-information",
+      "section": "quick",
+      "title_en": "Learning Deep Modality-Shared Self-Expressiveness for Image Clustering with Textual Information",
+      "authors": "Xianghan Meng, Wei He, Zhiyuan Huang, Chun-Guang Li",
+      "date": "2026-08-09",
+      "pdf": "https://arxiv.org/pdf/2608.08418v1",
+      "score": "6.0",
+      "evidence": "利用文本信息的深度模态共享自表达方法进行图像聚类",
+      "tldr": "利用文本信息增强图像聚类是新兴方向，但现有方法直接强制跨模态一致可能破坏模态内结构，导致对齐不可靠。本文提出DeepMORSE，通过模态共享自表达模型发现跨模态结构，同时学习符合模态特定子空间并集的结构化表示。在六个数据集上聚类性能提升超3%，图像检索与零样本分类达SOTA。理论证明自表达系数抑制类间噪声，小批量优化引入隐式正则化，无需任务特定损失即可获得强迁移表示。",
+      "tags": "query:cgcd",
+      "abstract_en": "Leveraging textual information for image clustering has emerged as a promising direction, largely owing to the powerful representations learned by Vision-Language Models (VLMs). Existing approaches typically retrieve a textual counterpart for each image and then refine multimodal representations by directly enforcing cross-modal agreement, e.g., maximizing image-text similarity inherited from pretrained VLMs. However, such a strategy aligns heterogeneous representations across modalities without explicitly modeling the intrinsic structure within each modality and thus might yield unreliable alignment or distort modality-specific structures that are crucial for clustering. In this paper, we propose a simple but principled approach, termed deep modality-shared self-expressive model (DeepMORSE), which discovers cross-modal structures via a modality-shared self-expressive model and simultaneously learns structured representations that conform to a union of modality-specific subspaces. Moreover, we theoretically justify that the modality-shared self-expressive coefficients suppress inter-class noise towards a subspace-preserving solution, and show that mini-batch optimization procedure introduces an implicit regularization onto the self-expressive model. We evaluate our DeepMORSE on six widely used image clustering benchmarks and observe performance improvements exceeding 3% on the UCF-101, DTD-47, and ImageNet-Dogs datasets. In addition, we demonstrate the strong transferability of the learned representations by achieving state-of-the-art performance on downstream tasks such as image retrieval and zero-shot classification---without requiring any task-specific losses or post-processing. The code is available at: https://github.com/mengxianghan123/DeepMORSE.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
