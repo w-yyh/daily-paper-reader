@@ -1,0 +1,59 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-25T20:47:46.659549+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.21937v1",
+      "source": "arxiv",
+      "title": "C$^2$Path: Class-Conditional Pathway Decoupling for Vision-Language Incremental Object Detection",
+      "abstract": "Incremental Object Detection (IOD) aims to enable detectors to continuously learn novel categories while preserving previously acquired knowledge. However, existing methods suffer from two forms of \\textbf{class knowledge coupling}: class boundary erosion induced by shared parameter updates and class representation entanglement arising from mixed feature encoding. We argue that effective incremental learning requires class-specific computational pathways that enable isolated parameter updates and separated class-wise injection. To this end, we propose \\textbf{C$^2$Path}, a class-conditional pathway decoupling framework for vision-language incremental object detection that leverages token-level class cues to establish dedicated and updatable computational pathways for different categories. Specifically, C$^2$Path introduces a category expert library and a class-conditional decoupling module. The expert library consists of learnable low-rank computational nodes that capture category-specific knowledge, while the decoupling module generates class-aware routing signals to dynamically compose \\textit{ClassLoRA} adapters from these experts, thereby forming class-specific computational pathways for isolated updates and separated injection across categories. Extensive experiments on COCO 2017 under multiple incremental learning settings demonstrate that C$^2$Path consistently outperforms state-of-the-art methods, providing an effective and scalable solution for continual category expansion in vision-language detectors.",
+      "authors": [
+        "Lecheng Xu",
+        "Feifei Shao",
+        "Ouyangzi Ye",
+        "Zhen Wang",
+        "Lin Li",
+        "Kexin Li",
+        "Zhao Wang",
+        "Changqin Huang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-22T12:19:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.21937v1",
+      "tags": [
+        "keyword:CGCD",
+        "query:CGCD"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Incremental Object Detection continuously learns novel categories while preserving previous knowledge, aligning with open world unknown classes.",
+      "llm_evidence_cn": "增量目标检测持续学习新类别并保持旧知识，符合开放世界未知类别学习。",
+      "llm_evidence": "增量目标检测持续学习新类别并保持旧知识，符合开放世界未知类别学习。",
+      "canonical_evidence": "增量目标检测持续学习新类别并保持旧知识，符合开放世界未知类别学习。",
+      "llm_tldr_en": "The paper addresses class knowledge coupling in incremental object detection by proposing C2Path, which decouples class-conditional pathways using token-level class cues for isolated parameter updates and separated feature injection. Experiments show improved catastrophic forgetting mitigation and novel category detection. It advances open-world learning with unknown classes.",
+      "llm_tldr_cn": "针对增量目标检测中持续学习新类别时存在的类知识耦合问题，本文提出类条件路径解耦框架C2Path。该方法利用token级类线索建立类专属计算通路，实现参数隔离更新和类级特征注入，从而缓解旧知识遗忘和新类别表示纠缠。实验表明C2Path在多个基准上有效提升新类别检测性能并减轻灾难性遗忘，为开放世界中未知类别学习提供了新思路。",
+      "llm_tldr": "针对增量目标检测中持续学习新类别时存在的类知识耦合问题，本文提出类条件路径解耦框架C2Path。该方法利用token级类线索建立类专属计算通路，实现参数隔离更新和类级特征注入，从而缓解旧知识遗忘和新类别表示纠缠。实验表明C2Path在多个基准上有效提升新类别检测性能并减轻灾难性遗忘，为开放世界中未知类别学习提供了新思路。",
+      "llm_tags": [
+        "query:cgcd"
+      ],
+      "matched_query_tag": "query:cgcd",
+      "matched_query_text": "learning algorithms that handle open world scenarios with unknown classes",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

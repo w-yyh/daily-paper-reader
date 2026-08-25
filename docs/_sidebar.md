@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-08-25 <!--dpr-date:20260825-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/25/2608.21937v1-c2path-class-conditional-pathway-decoupling-for-vision-language-incremental-object-detection" data-sidebar-item="{&quot;title&quot;: &quot;C$^2$Path: Class-Conditional Pathway Decoupling for Vision-Language Incremental Object Detection&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2608.21937v1-c2path-class-conditional-pathway-decoupling-for-vision-language-incremental-object-detection&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;增量目标检测持续学习新类别并保持旧知识，符合开放世界未知类别学习。&quot;}">C$^2$Path: Class-Conditional Pathway Decoupling for Vision-Language Incremental Object Detection</a>
   * 2026-08-14 <!--dpr-date:20260814-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/14/2608.12698v1-class-geometry-as-supervision-for-sample-efficient-open-world-detection" data-sidebar-item="{&quot;title&quot;: &quot;Class Geometry as Supervision for Sample-Efficient Open-World Detection&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2608.12698v1-class-geometry-as-supervision-for-sample-efficient-open-world-detection&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;cgcd&quot;}], &quot;evidence&quot;: &quot;开放世界检测利用类几何监督学习已知与新颖类别&quot;}">Class Geometry as Supervision for Sample-Efficient Open-World Detection</a>

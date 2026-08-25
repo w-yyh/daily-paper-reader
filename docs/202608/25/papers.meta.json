@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-25",
+  "date": "2026-08-25",
+  "generated_at": "2026-08-25T20:49:15",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/25/2608.21937v1-c2path-class-conditional-pathway-decoupling-for-vision-language-incremental-object-detection",
+      "section": "quick",
+      "title_en": "C$^2$Path: Class-Conditional Pathway Decoupling for Vision-Language Incremental Object Detection",
+      "authors": "Lecheng Xu, Feifei Shao, Ouyangzi Ye, Zhen Wang, Lin Li, Kexin Li, Zhao Wang, Changqin Huang",
+      "date": "2026-08-22",
+      "pdf": "https://arxiv.org/pdf/2608.21937v1",
+      "score": "6.0",
+      "evidence": "增量目标检测持续学习新类别并保持旧知识，符合开放世界未知类别学习。",
+      "tldr": "增量目标检测中，现有方法因共享参数更新和混合特征编码导致类别边界侵蚀与表示纠缠，严重制约持续学习性能。本文提出C^2Path框架，利用token级类别线索，通过类别专家库与类条件解耦模块动态组合ClassLoRA适配器，为每类构建专用可更新计算路径，实现参数隔离更新与类别分离注入。在COCO 2017多种增量设置下，该方法一致超越现有最优方法，为视觉语言检测器的持续类别扩展提供了有效且可扩展的解决方案。",
+      "tags": "query:cgcd",
+      "abstract_en": "Incremental Object Detection (IOD) aims to enable detectors to continuously learn novel categories while preserving previously acquired knowledge. However, existing methods suffer from two forms of \\textbf{class knowledge coupling}: class boundary erosion induced by shared parameter updates and class representation entanglement arising from mixed feature encoding. We argue that effective incremental learning requires class-specific computational pathways that enable isolated parameter updates and separated class-wise injection. To this end, we propose \\textbf{C$^2$Path}, a class-conditional pathway decoupling framework for vision-language incremental object detection that leverages token-level class cues to establish dedicated and updatable computational pathways for different categories. Specifically, C$^2$Path introduces a category expert library and a class-conditional decoupling module. The expert library consists of learnable low-rank computational nodes that capture category-specific knowledge, while the decoupling module generates class-aware routing signals to dynamically compose \\textit{ClassLoRA} adapters from these experts, thereby forming class-specific computational pathways for isolated updates and separated injection across categories. Extensive experiments on COCO 2017 under multiple incremental learning settings demonstrate that C$^2$Path consistently outperforms state-of-the-art methods, providing an effective and scalable solution for continual category expansion in vision-language detectors.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
